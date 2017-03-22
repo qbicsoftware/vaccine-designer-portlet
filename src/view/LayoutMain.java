@@ -1,0 +1,663 @@
+package view;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
+import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Upload.SucceededEvent;
+import com.vaadin.ui.Upload.SucceededListener;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+
+import helper.ParserInputNewFiletype;
+import helper.ParserInputOldFiletype;
+import helper.ParserInputStandard;
+import helper.ParserScriptResult;
+import helper.UploaderInput;
+import helper.Utils;
+import helper.WriterResults;
+import helper.WriterScriptInput;
+
+/**
+ * 
+ * The class {@link LayoutMain} represents the main layout which is always shown. It handles all the
+ * computation and view changes. All important paths are set here.
+ * 
+ * @author spaethju
+ * 
+ */
+@SuppressWarnings("serial")
+public class LayoutMain extends VerticalLayout implements SucceededListener {
+
+  private Label titleLabel;
+  private Button nextButton, runButton, downloadButton, resetButton;
+  private HorizontalLayout buttonsLayout;
+  private Accordion contentAccordion;
+  private PanelUpload uploadPanel;
+  private PanelEpitopeSelection epitopeSelectionPanel;
+  private PanelParameters parameterPanel;
+  private PanelResults resultsPanel;
+  private WriterScriptInput inputWriter;
+  private ArrayList<File> downloadFiles;
+  private FileDownloader downloader;
+  private Process proc;
+  private int maxLength;
+
+  // All Paths are set here
+  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
+  private String scriptPath =
+      new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript/NeoOptiTope.py");
+  private String inputPath = new String("/Users/spaethju/Desktop/input.txt");
+  private String allelePath = new String("/Users/spaethju/Desktop/alleles.txt");
+  private String includePath = new String("/Users/spaethju/Desktop/include.txt");
+  private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
+  private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
+  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
+
+  /**
+   * Constructor creating the simple standard layout
+   */
+  public LayoutMain() {
+    this.addComponents(createTitleLabel(), createContentAccordion(), createButtonsLayout());
+    this.setMargin(true);
+    this.setSpacing(true);
+    this.setIcon(FontAwesome.CUBES);
+    contentAccordion.setSelectedTab(uploadPanel);
+    downloadFiles = new ArrayList<>();
+  }
+
+  /**
+   * Creates the title label
+   * 
+   * @return label showing the title
+   */
+  public Label createTitleLabel() {
+    titleLabel = new Label("Interactive Vaccine Designer");
+    titleLabel.setStyleName("header");
+    return titleLabel;
+  }
+
+
+  /**
+   * Creates the content accordion. Every information is shown inside the tabs of the accordion
+   * except of the buttons.
+   * 
+   * @return accordion with the four tabs "Upload Data", "Epitope Selection", "Parameter Settings"
+   *         and "Results"
+   */
+  public Accordion createContentAccordion() {
+    uploadPanel = new PanelUpload();
+    uploadPanel.setImmediate(true);
+    uploadPanel.getUpload().addSucceededListener(this);
+    epitopeSelectionPanel = new PanelEpitopeSelection();
+    epitopeSelectionPanel.setImmediate(true);
+    parameterPanel = new PanelParameters();
+    parameterPanel.setImmediate(true);
+    resultsPanel = new PanelResults();
+    resultsPanel.setImmediate(true);
+    contentAccordion = new Accordion();
+    contentAccordion.setImmediate(true);
+    contentAccordion.setSizeFull();
+    contentAccordion.addTab(uploadPanel, "Upload Data");
+    contentAccordion.getTab(uploadPanel).setIcon(FontAwesome.UPLOAD);
+    contentAccordion.getTab(uploadPanel).setEnabled(true);
+    contentAccordion.addTab(epitopeSelectionPanel, "Epitope Selection");
+    contentAccordion.getTab(epitopeSelectionPanel).setIcon(FontAwesome.MOUSE_POINTER);
+    contentAccordion.getTab(epitopeSelectionPanel).setEnabled(false);
+    contentAccordion.addTab(parameterPanel, "Parameter Settings");
+    contentAccordion.getTab(parameterPanel).setIcon(FontAwesome.SLIDERS);
+    contentAccordion.getTab(parameterPanel).setEnabled(false);
+    contentAccordion.addTab(resultsPanel, "Results");
+    contentAccordion.getTab(resultsPanel).setIcon(FontAwesome.PIE_CHART);
+    contentAccordion.getTab(resultsPanel).setEnabled(false);
+    contentAccordion.setStyleName("accordion-color");
+
+    return contentAccordion;
+  }
+
+  /**
+   * Creates a button bringing the user from the "Epitope Selection" tab to the "Parameter Settings"
+   * tab
+   * 
+   * @return next button
+   */
+  public Button createNextButton() {
+    nextButton = new Button("Next");
+    nextButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+    nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
+    nextButton.setDescription("Go on with the next step.");
+    nextButton.addClickListener(new ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+          epitopeSelectionPanel.applyMethodFilter();
+          setParameterRange();
+          parameterPanel.update();
+        }
+        epitopeSelectionPanel.getGeneTf().setValue("");
+        epitopeSelectionPanel.getMutationTf().setValue("");
+        epitopeSelectionPanel.getLengthTf().setValue("");
+        epitopeSelectionPanel.getNeopeptideTf().setValue("");
+        contentAccordion.getTab(parameterPanel).setEnabled(true);
+        contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
+        contentAccordion.setSelectedTab(parameterPanel);
+
+        buttonsLayout.removeComponent(nextButton);
+        runButton = createRunButton();
+        buttonsLayout.addComponent(runButton);
+        setParameterRange();
+      }
+
+    });
+    nextButton.setEnabled(false);
+    return nextButton;
+  }
+
+  /**
+   * Creates a button which resets the whole progress and allows a new upload of the data. The user
+   * starts from the beginning again.
+   * 
+   * @return reset button
+   */
+  public Button createResetButton() {
+    resetButton = new Button("Reset");
+    resetButton.setDescription("Reset all. Upload a new File.");
+    resetButton.setIcon(FontAwesome.TIMES_CIRCLE_O);
+    resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
+    resetButton.addClickListener(new ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        downloadFiles.clear();
+        resultsPanel.reset();
+        epitopeSelectionPanel.reset();
+        parameterPanel.reset();
+        reset();
+        Utils.notification("Reset", "You can now upload new data.", "success");
+      }
+
+
+    });
+    resetButton.setEnabled(false);
+    return resetButton;
+  }
+
+  /**
+   * Creates the run button, running the computation of the optimal set of epitopes. Therefore it
+   * runs a thread with the process NeoOptiTope.py and opens it with the previous adjustet
+   * parameters and aruguments.
+   * 
+   * @return run button
+   */
+  public Button createRunButton() {
+
+    runButton = new Button("Run");
+    runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
+    runButton.setDescription("Computes the Epitope-Set.");
+    runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+    runButton.addClickListener(new ClickListener() {
+
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+
+        // remove the filters and set back the filters text fields
+        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+          epitopeSelectionPanel.applyMethodFilter();
+          parameterPanel.update();
+          setParameterRange();
+        }
+        epitopeSelectionPanel.getGeneTf().setValue("");
+        epitopeSelectionPanel.getMutationTf().setValue("");
+        epitopeSelectionPanel.getLengthTf().setValue("");
+        epitopeSelectionPanel.getNeopeptideTf().setValue("");
+
+        Boolean valuesCorrect = new Boolean(false);
+        try {
+          inputWriter = new WriterScriptInput();
+          setParameterRange();
+          parameterPanel.getKSlider().validate();
+          parameterPanel.getConsAlleleSlider().validate();
+          parameterPanel.getConsAntigenSlider().validate();
+          parameterPanel.getConsOverlapSlider().validate();
+          valuesCorrect = true;
+
+        } catch (InvalidValueException e) {
+          Notification.show(e.getMessage());
+        }
+
+        if (valuesCorrect) {
+          runButton.setCaption("Re-Run");
+
+          // set up script input
+          ArrayList<String> p = new ArrayList<>();
+          p.add("python");
+          p.add(scriptPath);
+
+          p.add("-i");
+          p.add(inputPath);
+
+          p.add("-imm");
+          String immCol = uploadPanel.getImmColTf().getValue();
+          p.add(immCol);
+
+          String distCol = uploadPanel.getDistanceColTf().getValue();
+          if (!distCol.equals("")) {
+            p.add("-d");
+            p.add(uploadPanel.getDistanceColTf().getValue());
+          }
+
+          String uncCol = uploadPanel.getUncertaintyColTf().getValue();
+          if (!uncCol.equals("")) {
+            p.add("-u");
+            p.add(uploadPanel.getUncertaintyColTf().getValue());
+          }
+
+          String taaCol = uploadPanel.getTaaColTf().getValue();
+          if (!taaCol.equals("")) {
+            p.add("-taa");
+            p.add(uploadPanel.getTaaColTf().getValue());
+          }
+
+          p.add("-a");
+          p.add(allelePath);
+
+          p.add("-excl");
+          p.add(excludePath);
+
+          p.add("-incl");
+          p.add(includePath);
+
+          p.add("-k");
+          p.add(Integer.toString(parameterPanel.getKSlider().getValue().intValue()));
+
+          p.add("-ktaa");
+          p.add(Integer.toString(parameterPanel.getKtaaSlider().getValue().intValue()));
+
+          p.add("-te");
+          p.add(parameterPanel.getThreshEpitopeTF().getValue().replaceAll(",", "."));
+
+          p.add("-td");
+          p.add(parameterPanel.getThreshDistanceTF().getValue().replaceAll(",", "."));
+
+          p.add("-o");
+          p.add(outputPath);
+
+          p.add("-c_al");
+          p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
+
+          p.add("-c_a");
+          p.add(Double.toString(parameterPanel.getConsAntigenSlider().getValue()));
+
+          p.add("-c_o");
+          p.add(Integer.toString(parameterPanel.getConsOverlapSlider().getValue().intValue()));
+
+
+
+          // writes alleles.txt, include.txt and exclude.txt
+          try {
+            inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue());
+          } catch (IOException e) {
+            Utils.notification("Problem!",
+                "There was a problem writing the input files. Please try again", "error");
+          }
+
+          runScript(p);
+          runButton.setStyleName(null);
+        }
+      }
+
+    });
+
+    return runButton;
+  }
+
+  /**
+   * Creates a button which gives the user the opportunity to download all already computed results.
+   * 
+   * @return download button
+   */
+  public Button createDownloadButton() {
+    downloadButton = new Button("Save");
+    downloadButton.setIcon(FontAwesome.DOWNLOAD);
+    downloadButton.setDescription("Save your results");
+    downloadButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+    downloadButton.setVisible(false);
+    Resource res = new FileResource(new File(tmpResultPath));
+    downloader = new FileDownloader(res);
+    downloader.extend(downloadButton);
+    return downloadButton;
+  }
+
+  /**
+   * Creates a layout presenting all buttons in a horizontal order.
+   * 
+   * @return layout with buttons
+   */
+  public HorizontalLayout createButtonsLayout() {
+    buttonsLayout = new HorizontalLayout();
+    buttonsLayout.setSpacing(true);
+    resetButton = createResetButton();
+    nextButton = createNextButton();
+    // firstNextButton = createFirstNextButton();
+    downloadButton = createDownloadButton();
+    buttonsLayout.addComponents(resetButton, createNextButton(), downloadButton);
+    return buttonsLayout;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * com.vaadin.ui.Upload.SucceededListener#uploadSucceeded(com.vaadin.ui.Upload.SucceededEvent)
+   */
+  @Override
+  public void uploadSucceeded(SucceededEvent event) {
+    try {
+
+      UploaderInput uploader = uploadPanel.getReceiver();
+
+      uploader.getProgress().setVisible(false);
+      if (uploadPanel.getComboInput().getValue().equals("Standard")) {
+        ParserInputStandard parser = new ParserInputStandard();
+        parser.parse(uploader.getTempFile(), uploadPanel.getMethodColTf().getValue().trim(),
+            uploadPanel.getImmColTf().getValue().trim(),
+            uploadPanel.getUncertaintyColTf().getValue().trim(),
+            uploadPanel.getDistanceColTf().getValue().trim(),
+            uploadPanel.getTaaColTf().getValue().trim());
+
+
+
+        epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
+            uploadPanel.getMethodColTf().getValue().trim());
+        maxLength = parser.getMaxLength();
+        if (uploadPanel.getTaaColTf().getValue().equals("")) {
+          epitopeSelectionPanel.getDataGrid().removeColumn("type");
+        } else {
+          epitopeSelectionPanel.addTypeFilter();
+        }
+      } else if (uploadPanel.getComboInput().getValue().equals("Old Filetype")) {
+        ParserInputOldFiletype parser = new ParserInputOldFiletype();
+        parser.parse(uploader.getTempFile(), uploadPanel.getMethodColTf().getValue().trim(),
+            uploadPanel.getImmColTf().getValue().trim(),
+            uploadPanel.getUncertaintyColTf().getValue().trim(),
+            uploadPanel.getDistanceColTf().getValue().trim(),
+            uploadPanel.getTaaColTf().getValue().trim());
+
+        epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
+            uploadPanel.getMethodColTf().getValue().trim());
+        maxLength = parser.getMaxLength();
+        if (uploadPanel.getTaaColTf().getValue().equals("")) {
+          epitopeSelectionPanel.getDataGrid().removeColumn("type");
+        } else {
+          epitopeSelectionPanel.addTypeFilter();
+        }
+      } else if (uploadPanel.getComboInput().getValue().equals("New Filetype")) {
+        ParserInputNewFiletype parser = new ParserInputNewFiletype();
+        parser.parse(uploader.getTempFile(), uploadPanel.getMethodColTf().getValue().trim(),
+            uploadPanel.getImmColTf().getValue().trim(),
+            uploadPanel.getUncertaintyColTf().getValue().trim(),
+            uploadPanel.getDistanceColTf().getValue().trim(),
+            uploadPanel.getTaaColTf().getValue().trim());
+
+        epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
+            uploadPanel.getMethodColTf().getValue().trim());
+        maxLength = parser.getMaxLength();
+        if (uploadPanel.getTaaColTf().getValue().equals("")) {
+          epitopeSelectionPanel.getDataGrid().removeColumn("type");
+        } else {
+          epitopeSelectionPanel.addTypeFilter();
+        }
+      }
+
+
+      String distCol = uploadPanel.getDistanceColTf().getValue();
+      String uncCol = uploadPanel.getUncertaintyColTf().getValue();
+      if (!uploadPanel.getComboInput().getValue().equals("Standard")) {
+        epitopeSelectionPanel.getDataGrid().removeColumn("transcriptExpression");
+      }
+      if ((!uncCol.equals("")) || (!distCol.equals(""))) {
+        epitopeSelectionPanel.joinHeader();
+      }
+
+      if (distCol.equals("")) {
+        epitopeSelectionPanel.getDataGrid().removeColumn("distanceA1");
+        epitopeSelectionPanel.getDataGrid().removeColumn("distanceA2");
+        epitopeSelectionPanel.getDataGrid().removeColumn("distanceB1");
+        epitopeSelectionPanel.getDataGrid().removeColumn("distanceB2");
+        epitopeSelectionPanel.getDataGrid().removeColumn("distanceC1");
+        epitopeSelectionPanel.getDataGrid().removeColumn("distanceC2");
+      }
+      if (uncCol.equals("")) {
+        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA1");
+        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA2");
+        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB1");
+        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB2");
+        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC1");
+        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC2");
+      }
+
+      contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
+      contentAccordion.getTab(uploadPanel).setStyleName("upload-succeeded");
+      contentAccordion.getTab(uploadPanel).setEnabled(false);
+      contentAccordion.getTab(uploadPanel).setEnabled(false);
+      contentAccordion.setSelectedTab(epitopeSelectionPanel);
+      contentAccordion.addSelectedTabChangeListener(new SelectedTabChangeListener() {
+        @Override
+        public void selectedTabChange(SelectedTabChangeEvent event) {
+          epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+          if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+            epitopeSelectionPanel.applyMethodFilter();
+            parameterPanel.update();
+            setParameterRange();
+          }
+          epitopeSelectionPanel.getGeneTf().setValue("");
+          epitopeSelectionPanel.getMutationTf().setValue("");
+          epitopeSelectionPanel.getLengthTf().setValue("");
+          epitopeSelectionPanel.getNeopeptideTf().setValue("");
+        }
+      });
+      contentAccordion.getTab(uploadPanel).setIcon(FontAwesome.CHECK_CIRCLE);
+      buttonsLayout.addComponent(nextButton);
+      if (uploadPanel.getMethodColTf().getValue().equals("")) {
+        nextButton.setEnabled(true);
+      } else {
+        epitopeSelectionPanel.getMethodSelect().addValueChangeListener(new ValueChangeListener() {
+
+          @Override
+          public void valueChange(ValueChangeEvent event) {
+            epitopeSelectionPanel.applyMethodFilter();
+            parameterPanel.update();
+            setParameterRange();
+            epitopeSelectionPanel.getDataGrid().setEnabled(true);
+            nextButton.setEnabled(true);
+          }
+        });
+      }
+      Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
+      resetButton.setEnabled(true);
+    } catch (Exception e) {
+      Utils.notification("Upload failed!", "Please try again", "error");
+    }
+  }
+
+  /**
+   * Runs the epitope selection script
+   * 
+   * @param program list of all arguments to start the script
+   */
+  public void runScript(ArrayList<String> program) {
+    WindowLoading loadingWindow = new WindowLoading();
+
+    Thread t = new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+
+        ProcessBuilder pb = new ProcessBuilder(program);
+        pb.environment().put("PATH", solverPath);
+
+        try {
+          proc = pb.start();
+          BufferedReader stdError =
+              new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+          String s;
+          System.out.println("Here is the standard error of the command (if any):\n");
+          while ((s = stdError.readLine()) != null) {
+            System.out.println(s);
+          }
+          if (0 == proc.waitFor()) {
+            proc.destroyForcibly();
+            prepareResults();
+            cleanFiles();
+            loadingWindow.success();
+          } else {
+            proc.destroyForcibly();
+            loadingWindow.failure();
+            cleanFiles();
+          }
+        } catch (IOException e) {
+          loadingWindow.failure();
+        } catch (InterruptedException e) {
+          Utils.notification("Computation interrupted!", "", "error");
+        }
+      }
+    });
+
+    loadingWindow.getCancelBu().addClickListener(new ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        t.interrupt();
+        proc.destroyForcibly();
+        loadingWindow.close();
+      }
+    });
+
+    t.start();
+
+    UI.getCurrent().setPollInterval(200);
+  }
+
+  /**
+   * Prepares the result to show them in the "Results" tab of the content accordion.
+   */
+  public void prepareResults() {
+    getResults();
+    downloadButton.setVisible(true);
+
+    contentAccordion.getTab(resultsPanel).setEnabled(true);
+    contentAccordion.getTab(parameterPanel).setEnabled(true);
+    contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
+    contentAccordion.setSelectedTab(resultsPanel);
+    contentAccordion.addSelectedTabChangeListener(new SelectedTabChangeListener() {
+      @Override
+      public void selectedTabChange(SelectedTabChangeEvent event) {
+        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+          epitopeSelectionPanel.applyMethodFilter();
+          setParameterRange();
+          parameterPanel.update();
+        }
+        epitopeSelectionPanel.getGeneTf().setValue("");
+        epitopeSelectionPanel.getMutationTf().setValue("");
+        epitopeSelectionPanel.getLengthTf().setValue("");
+        epitopeSelectionPanel.getNeopeptideTf().setValue("");
+        for (TabResult tr : resultsPanel.getTabs()) {
+          tr.getFilterable().removeAllContainerFilters();
+        }
+        setParameterRange();
+      }
+    });
+
+  }
+
+  /**
+   * Deletes all files needed by the epitope selection script: allele file, exclude file, include
+   * file, and the ouput file.
+   */
+  public void cleanFiles() {
+    try {
+      Files.deleteIfExists(Paths.get(allelePath));
+      Files.deleteIfExists(Paths.get(excludePath));
+      Files.deleteIfExists(Paths.get(includePath));
+      Files.deleteIfExists(Paths.get(outputPath));
+    } catch (IOException e) {
+      Utils.notification("Problem", "There was a problem tidying up the files", "error");
+    }
+  }
+
+  /**
+   * Get all the results and add a new result to the downloadable file. Reads the output file and
+   * shows it in a tab. Prepares the downloadable result file.
+   */
+  public void getResults() {
+    File resultsFile = new File(outputPath);
+    downloadFiles.add(resultsFile);
+    ParserScriptResult rp = new ParserScriptResult();
+    rp.parse(resultsFile);
+    resultsPanel.addResultTab(rp.getResultBeans(), rp.getAlleles());
+    WriterResults ow = new WriterResults();
+    ow.writeOutputData(downloadFiles);
+  }
+
+  /**
+   * Resets the main layout to the settings from the beginning
+   */
+  public void reset() {
+    this.removeAllComponents();
+    this.addComponents(createTitleLabel(), createContentAccordion(), createButtonsLayout());
+    contentAccordion.setSelectedTab(uploadPanel);
+    downloadFiles = new ArrayList<>();
+  }
+
+  /**
+   * Sets the range of the parameters which can be adjusted by the user in the "Parameter Settings"
+   * tab of the accordion
+   */
+  public void setParameterRange() {
+    double numberOfIncluded = epitopeSelectionPanel.getIncludedBeans().size();
+    double numberOfExcluded = epitopeSelectionPanel.getExcludedBeans().size();
+    double numberOfPeptides = epitopeSelectionPanel.getDataGrid().getContainerDataSource().size();
+
+    parameterPanel.getKSlider().setMin(numberOfIncluded);
+
+    if ((numberOfPeptides - numberOfExcluded) < 100) {
+      parameterPanel.getKSlider().setMax(numberOfPeptides - numberOfExcluded);
+    } else {
+      parameterPanel.getKSlider().setMax(100);
+    }
+    if (uploadPanel.getTaaColTf().getValue().equals("")) {
+      parameterPanel.getKtaaSlider().setMax(0);
+    } else {
+      parameterPanel.getKtaaSlider().setMax(parameterPanel.getKSlider().getValue());
+    }
+    parameterPanel.getConsOverlapSlider().setMax(maxLength);
+
+  }
+
+}

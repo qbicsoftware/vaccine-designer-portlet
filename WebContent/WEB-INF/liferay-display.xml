@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE display PUBLIC "-//Liferay//DTD Display 6.2.0//EN" "http://www.liferay.com/dtd/liferay-display_6_2_0.dtd">
+<display>
+    <category name="QBiC">
+        <portlet id="Vaccinedesignerportlet Application portlet"/>
+    </category>
+</display>
