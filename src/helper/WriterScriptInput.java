@@ -25,7 +25,7 @@ public class WriterScriptInput {
 
   private BufferedWriter inputWriter, includeWriter, excludeWriter, allelesWriter;
   private ArrayList<String> includedBeans, excludedBeans;
-  private String method, type, uncertainty, distance, imm;
+  private String type, uncertainty, distance, imm;
 
   /**
    * Constructor
@@ -41,9 +41,8 @@ public class WriterScriptInput {
    * @param container bean item container containing all neopeptides from the uploaded input file.
    * @throws IOException
    */
-  public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, String imm) throws IOException {
+  public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, String imm, String type, String uncertainty,String distance) throws IOException {
     this.imm = imm;
-    this.method = method;
     this.type = type;
     this.uncertainty = uncertainty;
     this.distance = distance;
@@ -91,12 +90,32 @@ public class WriterScriptInput {
   public void writeInputFile(BeanItemContainer<EpitopeSelectionBean> container) throws IOException {
 
     // initialize buffered writer
-    inputWriter.write("neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + imm + "\t" + "mutation");
+    String header = new String("neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + imm + "\t" + "mutation");
+    if (!type.equals("")){
+      header += ("\t" + type);
+    }
+    if (!uncertainty.equals("")){
+      header += ("\t" + uncertainty);
+    }
+    if (!distance.equals("")){
+      header += ("\t" + distance);
+    }
+    inputWriter.write(header);
     inputWriter.newLine();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
       for (String key : bean.getImm().keySet()) {
-        inputWriter.write(bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation());
+        String peptide = new String(bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation());
+        if (!type.equals("")){
+          peptide += ("\t" + bean.getType());
+        }
+        if (!uncertainty.equals("")){
+          peptide += ("\t" + bean.getUnc().get(key));
+        }
+        if (!distance.equals("")){
+          peptide += ("\t" + bean.getDist().get(key));
+        }
+        inputWriter.write(peptide);
         inputWriter.newLine();
       }
     }

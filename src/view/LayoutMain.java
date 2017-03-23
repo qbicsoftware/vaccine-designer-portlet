@@ -320,7 +320,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
           // writes alleles.txt, include.txt and exclude.txt
           try {
-            inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue());
+            inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
           } catch (IOException e) {
             Utils.notification("Problem!",
                 "There was a problem writing the input files. Please try again", "error");
@@ -533,7 +533,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           if (0 == proc.waitFor()) {
             proc.destroyForcibly();
             prepareResults();
-            cleanFiles();
+//            cleanFiles();
             loadingWindow.success();
           } else {
             proc.destroyForcibly();
