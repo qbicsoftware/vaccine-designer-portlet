@@ -27,6 +27,7 @@ import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -131,6 +132,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           uploadPanel.getDatasetGrid().removeColumn("id");
           uploadPanel.getDatasetGrid().removeColumn("projectBean");
           uploadPanel.getDatasetGrid().removeColumn("dataSetTypeCode");
+          uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
           uploadPanel.getDatasetGrid().setHeightByRows(5);
           uploadPanel.getDatasetGrid().setVisible(true);
           gridAcivated = true;

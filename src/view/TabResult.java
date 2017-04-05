@@ -20,6 +20,7 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
@@ -301,8 +302,9 @@ public class TabResult extends VerticalLayout {
     // adjust grid
     resultGrid = new Grid();
     resultGrid.setSizeFull();
-    if (resultBean.getEpitopeResultBeans().size() > 12) {
-      resultGrid.setHeightByRows(12);
+    resultGrid.setHeightMode(HeightMode.ROW);
+    if (resultBean.getEpitopeResultBeans().size() > 10) {
+      resultGrid.setHeightByRows(10);
     } else {
 
       resultGrid.setHeightByRows(resultBean.getEpitopeResultBeans().size());

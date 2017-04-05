@@ -1,11 +1,9 @@
 package view;
 
-import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
@@ -53,7 +51,6 @@ public class PanelUpload extends CustomComponent {
   private Button uploadButton;
   private Grid datasetGrid;
   private BeanItem<DatasetBean> selected;
-  private Filterable filterable;
 
   /**
    * Constructor
@@ -213,7 +210,7 @@ public class PanelUpload extends CustomComponent {
       @Override
       public void valueChange(ValueChangeEvent event) {
         if(dataSelection.getValue().equals("Upload")){
-          panelContent.removeComponent(dataBaseSelection);
+          panelContent.removeComponent(databaseLayout);
           panelContent.addComponent(uploadLayout);
         } else if (dataSelection.getValue().equals("Database")) {
           panelContent.removeComponent(uploadLayout);
@@ -289,23 +286,6 @@ public class PanelUpload extends CustomComponent {
     return infoLayout;
   }
   
-  /**
-   * Sets up the filter to a certain column filtering by a certain string
-   * 
-   * @param column to filter
-   * @param filter string to filter the column
-   */
-  public void filter(String column, String filter) {
-    Filter tmpFilter = new SimpleStringFilter(column, filter, false, false);
-    if (!filterable.getContainerFilters().contains(tmpFilter)) {
-      filterable.removeAllContainerFilters();
-      filterable.addContainerFilter(tmpFilter);
-    } else {
-      filterable.removeContainerFilter(tmpFilter);
-    }
-
-  }
-
   public TextField getImmColTf() {
     return immColTf;
   }
