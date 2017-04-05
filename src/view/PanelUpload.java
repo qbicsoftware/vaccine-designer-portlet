@@ -1,19 +1,25 @@
 package view;
 
-import java.util.ArrayList;
-
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.event.SelectionEvent;
+import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.Grid.SingleSelectionModel;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
@@ -22,6 +28,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import helper.UploaderInput;
+import model.DatasetBean;
 
 /**
  * 
@@ -37,21 +44,29 @@ public class PanelUpload extends CustomComponent {
   private UploaderInput receiver;
   private Upload upload;
   private Panel uploadPanel;
-  private VerticalLayout panelContent, uploadLayout;
+  private VerticalLayout panelContent, uploadLayout, databaseLayout;
   private TextField immColTf, distanceColTf, uncertaintyColTf, taaColTf,methodColTf;
   private HorizontalLayout inputLayout, dataBaseSelection;
   private NativeSelect comboInput;
   private OptionGroup dataSelection;
-  private ArrayList<String> dataBase;
+  private ComboBox projectSelectionCB, fileSelectionCB;
+  private Button uploadButton;
+  private Grid datasetGrid;
+  private BeanItem<DatasetBean> selected;
+  private Filterable filterable;
 
   /**
    * Constructor
    */
   public PanelUpload() {
     
-    dataBase = new ArrayList<>();
-    dataBase.add("Patient 1");
-    dataBase.add("Patient 2");
+    projectSelectionCB = new ComboBox("Choose Project");
+    projectSelectionCB.setRequired(true);
+    fileSelectionCB = new ComboBox("Choose File");
+    fileSelectionCB.setRequired(true);
+    fileSelectionCB.setEnabled(false);
+    uploadButton = new Button("Upload");
+    uploadButton.setEnabled(false);
     
     // Create the upload component and handle all its events
     receiver = new UploaderInput();
@@ -79,7 +94,7 @@ public class PanelUpload extends CustomComponent {
     uploadPanel = new Panel();
     uploadPanel.setContent(panelContent);
     receiver.getProgress().setVisible(false);
-
+    
     setCompositionRoot(uploadPanel);
   }
 
@@ -213,28 +228,47 @@ public class PanelUpload extends CustomComponent {
     return dataSelectionLayout;
   }
   
-  public HorizontalLayout createDatabaseSelection() {
+  public VerticalLayout createDatabaseSelection() {
+    databaseLayout = new VerticalLayout();
+    
     dataBaseSelection = new HorizontalLayout();
     dataBaseSelection.setMargin(true);
     dataBaseSelection.setSpacing(true);
-    
-    ComboBox selection = new ComboBox("Choose from database", dataBase);
-    selection.setRequired(true);
-    
-    Button uploadButton = new Button("Upload");
-    uploadButton.addClickListener(new ClickListener() {
-      
-      @Override
-      public void buttonClick(ClickEvent event) {
-        // TODO Auto-generated method stub
-        
-      }
-      
-    });
-    
-    dataBaseSelection.addComponents(selection, uploadButton);
+    dataBaseSelection.addComponents(projectSelectionCB, uploadButton);
     dataBaseSelection.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
-    return dataBaseSelection;
+    
+    datasetGrid = new Grid();
+    datasetGrid.setSizeFull();
+    datasetGrid.setVisible(false);
+    datasetGrid.setSelectionMode(SelectionMode.SINGLE);
+    datasetGrid.addSelectionListener(new SelectionListener() {
+
+      @SuppressWarnings("unchecked")
+      @Override
+         public void select(SelectionEvent event) {
+             Notification.show("Select row: "+datasetGrid.getSelectedRow());
+             Object selected = ((SingleSelectionModel) datasetGrid.getSelectionModel()).getSelectedRow();
+             setSelected((BeanItem<DatasetBean>) datasetGrid.getContainerDataSource().getItem(selected));
+             uploadButton.setEnabled(true);
+             if (selected == null) {
+               uploadButton.setEnabled(false);
+             }
+         }
+      });
+    
+    
+    databaseLayout.addComponent(dataBaseSelection);
+    databaseLayout.addComponent(datasetGrid);
+    
+    return databaseLayout;
+  }
+
+  public Grid getDatasetGrid() {
+    return datasetGrid;
+  }
+
+  public void setDatasetGrid(Grid datasetGrid) {
+    this.datasetGrid = datasetGrid;
   }
 
   /**
@@ -253,6 +287,23 @@ public class PanelUpload extends CustomComponent {
 
     infoLayout.addComponents(infoLa);
     return infoLayout;
+  }
+  
+  /**
+   * Sets up the filter to a certain column filtering by a certain string
+   * 
+   * @param column to filter
+   * @param filter string to filter the column
+   */
+  public void filter(String column, String filter) {
+    Filter tmpFilter = new SimpleStringFilter(column, filter, false, false);
+    if (!filterable.getContainerFilters().contains(tmpFilter)) {
+      filterable.removeAllContainerFilters();
+      filterable.addContainerFilter(tmpFilter);
+    } else {
+      filterable.removeContainerFilter(tmpFilter);
+    }
+
   }
 
   public TextField getImmColTf() {
@@ -291,6 +342,44 @@ public class PanelUpload extends CustomComponent {
     this.comboInput = comboInput;
   }
 
+  public OptionGroup getDataSelection() {
+    return dataSelection;
+  }
 
+  public void setDataSelection(OptionGroup dataSelection) {
+    this.dataSelection = dataSelection;
+  }
+
+  public ComboBox getProjectSelectionCB() {
+    return projectSelectionCB;
+  }
+
+  public void setProjectSelectionCB(ComboBox selectionCB) {
+    this.projectSelectionCB = selectionCB;
+  }
+  
+  public ComboBox getFileSelectionCB() {
+    return fileSelectionCB;
+  }
+
+  public void setFileSelectionCB(ComboBox selectionCB) {
+    this.fileSelectionCB = selectionCB;
+  }
+
+  public Button getUploadButton() {
+    return uploadButton;
+  }
+
+  public void setUploadButton(Button uploadButton) {
+    this.uploadButton = uploadButton;
+  }
+
+  public BeanItem<DatasetBean> getSelected() {
+    return selected;
+  }
+
+  public void setSelected(BeanItem<DatasetBean> selected) {
+    this.selected = selected;
+  }
 
 }
