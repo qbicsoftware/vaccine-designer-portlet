@@ -22,6 +22,7 @@ import helper.DBManager;
 import helper.Utils;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 import logging.Log4j2Logger;
+import mx4j.tools.config.DefaultConfigurationBuilder.New;
 import view.LayoutMain;
 
 /**
@@ -58,7 +59,6 @@ public class MyUI extends UI {
     
     if (LiferayAndVaadinUtils.isLiferayPortlet()) {
       logger.info("Vaccine Designer is running on Liferay and user is logged in.");
-      //TODO delete comment
       userID = LiferayAndVaadinUtils.getUser().getScreenName();
       
     } 
@@ -73,7 +73,6 @@ public class MyUI extends UI {
         success = false;
         logger.error(
             "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
-        Utils.notification("Connection to database failed", "You cannot use the database function.", "error");
       }
       
       if (success) {
@@ -85,16 +84,16 @@ public class MyUI extends UI {
             config.getMysqlDB(), config.getMysqlUser(), config.getMysqlPass());
         @SuppressWarnings("unused")
         DBManager dbm = new DBManager(mysqlConfig);
-        HashMap<String, List<DataSet>> dataSets = new HashMap<>();
+        
+        List<Project> projects = new ArrayList<>();
         for (String space : spaces) {
           for (Project project : openbis.getProjectsOfSpace(space)) {
-            List<DataSet> dataSetsOfProject = openbis.getDataSetsOfProjectByIdentifier((project.getIdentifier()));
-            dataSets.put(project.getIdentifier(), dataSetsOfProject);
+            projects.add(project);
           }
         }
         
         // initialize the View with sample types, spaces and the dictionaries of tissues and species
-        mainLayout = new LayoutMain(dataSets, openbis);
+        mainLayout = new LayoutMain(projects, openbis);
         setContent(mainLayout);
 
         logger.info("User \"" + userID + "\" connected to openBIS.");

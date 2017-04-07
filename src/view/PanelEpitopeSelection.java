@@ -120,6 +120,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     dataGrid.getColumn("mutation").setEditable(false);
     dataGrid.getColumn("transcript").setEditable(false);
     dataGrid.getColumn("transcriptExpression").setEditable(false);
+    dataGrid.getColumn("type").setEditable(false);
     dataGrid.getColumn("hlaA1").setEditable(false);
     dataGrid.getColumn("hlaA1").setHeaderCaption(hlaA1);
     dataGrid.getColumn("hlaA2").setEditable(false);

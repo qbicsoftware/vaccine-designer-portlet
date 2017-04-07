@@ -8,6 +8,8 @@ import java.util.HashMap;
 
 import com.vaadin.data.util.BeanItemContainer;
 
+import logging.Log4j2Logger;
+import main.MyUI;
 import model.EpitopeSelectionBean;
 
 /**
@@ -28,6 +30,10 @@ public class ParserInputOldFiletype {
   private String methodCol, immCol, uncertaintyCol, distanceCol, typeCol;
   private HashMap<String, HashMap<String, String>> immMap, uncMap, distMap, otherMap;
   private BufferedReader brReader;
+  private File file;
+  private Boolean hasType, hasDist, hasImm, hasUnc, hasMethod;
+  
+  logging.Logger logger = new Log4j2Logger(MyUI.class);
 
   public ParserInputOldFiletype() {
 
@@ -43,27 +49,59 @@ public class ParserInputOldFiletype {
    * @param uncertaintyCol name of the uncertainty column
    * @param distanceCol name of the distance column
    * @param typeCol name of the type column
-   * @throws IOException
+   * @throws Exception 
    */
   public void parse(File file, String methodCol, String immCol, String uncertaintyCol, String distanceCol,
-      String typeCol) throws IOException {
+      String typeCol) throws Exception {
 
     this.immCol = immCol;
     this.uncertaintyCol = uncertaintyCol;
     this.distanceCol = distanceCol;
     this.typeCol = typeCol;
     this.methodCol = methodCol;
+    this.file = file;
 
     // initialize bean item container for epitope selection beans
     epitopes = new BeanItemContainer<EpitopeSelectionBean>(EpitopeSelectionBean.class);
 
     // initialize buffered reader reading the file line by line
-      brReader = new BufferedReader(new FileReader(file));
-      line = brReader.readLine();
-   
-      setHeaders();
-      readInput();
-      setBean();
+      
+      if(correctInput()) {
+        brReader = new BufferedReader(new FileReader(file));
+        line = brReader.readLine();
+        setHeaders();
+        readInput();
+        setBean();
+      } else {
+        throw new Exception();
+      }
+  }
+  
+  public Boolean correctInput() throws IOException {
+    // splits the line tab seperarated
+    brReader = new BufferedReader(new FileReader(file));
+    line = brReader.readLine();
+    String[] headers = line.split("\t");
+
+    for (String h : headers) {
+      if (!typeCol.equals("") && h.equals(typeCol)) {
+        hasType = true;
+      }
+      if (!distanceCol.equals("") && h.equals(distanceCol)) {
+        hasDist = true;
+      }
+      if (!uncertaintyCol.equals("") && h.equals(uncertaintyCol)) {
+        hasUnc = true;
+      }
+      if (!methodCol.equals("") && h.equals(methodCol)) {
+        hasMethod = true;
+      }
+      if (!immCol.equals("") && h.equals(immCol)) {
+        hasImm = true;
+      }
+    }
+    
+    return hasImm;
   }
 
   /**
@@ -80,38 +118,38 @@ public class ParserInputOldFiletype {
     // for each tab separated header set the corresponding field to the counters value and set
     // counter + 1
     for (String h : headers) {
-       if (h.equalsIgnoreCase("GENE")) {
+       if (h.equals("GENE")) {
         gene = counter;
         counter = counter + 1;
-       } else if (h.equalsIgnoreCase("POS")) {
+       } else if (h.equals("POS")) {
          mutation = counter;
          counter = counter + 1;
-      } else if (h.equalsIgnoreCase("TRANSCRIPT")) {
+      } else if (h.equals("TRANSCRIPT")) {
         transcript = counter;
         counter = counter + 1;
-      } else if (h.equalsIgnoreCase("PEPTIDE")) {
+      } else if (h.equals("PEPTIDE")) {
         neopeptide = counter;
         counter = counter + 1;
-      } else if (h.equalsIgnoreCase("LENGTH")) {
+      } else if (h.equals("LENGTH")) {
         counter = counter + 1;
-      } else if (h.equalsIgnoreCase(("ALLELE"))) {
+      } else if (h.equals(("ALLELE"))) {
         hla = counter;
         counter = counter + 1;
-      } else if (h.equalsIgnoreCase(immCol)) {
+      } else if (h.equals(immCol)) {
         hla1BindingPrediction = counter;
         counter = counter + 1;
 
         // just if a column name was given:
-      } else if (!uncertaintyCol.equals("") && h.equalsIgnoreCase(uncertaintyCol)) {
+      } else if (!uncertaintyCol.equals("") && h.equals(uncertaintyCol)) {
         uncertainty = counter;
         counter = counter + 1;
-      } else if (!distanceCol.equals("") && h.equalsIgnoreCase(distanceCol)) {
+      } else if (!distanceCol.equals("") && h.equals(distanceCol)) {
         distance = counter;
         counter = counter + 1;
-      } else if (!typeCol.equals("") && h.equalsIgnoreCase(typeCol)) {
+      } else if (!typeCol.equals("") && h.equals(typeCol)) {
         type = counter;
         counter = counter + 1;
-      } else if (!methodCol.equals("") && h.equalsIgnoreCase(methodCol)) {
+      } else if (!methodCol.equals("") && h.equals(methodCol)) {
         method = counter;
         counter = counter + 1;
 
@@ -158,11 +196,11 @@ public class ParserInputOldFiletype {
         others.put("gene", columns[gene]);
         others.put("transcript", columns[transcript]);
         others.put("transcriptExpression", columns[transcriptExpression]);
-        if (!methodCol.equals("")){
+        if (!methodCol.equals("") && hasMethod){
           others.put("method", columns[method]);
         }
         // if type column exists also read type
-        if (!typeCol.equals("")) {
+        if (!typeCol.equals("") && hasType) {
           others.put("type", columns[type]);
         }
 
@@ -214,11 +252,11 @@ public class ParserInputOldFiletype {
         // alleleMap.put(columns[hla], columns[hla1BindingPrediction] + "," + columns[uncertainty] +
         // "," + columns[distance]);
         immMap.get(columns[neopeptide]).putAll(alleleImmMap);
-        if (!uncertaintyCol.equals("")) {
+        if (!uncertaintyCol.equals("") && hasUnc) {
           alleleUncMap.put(columns[hla].replace("HLA-", ""), columns[uncertainty]);
           uncMap.get(columns[neopeptide]).putAll(alleleUncMap);
         }
-        if (!distanceCol.equals("")) {
+        if (!distanceCol.equals("") && hasDist) {
           alleleDistMap.put(columns[hla].replace("HLA-", ""), columns[distance]);
           distMap.get(columns[neopeptide]).putAll(alleleDistMap);
         }
@@ -243,14 +281,14 @@ public class ParserInputOldFiletype {
       newBean.setImm(immMap.get(key));
       String[] alleleNames = newBean.prepareAlleleNames();
       newBean.prepareImm(alleleNames);
-      if (!methodCol.equals("")) {
+      if (!methodCol.equals("") && hasMethod) {
         newBean.setMethod(otherMap.get(key).get("method"));
       }
-      if (!uncertaintyCol.equals("")) {
+      if (!uncertaintyCol.equals("") && hasUnc) {
         newBean.setUnc(uncMap.get(key));
         newBean.prepareUncertainty(alleleNames);
       }
-      if (!distanceCol.equals("")) {
+      if (!distanceCol.equals("") && hasDist) {
         newBean.setDist(distMap.get(key));
         newBean.prepareDistance(alleleNames);
       }
@@ -264,7 +302,7 @@ public class ParserInputOldFiletype {
       newBean.setGene(otherMap.get(key).get("gene"));
       newBean.setTranscript(otherMap.get(key).get("transcript"));
       newBean.setTranscriptExpression(1f);
-      if (!typeCol.equals("")) {
+      if (!typeCol.equals("") && hasType) {
         newBean.setType(otherMap.get(key).get("type"));
       }
 
@@ -289,5 +327,52 @@ public class ParserInputOldFiletype {
   }
 
 
+  public Boolean getHasType() {
+    return hasType;
+  }
 
+
+  public void setHasType(Boolean hasType) {
+    this.hasType = hasType;
+  }
+
+
+  public Boolean getHasDist() {
+    return hasDist;
+  }
+
+
+  public void setHasDist(Boolean hasDist) {
+    this.hasDist = hasDist;
+  }
+
+
+  public Boolean getHasImm() {
+    return hasImm;
+  }
+
+
+  public void setHasImm(Boolean hasImm) {
+    this.hasImm = hasImm;
+  }
+
+
+  public Boolean getHasUnc() {
+    return hasUnc;
+  }
+
+
+  public void setHasUnc(Boolean hasUnc) {
+    this.hasUnc = hasUnc;
+  }
+
+
+  public Boolean getHasMethod() {
+    return hasMethod;
+  }
+
+
+  public void setHasMethod(Boolean hasMethod) {
+    this.hasMethod = hasMethod;
+  }
 }

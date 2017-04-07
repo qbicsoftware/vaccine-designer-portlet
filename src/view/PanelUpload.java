@@ -1,6 +1,5 @@
 package view;
 
-import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItem;
@@ -111,24 +110,6 @@ public class PanelUpload extends CustomComponent {
     comboInput.setRequired(true);
     comboInput.setValue("Standard");
     
-    
-//    comboInput.addValueChangeListener(new ValueChangeListener() {
-//      
-//      @Override
-//      public void valueChange(ValueChangeEvent event) {
-//        if (comboInput.getValue().equals("New Filetype")) {
-//          inputLayout.removeComponent(immColTf);
-//          inputLayout.removeComponent(distanceColTf);
-//          inputLayout.removeComponent(uncertaintyColTf);
-//        } else {
-//          inputLayout.addComponent(immColTf);
-//          inputLayout.addComponent(distanceColTf);
-//          inputLayout.addComponent(uncertaintyColTf);
-//        }
-//        
-//      }
-//    });
-    
     comboInput.addValueChangeListener(new ValueChangeListener() {
       
       @Override
@@ -237,6 +218,7 @@ public class PanelUpload extends CustomComponent {
     datasetGrid = new Grid();
     datasetGrid.setSizeFull();
     datasetGrid.setVisible(false);
+    datasetGrid.setImmediate(true);
     datasetGrid.setSelectionMode(SelectionMode.SINGLE);
     datasetGrid.addSelectionListener(new SelectionListener() {
 
