@@ -103,19 +103,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
   private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
   private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
-  
-  // Testing
-//  private String home = new String("/home/luser/neoOptiTope/");
-//  private String outputPath = new String(home + "output.txt");
-//  private String scriptPath =
-//      new String(home+"script/NeoOptiTope.py");
-//  private String inputPath = new String(home+"input.txt");
-//  private String allelePath = new String(home+"alleles.txt");
-//  private String includePath = new String(home+"include.txt");
-//  private String excludePath = new String(home+"exclude.txt");
-//  private String solverPath = new String(home+"/script");
-//  private String tmpResultPath = new String(home+"tmp_result.txt");
-//  private String tmpDownloadPath = new String(home+"tmp_download.txt");
 
   logging.Logger logger = new Log4j2Logger(MyUI.class);
   
@@ -166,7 +153,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           uploadPanel.getDatasetGrid().setEnabled(true);
           uploadPanel.getDatasetGrid().setContainerDataSource(container);
           filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
+          filterable.removeAllContainerFilters();
           filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
+          filter("fileName", ".tsv");
           if (!gridAcivated) {
             uploadPanel.getDatasetGrid().removeColumn("children");
             uploadPanel.getDatasetGrid().removeColumn("properties");
@@ -175,7 +164,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             uploadPanel.getDatasetGrid().removeColumn("dataSetTypeCode");
             uploadPanel.getDatasetGrid().removeColumn("code");
             uploadPanel.getDatasetGrid().removeColumn("dssPath");
-            uploadPanel.getDatasetGrid().removeColumn("type");
+            //uploadPanel.getDatasetGrid().removeColumn("type");
             uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
             uploadPanel.getDatasetGrid().setHeightByRows(5);
             uploadPanel.getDatasetGrid().setVisible(true);
@@ -507,7 +496,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   }
   
   public void processingData(File file) {
-    try {
       if (uploadPanel.getComboInput().getValue().equals("Standard")) {
         ParserInputStandard parser = new ParserInputStandard();
         try {
@@ -647,10 +635,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       }
       Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
       resetButton.setEnabled(true);
-    } catch (Exception e) {
-      logger.error("Upload failed.");
-      Utils.notification("Upload failed", "Please check your file or column names", "error");
-    }
   }
 
   /**
@@ -821,7 +805,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public void filter(String column, String filter) {
     Filter tmpFilter = new SimpleStringFilter(column, filter, false, false);
     if (!filterable.getContainerFilters().contains(tmpFilter)) {
-      filterable.removeAllContainerFilters();
       filterable.addContainerFilter(tmpFilter);
     } else {
       filterable.removeContainerFilter(tmpFilter);
