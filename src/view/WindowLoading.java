@@ -42,7 +42,7 @@ public class WindowLoading extends Window {
 
     loadingLayout = new VerticalLayout();
 
-    loadingLa = new Label("Computation in progress... Please wait.");
+    loadingLa = new Label("Computation in progress...");
     loadingBar = new ProgressBar();
     loadingBar.setIndeterminate(true);
     cancelBu = new Button("Cancel");

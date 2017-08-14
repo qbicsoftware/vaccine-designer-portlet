@@ -30,7 +30,7 @@
 		<dependency org="javax.servlet" name="javax.servlet-api" rev="3.0.1" conf="nodeploy->default" />
 
 		<!-- TestBench 4 -->
-		<dependency org="com.vaadin" name="vaadin-testbench-api" rev="&vaadin.version;" conf="nodeploy -> default" />
+		<dependency org="com.vaadin" name="vaadin-testbench-api" rev="&vaadin.version;" conf="nodeploy-> default" />
 
 		<!-- Precompiled DefaultWidgetSet -->
 		<dependency org="com.vaadin" name="vaadin-client-compiled"
@@ -43,10 +43,15 @@
 		<!-- Compiler for custom widget sets. Should not be deployed -->
 		<dependency org="com.vaadin" name="vaadin-client-compiler"
 			rev="&vaadin.version;" conf="widgetset-compile->default" />
-			
-			<dependency
-   org="com.vaadin.addon"
-   name="vaadin-charts"
-   rev="3.2.0" />
+		<!-- Vaadin charts -->
+		<dependency org="com.vaadin.addon" name="vaadin-charts" rev="3.2.0" />
+		<!-- QBiC -->
+		<dependency org="life.qbic.openbis" name="openbisclient" rev="1.1.1" />
+		<!--<dependency org="life.qbic.openbis" name="liferayandvaadinhelpers" rev="1.1.2" /> -->
+		
+		<!-- logging -->
+		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.2" />
+  		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.2" />
+  
 	</dependencies>
 </ivy-module>

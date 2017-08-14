@@ -11,6 +11,7 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -119,6 +120,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     dataGrid.getColumn("mutation").setEditable(false);
     dataGrid.getColumn("transcript").setEditable(false);
     dataGrid.getColumn("transcriptExpression").setEditable(false);
+    dataGrid.getColumn("type").setEditable(false);
     dataGrid.getColumn("hlaA1").setEditable(false);
     dataGrid.getColumn("hlaA1").setHeaderCaption(hlaA1);
     dataGrid.getColumn("hlaA2").setEditable(false);
@@ -158,6 +160,8 @@ public class PanelEpitopeSelection extends CustomComponent {
     dataGrid.getColumn("included").setHeaderCaption("In");
     dataGrid.getColumn("excluded").setHeaderCaption("Out");
 
+    dataGrid.setHeightMode(HeightMode.ROW);
+    dataGrid.setHeightByRows(10);
     dataGrid.setVisible(true);
 
     // set row style for include and exclude

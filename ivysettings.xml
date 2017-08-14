@@ -9,7 +9,9 @@
 			<!-- Vaadin Add-on repository -->
 			<ibiblio name="vaadin-addons" usepoms="true" m2compatible="true"
 				root="http://maven.vaadin.com/vaadin-addons" />
-
+			<ibiblio name="nexus-snapshots" m2compatible="true" usepoms="true" root="https://peltzer.com.de/nexus/content/repositories/snapshots" changingPattern="*-SNAPSHOT"/>
+            <ibiblio name="nexus-releases" m2compatible="true" usepoms="true" root="https://peltzer.com.de/nexus/content/repositories/releases" />
+			
 			<!-- Vaadin snapshots repository -->
 			<ibiblio name="vaadin-snapshots" usepoms="true" m2compatible="true"
 				root="https://oss.sonatype.org/content/repositories/vaadin-snapshots" />

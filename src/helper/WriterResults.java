@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class WriterResults {
 
   private int resultCounter;
-  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
   private BufferedReader br;
 
 
@@ -34,7 +33,7 @@ public class WriterResults {
    * 
    * @param files files of all computed results
    */
-  public void writeOutputData(ArrayList<File> files) {
+  public void writeOutputData(ArrayList<File> files, String tmpResultPath) {
     resultCounter = 1;
 
     try {

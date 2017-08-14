@@ -2,25 +2,36 @@ package view;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
@@ -30,6 +41,9 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
+import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
+import helper.DBFileHandler;
 import helper.ParserInputNewFiletype;
 import helper.ParserInputOldFiletype;
 import helper.ParserInputStandard;
@@ -38,6 +52,10 @@ import helper.UploaderInput;
 import helper.Utils;
 import helper.WriterResults;
 import helper.WriterScriptInput;
+import life.qbic.openbis.openbisclient.OpenBisClient;
+import logging.Log4j2Logger;
+import main.MyUI;
+import model.DatasetBean;
 
 /**
  * 
@@ -50,7 +68,6 @@ import helper.WriterScriptInput;
 @SuppressWarnings("serial")
 public class LayoutMain extends VerticalLayout implements SucceededListener {
 
-  private Label titleLabel;
   private Button nextButton, runButton, downloadButton, resetButton;
   private HorizontalLayout buttonsLayout;
   private Accordion contentAccordion;
@@ -63,8 +80,19 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private FileDownloader downloader;
   private Process proc;
   private int maxLength;
+  private DBFileHandler fileHandler;
+  private Boolean gridAcivated;
+  private Filterable filterable;
+  private static Boolean hasType;
+  private static Boolean hasMethod;
+  private static Boolean hasUnc;
+  private static Boolean hasDist;
+  private OpenBisClient openbis;
+  private List<Project> projects;
 
-  // All Paths are set here
+  
+
+// All Paths are set here
   private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
   private String scriptPath =
       new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript/NeoOptiTope.py");
@@ -74,30 +102,112 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
   private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
   private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
+  private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
 
+  logging.Logger logger = new Log4j2Logger(MyUI.class);
+  
   /**
    * Constructor creating the simple standard layout
    */
+  public LayoutMain(List<Project> projects, OpenBisClient openbis) {
+    this.openbis = openbis;
+    this.projects = projects;
+    init();
+    initDatabase();
+  }
+  
   public LayoutMain() {
-    this.addComponents(createTitleLabel(), createContentAccordion(), createButtonsLayout());
+    init();
+  }
+  
+  public void init() {
+    this.addComponents(createContentAccordion(), createButtonsLayout());
+    uploadPanel.getDataSelection().setEnabled(false);
+    
     this.setMargin(true);
     this.setSpacing(true);
+    
     this.setIcon(FontAwesome.CUBES);
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
-  }
 
-  /**
-   * Creates the title label
-   * 
-   * @return label showing the title
-   */
-  public Label createTitleLabel() {
-    titleLabel = new Label("Interactive Vaccine Designer");
-    titleLabel.setStyleName("header");
-    return titleLabel;
   }
+  
+  public void initDatabase() {
+    uploadPanel.getDataSelection().setEnabled(true);
+    gridAcivated = false;
+    fileHandler = new DBFileHandler(openbis);
+    
+    for (Project project : projects) {
+      uploadPanel.getProjectSelectionCB().addItem(project.getIdentifier());
+    }
+    
+    uploadPanel.getProjectSelectionCB().addValueChangeListener(new ValueChangeListener() {
+      
+      @Override
+      public void valueChange(ValueChangeEvent event) {
+        List<DataSet> dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+        BeanItemContainer<DatasetBean> container = fileHandler.fillTable(dataSets);
+        logger.error(Integer.toString(container.size()));
+        if (container.size() > 0) {
+          uploadPanel.getDatasetGrid().setEnabled(true);
+          uploadPanel.getDatasetGrid().setContainerDataSource(container);
+          filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
+          filterable.removeAllContainerFilters();
+          filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
+          filter("fileName", ".tsv");
+          if (!gridAcivated) {
+            uploadPanel.getDatasetGrid().removeColumn("children");
+            uploadPanel.getDatasetGrid().removeColumn("properties");
+            uploadPanel.getDatasetGrid().removeColumn("id");
+            uploadPanel.getDatasetGrid().removeColumn("projectBean");
+            uploadPanel.getDatasetGrid().removeColumn("dataSetTypeCode");
+            uploadPanel.getDatasetGrid().removeColumn("code");
+            uploadPanel.getDatasetGrid().removeColumn("dssPath");
+            //uploadPanel.getDatasetGrid().removeColumn("type");
+            uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
+            uploadPanel.getDatasetGrid().setHeightByRows(5);
+            uploadPanel.getDatasetGrid().setVisible(true);
+            gridAcivated = true;
+          }
+        } else {
+          uploadPanel.getDatasetGrid().setEnabled(false);
+          uploadPanel.getDatasetGrid().setContainerDataSource(container);
+        }
+      }
+    });
+    
+    uploadPanel.getUploadButton().addClickListener(new ClickListener() {
+      
+      @SuppressWarnings("deprecation")
+      @Override
+      public void buttonClick(ClickEvent event) {
+        String code = uploadPanel.getSelected().getBean().getCode();
+        String fileName = uploadPanel.getSelected().getBean().getFileName();
+        String url = "";
+        try {
+          url = openbis.getDataStoreDownloadURL(code, fileName).toString();
+        } catch (MalformedURLException e1) {
+          Utils.notification("File Error", "URL for File was not found", "error");
+          logger.error("Cannot find the File URL");
+        }
+        try(
+            ReadableByteChannel in=Channels.newChannel(
+              new URL(url).openStream());
+            FileChannel out=new FileOutputStream(
+              tmpDownloadPath).getChannel() ) {
 
+            out.transferFrom(in, 0, Long.MAX_VALUE);
+          } catch (IOException e) {
+            Utils.notification("File Error ", "Error while reading the file", "error");
+            e.printStackTrace();
+          }
+          
+          File file = new File(tmpDownloadPath);
+          processingData(file);
+      }
+    });
+  }
 
   /**
    * Creates the content accordion. Every information is shown inside the tabs of the accordion
@@ -110,6 +220,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     uploadPanel = new PanelUpload();
     uploadPanel.setImmediate(true);
     uploadPanel.getUpload().addSucceededListener(this);
+    
     epitopeSelectionPanel = new PanelEpitopeSelection();
     epitopeSelectionPanel.setImmediate(true);
     parameterPanel = new PanelParameters();
@@ -132,6 +243,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion.getTab(resultsPanel).setIcon(FontAwesome.PIE_CHART);
     contentAccordion.getTab(resultsPanel).setEnabled(false);
     contentAccordion.setStyleName("accordion-color");
+    
 
     return contentAccordion;
   }
@@ -216,7 +328,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     runButton = new Button("Run");
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
-    runButton.setDescription("Computes the Epitope-Set.");
+    runButton.setDescription("Computes the set of epitopes.");
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
     runButton.addClickListener(new ClickListener() {
 
@@ -238,7 +350,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
         Boolean valuesCorrect = new Boolean(false);
         try {
-          inputWriter = new WriterScriptInput();
+          inputWriter = new WriterScriptInput(inputPath, allelePath, includePath, excludePath);
           setParameterRange();
           parameterPanel.getKSlider().validate();
           parameterPanel.getConsAlleleSlider().validate();
@@ -317,13 +429,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           p.add(Integer.toString(parameterPanel.getConsOverlapSlider().getValue().intValue()));
 
 
-
           // writes alleles.txt, include.txt and exclude.txt
           try {
+            logger.error(uploadPanel.getTaaColTf().getValue());
             inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
           } catch (IOException e) {
             Utils.notification("Problem!",
                 "There was a problem writing the input files. Please try again", "error");
+            logger.error("Error while writing the input data");
           }
 
           runScript(p);
@@ -377,23 +490,32 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   @Override
   public void uploadSucceeded(SucceededEvent event) {
-    try {
-
-      UploaderInput uploader = uploadPanel.getReceiver();
-
-      uploader.getProgress().setVisible(false);
+    UploaderInput uploader = uploadPanel.getReceiver();
+    uploader.getProgress().setVisible(false);
+    processingData(uploader.getTempFile());
+  }
+  
+  public void processingData(File file) {
       if (uploadPanel.getComboInput().getValue().equals("Standard")) {
         ParserInputStandard parser = new ParserInputStandard();
-        parser.parse(uploader.getTempFile(), uploadPanel.getMethodColTf().getValue().trim(),
-            uploadPanel.getImmColTf().getValue().trim(),
-            uploadPanel.getUncertaintyColTf().getValue().trim(),
-            uploadPanel.getDistanceColTf().getValue().trim(),
-            uploadPanel.getTaaColTf().getValue().trim());
+        try {
+          parser.parse(file, uploadPanel.getMethodColTf().getValue(),
+              uploadPanel.getImmColTf().getValue(),
+              uploadPanel.getUncertaintyColTf().getValue(),
+              uploadPanel.getDistanceColTf().getValue(),
+              uploadPanel.getTaaColTf().getValue());
+          hasMethod = parser.getHasMethod();
+          hasType = parser.getHasType();
+          hasDist = parser.getHasDist();
+          hasUnc = parser.getHasUnc();
+        } catch (Exception e) {
+          logger.error("File was not parsable with the current adjustments");
+        }
 
 
 
         epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-            uploadPanel.getMethodColTf().getValue().trim());
+            uploadPanel.getMethodColTf().getValue());
         maxLength = parser.getMaxLength();
         if (uploadPanel.getTaaColTf().getValue().equals("")) {
           epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -402,14 +524,24 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
       } else if (uploadPanel.getComboInput().getValue().equals("Old Filetype")) {
         ParserInputOldFiletype parser = new ParserInputOldFiletype();
-        parser.parse(uploader.getTempFile(), uploadPanel.getMethodColTf().getValue().trim(),
-            uploadPanel.getImmColTf().getValue().trim(),
-            uploadPanel.getUncertaintyColTf().getValue().trim(),
-            uploadPanel.getDistanceColTf().getValue().trim(),
-            uploadPanel.getTaaColTf().getValue().trim());
+        try {
+          parser.parse(file, uploadPanel.getMethodColTf().getValue(),
+              uploadPanel.getImmColTf().getValue(),
+              uploadPanel.getUncertaintyColTf().getValue(),
+              uploadPanel.getDistanceColTf().getValue(),
+              uploadPanel.getTaaColTf().getValue());
+          hasMethod = parser.getHasMethod();
+          hasType = parser.getHasType();
+          hasDist = parser.getHasDist();
+          hasUnc = parser.getHasUnc();
+        } catch (IOException e) {
+          logger.error("File was not parsable with the current adjustments");
+        } catch (Exception e) {
+          logger.error("File was not parsable with the current adjustments");
+        }
 
         epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-            uploadPanel.getMethodColTf().getValue().trim());
+            uploadPanel.getMethodColTf().getValue());
         maxLength = parser.getMaxLength();
         if (uploadPanel.getTaaColTf().getValue().equals("")) {
           epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -418,11 +550,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
       } else if (uploadPanel.getComboInput().getValue().equals("New Filetype")) {
         ParserInputNewFiletype parser = new ParserInputNewFiletype();
-        parser.parse(uploader.getTempFile(), uploadPanel.getMethodColTf().getValue().trim(),
-            uploadPanel.getImmColTf().getValue().trim(),
-            uploadPanel.getUncertaintyColTf().getValue().trim(),
-            uploadPanel.getDistanceColTf().getValue().trim(),
-            uploadPanel.getTaaColTf().getValue().trim());
+        try {
+          parser.parse(file, uploadPanel.getMethodColTf().getValue(),
+              uploadPanel.getTaaColTf().getValue());
+          hasMethod = parser.getHasMethod();
+          hasType = parser.getHasType();
+        } catch (IOException e) {
+          logger.error("File was not parsable with the current adjustments");
+        }
 
         epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
             uploadPanel.getMethodColTf().getValue().trim());
@@ -500,9 +635,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       }
       Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
       resetButton.setEnabled(true);
-    } catch (Exception e) {
-      Utils.notification("Upload failed!", "Please try again", "error");
-    }
   }
 
   /**
@@ -528,12 +660,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           String s;
           System.out.println("Here is the standard error of the command (if any):\n");
           while ((s = stdError.readLine()) != null) {
-            System.out.println(s);
+            logger.error(s);
           }
           if (0 == proc.waitFor()) {
             proc.destroyForcibly();
             prepareResults();
-//            cleanFiles();
+            cleanFiles();
             loadingWindow.success();
           } else {
             proc.destroyForcibly();
@@ -541,9 +673,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             cleanFiles();
           }
         } catch (IOException e) {
+          logger.error("NeoOptiTope could not be found");
           loadingWindow.failure();
         } catch (InterruptedException e) {
           Utils.notification("Computation interrupted!", "", "error");
+          logger.error("Computation interrupted");
         }
       }
     });
@@ -606,8 +740,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       Files.deleteIfExists(Paths.get(excludePath));
       Files.deleteIfExists(Paths.get(includePath));
       Files.deleteIfExists(Paths.get(outputPath));
+      Files.deleteIfExists(Paths.get(tmpDownloadPath));
     } catch (IOException e) {
-      Utils.notification("Problem", "There was a problem tidying up the files", "error");
+      logger.error("At least one file could not have been deleted");
     }
   }
 
@@ -622,7 +757,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     rp.parse(resultsFile);
     resultsPanel.addResultTab(rp.getResultBeans(), rp.getAlleles());
     WriterResults ow = new WriterResults();
-    ow.writeOutputData(downloadFiles);
+    ow.writeOutputData(downloadFiles, tmpResultPath);
   }
 
   /**
@@ -630,9 +765,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   public void reset() {
     this.removeAllComponents();
-    this.addComponents(createTitleLabel(), createContentAccordion(), createButtonsLayout());
+    init();
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
+    
   }
 
   /**
@@ -659,5 +795,49 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     parameterPanel.getConsOverlapSlider().setMax(maxLength);
 
   }
+  
+  /**
+   * Sets up the filter to a certain column filtering by a certain string
+   * 
+   * @param column to filter
+   * @param filter string to filter the column
+   */
+  public void filter(String column, String filter) {
+    Filter tmpFilter = new SimpleStringFilter(column, filter, false, false);
+    if (!filterable.getContainerFilters().contains(tmpFilter)) {
+      filterable.addContainerFilter(tmpFilter);
+    } else {
+      filterable.removeContainerFilter(tmpFilter);
+    }
 
+  }
+
+  public static Boolean getHasMethod() {
+    return hasMethod;
+  }
+
+  public static Boolean getHasType() {
+    return hasType;
+  }
+
+  public static void setHasType(Boolean hasType) {
+    LayoutMain.hasType = hasType;
+  }
+
+  public static Boolean getHasUnc() {
+    return hasUnc;
+  }
+
+  public static void setHasUnc(Boolean hasUnc) {
+    LayoutMain.hasUnc = hasUnc;
+  }
+
+  public static Boolean getHasDist() {
+    return hasDist;
+  }
+
+  public static void setHasDist(Boolean hasDist) {
+    LayoutMain.hasDist = hasDist;
+  }
+  
 }

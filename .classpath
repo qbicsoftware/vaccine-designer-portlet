@@ -21,7 +21,7 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=vaccineDesignerPortlet&amp;ivyXmlPath=ivy.xml&amp;confs=widgetset-compile&amp;ivySettingsPath=%24%7Bworkspace_loc%3AvaccineDesignerPortlet%2Fivysettings.xml%7D&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
 	<classpathentry exported="true" kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=vaccineDesignerPortlet&amp;ivyXmlPath=ivy.xml&amp;confs=nodeploy&amp;ivySettingsPath=%24%7Bworkspace_loc%3AvaccineDesignerPortlet%2Fivysettings.xml%7D&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
-	<classpathentry exported="true" kind="lib" path="/Users/spaethju/MegaCloud/Studium/HiWi QBiC/Vaccine Designer/portal-service.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/spaethju/MegaCloud/Studium/HiWi QBiC/Vaccine Designer/portlet.jar"/>
+	<classpathentry kind="lib" path="/Users/spaethju/MegaCloud/Studium/HiWi QBiC/Vaccine Designer/jars/portal-service.jar"/>
+	<classpathentry kind="lib" path="/Users/spaethju/MegaCloud/Studium/HiWi QBiC/Vaccine Designer/jars/portlet.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
