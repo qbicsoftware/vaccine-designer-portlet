@@ -1,1 +1,0 @@
-$wnd.main_widgetset_VaccinedesignerportletWidgetset.runAsyncCallback2('hgb(1650,1,cae);_.vc=function Wpc(){E9b((!x9b&&(x9b=new K9b),x9b),this.a.d)};T2d(Zh)(2);\n//# sourceURL=main.widgetset.VaccinedesignerportletWidgetset-2.js\n')
