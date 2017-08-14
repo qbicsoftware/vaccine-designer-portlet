@@ -52,7 +52,6 @@ public class MyPortletUI extends UI {
         }
         projects = new ArrayList<>();
         boolean success = true;
-        userID = "zxmqw74";
         config = ConfigurationManagerFactory.getInstance();
         logger.info(config.getDataSourceUser() + config.getDataSourcePassword() + config.getDataSourceUrl());
         tmpFolder = config.getTmpFolder();
