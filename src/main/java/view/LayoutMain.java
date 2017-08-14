@@ -91,17 +91,29 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   
 
 // All Paths are set here
-  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
+//  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
+//  private String scriptPath =
+//      new String("/Users/spaethju/WP3-EpitopeSelector-master/NeoOptiTope.py");
+//  private String inputPath = new String("/Users/spaethju/Desktop/input.txt");
+//  private String allelePath = new String("/Users/spaethju/Desktop/alleles.txt");
+//  private String includePath = new String("/Users/spaethju/Desktop/include.txt");
+//  private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
+//  private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
+//  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
+//  private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
+
+  private String outputPath = new String("/tmp/output.txt");
   private String scriptPath =
-      new String("/Users/spaethju/WP3-EpitopeSelector-master/NeoOptiTope.py");
-  private String inputPath = new String("/Users/spaethju/Desktop/input.txt");
-  private String allelePath = new String("/Users/spaethju/Desktop/alleles.txt");
-  private String includePath = new String("/Users/spaethju/Desktop/include.txt");
-  private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
-  private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
-  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
-  private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
-  
+          new String("/usr/share/neooptitope/NeoOptiTope.py");
+  private String inputPath = new String("/tmp/input.txt");
+  private String allelePath = new String("/tmp/alleles.txt");
+  private String includePath = new String("/tmp/include.txt");
+  private String excludePath = new String("/tmp/exclude.txt");
+  private String solverPath = new String("/usr/local/sbin/");
+  private String tmpResultPath = new String("/tmp/tmp_result.txt");
+  private String tmpDownloadPath = new String("/tmp/tmp_download.txt");
+
+
   /**
    * Constructor creating the simple standard layout
    */
