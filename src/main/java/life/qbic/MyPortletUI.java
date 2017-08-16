@@ -53,7 +53,6 @@ public class MyPortletUI extends UI {
         projects = new ArrayList<>();
         boolean success = true;
         config = ConfigurationManagerFactory.getInstance();
-        logger.info(config.getDataSourceUser() + config.getDataSourcePassword() + config.getDataSourceUrl());
         tmpFolder = config.getTmpFolder();
 
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
