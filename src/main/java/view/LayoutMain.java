@@ -1,10 +1,6 @@
 package view;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -52,6 +48,7 @@ import helper.UploaderInput;
 import helper.Utils;
 import helper.WriterResults;
 import helper.WriterScriptInput;
+import life.qbic.MyPortletUI;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 import model.DatasetBean;
 
@@ -527,6 +524,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           hasUnc = parser.getHasUnc();
         } catch (Exception e) {
           life.qbic.MyPortletUI.logger.error("File was not parsable with the current adjustments");
+          e.printStackTrace();
         }
 
 
@@ -651,6 +649,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         });
       }
       Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
+      life.qbic.MyPortletUI.logger.info("Upload successful");
       resetButton.setEnabled(true);
   }
 

@@ -1,5 +1,7 @@
 package model;
 
+import life.qbic.MyPortletUI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -307,6 +309,10 @@ public class EpitopeSelectionBean {
     int bCounter = 0;
     int cCounter = 0;
 
+    for (String key : imm.keySet()) {
+      MyPortletUI.logger.info("Alleles: ");
+      MyPortletUI.logger.info("HLA: "+ key + ", Score: " + imm.get(key));
+    }
     for (String key : imm.keySet()) {
       if (key.contains("A*") && aCounter == 1) {
         hlaA.add(key);
