@@ -7,6 +7,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,12 +54,12 @@ import life.qbic.openbis.openbisclient.OpenBisClient;
 import model.DatasetBean;
 
 /**
- * 
+ *
  * The class {@link LayoutMain} represents the main layout which is always shown. It handles all the
  * computation and view changes. All important paths are set here.
- * 
+ *
  * @author spaethju
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class LayoutMain extends VerticalLayout implements SucceededListener {
@@ -85,7 +86,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private OpenBisClient openbis;
   private List<Project> projects;
 
-  
+
 
 // All Paths are set here
 //  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
@@ -120,40 +121,39 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     init();
     initDatabase();
   }
-  
+
   public LayoutMain() {
     init();
   }
-  
+
   public void init() {
     this.addComponents(createContentAccordion(), createButtonsLayout());
     uploadPanel.getDataSelection().setEnabled(false);
-    
+
     this.setMargin(true);
     this.setSpacing(true);
-    
+
     this.setIcon(FontAwesome.CUBES);
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
 
   }
-  
+
   public void initDatabase() {
     uploadPanel.getDataSelection().setEnabled(true);
     gridAcivated = false;
     fileHandler = new DBFileHandler(openbis);
-    
+
     for (Project project : projects) {
       uploadPanel.getProjectSelectionCB().addItem(project.getIdentifier());
     }
-    
+
     uploadPanel.getProjectSelectionCB().addValueChangeListener(new ValueChangeListener() {
-      
+
       @Override
       public void valueChange(ValueChangeEvent event) {
         List<DataSet> dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
         BeanItemContainer<DatasetBean> container = fileHandler.fillTable(dataSets);
-        life.qbic.MyPortletUI.logger.error(Integer.toString(container.size()));
         if (container.size() > 0) {
           uploadPanel.getDatasetGrid().setEnabled(true);
           uploadPanel.getDatasetGrid().setContainerDataSource(container);
@@ -181,43 +181,35 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
       }
     });
-    
-    uploadPanel.getUploadButton().addClickListener(new ClickListener() {
-      
-      @SuppressWarnings("deprecation")
+
+      uploadPanel.getUploadButton().addClickListener(new ClickListener() {
       @Override
       public void buttonClick(ClickEvent event) {
+        String filename = uploadPanel.getSelected().getBean().getFileName();
         String code = uploadPanel.getSelected().getBean().getCode();
-        String fileName = uploadPanel.getSelected().getBean().getFileName();
-        String url = "";
-        try {
-          url = openbis.getDataStoreDownloadURL(code, fileName).toString();
-        } catch (MalformedURLException e1) {
-          Utils.notification("File Error", "URL for File was not found", "error");
-          life.qbic.MyPortletUI.logger.error("Cannot find the File URL");
-        }
-        try(
-            ReadableByteChannel in=Channels.newChannel(
-              new URL(url).openStream());
-            FileChannel out=new FileOutputStream(
-              tmpDownloadPath).getChannel() ) {
 
-            out.transferFrom(in, 0, Long.MAX_VALUE);
-          } catch (IOException e) {
-            Utils.notification("File Error ", "Error while reading the file", "error");
-            e.printStackTrace();
-          }
-          
+        final Path destination = Paths.get(tmpDownloadPath);
+        try {
+          InputStream in = openbis.getDatasetStream(code, "result/"+filename);
+          Files.copy(in, destination);
           File file = new File(tmpDownloadPath);
           processingData(file);
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (Exception e) {
+          MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
+          Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
+          e.printStackTrace();
+        }
       }
     });
   }
 
+
   /**
    * Creates the content accordion. Every information is shown inside the tabs of the accordion
    * except of the buttons.
-   * 
+   *
    * @return accordion with the four tabs "Upload Data", "Epitope Selection", "Parameter Settings"
    *         and "Results"
    */
@@ -225,7 +217,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     uploadPanel = new PanelUpload();
     uploadPanel.setImmediate(true);
     uploadPanel.getUpload().addSucceededListener(this);
-    
+
     epitopeSelectionPanel = new PanelEpitopeSelection();
     epitopeSelectionPanel.setImmediate(true);
     parameterPanel = new PanelParameters();
@@ -248,7 +240,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion.getTab(resultsPanel).setIcon(FontAwesome.PIE_CHART);
     contentAccordion.getTab(resultsPanel).setEnabled(false);
     contentAccordion.setStyleName("accordion-color");
-    
+
 
     return contentAccordion;
   }
@@ -256,7 +248,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   /**
    * Creates a button bringing the user from the "Epitope Selection" tab to the "Parameter Settings"
    * tab
-   * 
+   *
    * @return next button
    */
   public Button createNextButton() {
@@ -296,7 +288,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   /**
    * Creates a button which resets the whole progress and allows a new upload of the data. The user
    * starts from the beginning again.
-   * 
+   *
    * @return reset button
    */
   public Button createResetButton() {
@@ -326,7 +318,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * Creates the run button, running the computation of the optimal set of epitopes. Therefore it
    * runs a thread with the process NeoOptiTope.py and opens it with the previous adjustet
    * parameters and aruguments.
-   * 
+   *
    * @return run button
    */
   public Button createRunButton() {
@@ -440,11 +432,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
           // writes alleles.txt, include.txt and exclude.txt
           try {
-            life.qbic.MyPortletUI.logger.error(uploadPanel.getTaaColTf().getValue());
             inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
           } catch (IOException e) {
             Utils.notification("Problem!",
-                "There was a problem writing the input files. Please try again", "error");
+                    "There was a problem writing the input files. Please try again", "error");
             life.qbic.MyPortletUI.logger.error("Error while writing the input data");
           }
 
@@ -460,7 +451,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   /**
    * Creates a button which gives the user the opportunity to download all already computed results.
-   * 
+   *
    * @return download button
    */
   public Button createDownloadButton() {
@@ -477,7 +468,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   /**
    * Creates a layout presenting all buttons in a horizontal order.
-   * 
+   *
    * @return layout with buttons
    */
   public HorizontalLayout createButtonsLayout() {
@@ -508,154 +499,136 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     }
 
   }
-  
-  public void processingData(File file) {
-      if (uploadPanel.getComboInput().getValue().equals("Standard")) {
-        ParserInputStandard parser = new ParserInputStandard();
-        try {
-          parser.parse(file, uploadPanel.getMethodColTf().getValue(),
+
+  public void processingData(File file) throws Exception {
+    if (uploadPanel.getComboInput().getValue().equals("Standard")) {
+      ParserInputStandard parser = new ParserInputStandard();
+      parser.parse(file, uploadPanel.getMethodColTf().getValue(),
               uploadPanel.getImmColTf().getValue(),
               uploadPanel.getUncertaintyColTf().getValue(),
               uploadPanel.getDistanceColTf().getValue(),
               uploadPanel.getTaaColTf().getValue());
-          hasMethod = parser.getHasMethod();
-          hasType = parser.getHasType();
-          hasDist = parser.getHasDist();
-          hasUnc = parser.getHasUnc();
-        } catch (Exception e) {
-          life.qbic.MyPortletUI.logger.error("File was not parsable with the current adjustments");
-          e.printStackTrace();
-        }
+      hasMethod = parser.getHasMethod();
+      hasType = parser.getHasType();
+      hasDist = parser.getHasDist();
+      hasUnc = parser.getHasUnc();
+      epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
+              uploadPanel.getMethodColTf().getValue());
+      maxLength = parser.getMaxLength();
+      if (uploadPanel.getTaaColTf().getValue().equals("")) {
+        epitopeSelectionPanel.getDataGrid().removeColumn("type");
+      } else {
+        epitopeSelectionPanel.addTypeFilter();
+      }
+    } else if (uploadPanel.getComboInput().getValue().equals("Old Filetype")) {
 
+      ParserInputOldFiletype parser = new ParserInputOldFiletype();
 
-
-        epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-            uploadPanel.getMethodColTf().getValue());
-        maxLength = parser.getMaxLength();
-        if (uploadPanel.getTaaColTf().getValue().equals("")) {
-          epitopeSelectionPanel.getDataGrid().removeColumn("type");
-        } else {
-          epitopeSelectionPanel.addTypeFilter();
-        }
-      } else if (uploadPanel.getComboInput().getValue().equals("Old Filetype")) {
-        ParserInputOldFiletype parser = new ParserInputOldFiletype();
-        try {
-          parser.parse(file, uploadPanel.getMethodColTf().getValue(),
+      parser.parse(file, uploadPanel.getMethodColTf().getValue(),
               uploadPanel.getImmColTf().getValue(),
               uploadPanel.getUncertaintyColTf().getValue(),
               uploadPanel.getDistanceColTf().getValue(),
               uploadPanel.getTaaColTf().getValue());
-          hasMethod = parser.getHasMethod();
-          hasType = parser.getHasType();
-          hasDist = parser.getHasDist();
-          hasUnc = parser.getHasUnc();
-        } catch (IOException e) {
-          life.qbic.MyPortletUI.logger.error("File was not parsable with the current adjustments");
-        } catch (Exception e) {
-          life.qbic.MyPortletUI.logger.error("File was not parsable with the current adjustments");
-        }
 
-        epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-            uploadPanel.getMethodColTf().getValue());
-        maxLength = parser.getMaxLength();
-        if (uploadPanel.getTaaColTf().getValue().equals("")) {
-          epitopeSelectionPanel.getDataGrid().removeColumn("type");
-        } else {
-          epitopeSelectionPanel.addTypeFilter();
-        }
-      } else if (uploadPanel.getComboInput().getValue().equals("New Filetype")) {
-        ParserInputNewFiletype parser = new ParserInputNewFiletype();
-        try {
-          parser.parse(file, uploadPanel.getMethodColTf().getValue(),
+      hasMethod = parser.getHasMethod();
+      hasType = parser.getHasType();
+      hasDist = parser.getHasDist();
+      hasUnc = parser.getHasUnc();
+      epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
+              uploadPanel.getMethodColTf().getValue());
+      maxLength = parser.getMaxLength();
+      if (uploadPanel.getTaaColTf().getValue().equals("")) {
+        epitopeSelectionPanel.getDataGrid().removeColumn("type");
+      } else {
+        epitopeSelectionPanel.addTypeFilter();
+      }
+    } else if (uploadPanel.getComboInput().getValue().equals("New Filetype")) {
+      ParserInputNewFiletype parser = new ParserInputNewFiletype();
+      parser.parse(file, uploadPanel.getMethodColTf().getValue(),
               uploadPanel.getTaaColTf().getValue());
-          hasMethod = parser.getHasMethod();
-          hasType = parser.getHasType();
-        } catch (IOException e) {
-          life.qbic.MyPortletUI.logger.error("File was not parsable with the current adjustments");
+      hasMethod = parser.getHasMethod();
+      hasType = parser.getHasType();
+      epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
+              uploadPanel.getMethodColTf().getValue().trim());
+      maxLength = parser.getMaxLength();
+      if (uploadPanel.getTaaColTf().getValue().equals("")) {
+        epitopeSelectionPanel.getDataGrid().removeColumn("type");
+      } else {
+        epitopeSelectionPanel.addTypeFilter();
+      }
+    }
+
+    String distCol = uploadPanel.getDistanceColTf().getValue();
+    String uncCol = uploadPanel.getUncertaintyColTf().getValue();
+    if (!uploadPanel.getComboInput().getValue().equals("Standard")) {
+      epitopeSelectionPanel.getDataGrid().removeColumn("transcriptExpression");
+    }
+    if ((!uncCol.equals("")) || (!distCol.equals(""))) {
+      epitopeSelectionPanel.joinHeader();
+    }
+
+    if (distCol.equals("")) {
+      epitopeSelectionPanel.getDataGrid().removeColumn("distanceA1");
+      epitopeSelectionPanel.getDataGrid().removeColumn("distanceA2");
+      epitopeSelectionPanel.getDataGrid().removeColumn("distanceB1");
+      epitopeSelectionPanel.getDataGrid().removeColumn("distanceB2");
+      epitopeSelectionPanel.getDataGrid().removeColumn("distanceC1");
+      epitopeSelectionPanel.getDataGrid().removeColumn("distanceC2");
+    }
+    if (uncCol.equals("")) {
+      epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA1");
+      epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA2");
+      epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB1");
+      epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB2");
+      epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC1");
+      epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC2");
+    }
+
+    contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
+    contentAccordion.getTab(uploadPanel).setStyleName("upload-succeeded");
+    contentAccordion.getTab(uploadPanel).setEnabled(false);
+    contentAccordion.getTab(uploadPanel).setEnabled(false);
+    contentAccordion.setSelectedTab(epitopeSelectionPanel);
+    contentAccordion.addSelectedTabChangeListener(new SelectedTabChangeListener() {
+      @Override
+      public void selectedTabChange(SelectedTabChangeEvent event) {
+        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+          epitopeSelectionPanel.applyMethodFilter();
+          parameterPanel.update();
+          setParameterRange();
         }
-
-        epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-            uploadPanel.getMethodColTf().getValue().trim());
-        maxLength = parser.getMaxLength();
-        if (uploadPanel.getTaaColTf().getValue().equals("")) {
-          epitopeSelectionPanel.getDataGrid().removeColumn("type");
-        } else {
-          epitopeSelectionPanel.addTypeFilter();
-        }
+        epitopeSelectionPanel.getGeneTf().setValue("");
+        epitopeSelectionPanel.getMutationTf().setValue("");
+        epitopeSelectionPanel.getLengthTf().setValue("");
+        epitopeSelectionPanel.getNeopeptideTf().setValue("");
       }
+    });
+    contentAccordion.getTab(uploadPanel).setIcon(FontAwesome.CHECK_CIRCLE);
+    buttonsLayout.addComponent(nextButton);
+    if (uploadPanel.getMethodColTf().getValue().equals("")) {
+      nextButton.setEnabled(true);
+    } else {
+      epitopeSelectionPanel.getMethodSelect().addValueChangeListener(new ValueChangeListener() {
 
-
-      String distCol = uploadPanel.getDistanceColTf().getValue();
-      String uncCol = uploadPanel.getUncertaintyColTf().getValue();
-      if (!uploadPanel.getComboInput().getValue().equals("Standard")) {
-        epitopeSelectionPanel.getDataGrid().removeColumn("transcriptExpression");
-      }
-      if ((!uncCol.equals("")) || (!distCol.equals(""))) {
-        epitopeSelectionPanel.joinHeader();
-      }
-
-      if (distCol.equals("")) {
-        epitopeSelectionPanel.getDataGrid().removeColumn("distanceA1");
-        epitopeSelectionPanel.getDataGrid().removeColumn("distanceA2");
-        epitopeSelectionPanel.getDataGrid().removeColumn("distanceB1");
-        epitopeSelectionPanel.getDataGrid().removeColumn("distanceB2");
-        epitopeSelectionPanel.getDataGrid().removeColumn("distanceC1");
-        epitopeSelectionPanel.getDataGrid().removeColumn("distanceC2");
-      }
-      if (uncCol.equals("")) {
-        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA1");
-        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA2");
-        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB1");
-        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB2");
-        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC1");
-        epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC2");
-      }
-
-      contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
-      contentAccordion.getTab(uploadPanel).setStyleName("upload-succeeded");
-      contentAccordion.getTab(uploadPanel).setEnabled(false);
-      contentAccordion.getTab(uploadPanel).setEnabled(false);
-      contentAccordion.setSelectedTab(epitopeSelectionPanel);
-      contentAccordion.addSelectedTabChangeListener(new SelectedTabChangeListener() {
         @Override
-        public void selectedTabChange(SelectedTabChangeEvent event) {
-          epitopeSelectionPanel.getContainer().removeAllContainerFilters();
-          if (!uploadPanel.getMethodColTf().getValue().equals("")) {
-            epitopeSelectionPanel.applyMethodFilter();
-            parameterPanel.update();
-            setParameterRange();
-          }
-          epitopeSelectionPanel.getGeneTf().setValue("");
-          epitopeSelectionPanel.getMutationTf().setValue("");
-          epitopeSelectionPanel.getLengthTf().setValue("");
-          epitopeSelectionPanel.getNeopeptideTf().setValue("");
+        public void valueChange(ValueChangeEvent event) {
+          epitopeSelectionPanel.applyMethodFilter();
+          parameterPanel.update();
+          setParameterRange();
+          epitopeSelectionPanel.getDataGrid().setEnabled(true);
+          nextButton.setEnabled(true);
         }
       });
-      contentAccordion.getTab(uploadPanel).setIcon(FontAwesome.CHECK_CIRCLE);
-      buttonsLayout.addComponent(nextButton);
-      if (uploadPanel.getMethodColTf().getValue().equals("")) {
-        nextButton.setEnabled(true);
-      } else {
-        epitopeSelectionPanel.getMethodSelect().addValueChangeListener(new ValueChangeListener() {
-
-          @Override
-          public void valueChange(ValueChangeEvent event) {
-            epitopeSelectionPanel.applyMethodFilter();
-            parameterPanel.update();
-            setParameterRange();
-            epitopeSelectionPanel.getDataGrid().setEnabled(true);
-            nextButton.setEnabled(true);
-          }
-        });
-      }
-      Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
-      life.qbic.MyPortletUI.logger.info("Upload successful");
-      resetButton.setEnabled(true);
+    }
+    Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
+    life.qbic.MyPortletUI.logger.info("Upload successful");
+    resetButton.setEnabled(true);
   }
 
   /**
    * Runs the epitope selection script
-   * 
+   *
    * @param program list of all arguments to start the script
    */
   public void runScript(ArrayList<String> program) {
@@ -672,7 +645,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         try {
           proc = pb.start();
           BufferedReader stdError =
-              new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+                  new BufferedReader(new InputStreamReader(proc.getErrorStream()));
           String s;
           System.out.println("Here is the standard error of the command (if any):\n");
           while ((s = stdError.readLine()) != null) {
@@ -782,9 +755,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public void reset() {
     this.removeAllComponents();
     init();
+    initDatabase();
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
-    
+
   }
 
   /**
@@ -811,10 +785,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     parameterPanel.getConsOverlapSlider().setMax(maxLength);
 
   }
-  
+
   /**
    * Sets up the filter to a certain column filtering by a certain string
-   * 
+   *
    * @param column to filter
    * @param filter string to filter the column
    */
@@ -855,5 +829,5 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public static void setHasDist(Boolean hasDist) {
     LayoutMain.hasDist = hasDist;
   }
-  
+
 }

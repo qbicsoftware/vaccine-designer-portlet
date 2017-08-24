@@ -61,7 +61,7 @@ public class ParserInputOldFiletype {
     epitopes = new BeanItemContainer<EpitopeSelectionBean>(EpitopeSelectionBean.class);
 
     // initialize buffered reader reading the file line by line
-      
+
       if(correctInput()) {
         brReader = new BufferedReader(new FileReader(file));
         line = brReader.readLine();

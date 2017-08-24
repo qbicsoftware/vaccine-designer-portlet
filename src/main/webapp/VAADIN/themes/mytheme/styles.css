@@ -12984,3 +12984,63 @@ div.v-layout.v-horizontal.v-widget {
 	width: 19px;
 	overflow: hidden;
 }
+
+.mytheme .header {
+	color: #197de1;
+	font-size: 25px;
+	font-weight: bold;
+	font-variant: small-caps;
+}
+
+.mytheme .v-accordion-item-open .v-accordion-item-caption .v-caption {
+	color: #197de1;
+	font-weight: bold;
+}
+
+.mytheme .out {
+	color: #ed473b;
+}
+
+.mytheme .in {
+	color: #2c9720;
+}
+
+.mytheme .v-grid-row.excluded {
+	color: #ed473b;
+}
+
+.mytheme .v-grid-row.included {
+	color: #2c9720;
+	font-weight: bold;
+}
+
+.mytheme .v-upload .gwt-FileUpload {
+	font-size: 12px;
+}
+
+.mytheme .parameter {
+	color: #197de1;
+	font-size: 25px;
+}
+
+.mytheme .center {
+	text-align: center;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.mytheme .padded {
+	padding: 20px 10px 10px 10px;
+}
+
+.mytheme .info {
+	color: #2c9720;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.mytheme .v-slider .v-caption {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
