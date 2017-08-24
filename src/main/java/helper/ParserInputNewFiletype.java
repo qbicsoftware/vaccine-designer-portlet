@@ -65,7 +65,8 @@ public class ParserInputNewFiletype {
       readInput();
       setBean();
     } catch (NullPointerException e) {
-        MyPortletUI.logger.error("Error while parsing the data: Maybe some columns in the tsv file are missing or named falsly.");
+        MyPortletUI.logger.error("Error while parsing the data: Maybe some columns/entries in the tsv file are missing or are named falsly.");
+        e.printStackTrace();
       }
     
   }

@@ -310,10 +310,6 @@ public class EpitopeSelectionBean {
     int cCounter = 0;
 
     for (String key : imm.keySet()) {
-      MyPortletUI.logger.info("Alleles: ");
-      MyPortletUI.logger.info("HLA: "+ key + ", Score: " + imm.get(key));
-    }
-    for (String key : imm.keySet()) {
       if (key.contains("A*") && aCounter == 1) {
         hlaA.add(key);
       }
