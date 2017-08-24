@@ -67,6 +67,7 @@ public class PanelUpload extends CustomComponent {
     // Create the upload component and handle all its events
     receiver = new UploaderInput();
     upload = new Upload("Please Upload your Data", receiver);
+    upload.setSizeFull();
     upload.addProgressListener(receiver);
     upload.addFailedListener(receiver);
 
