@@ -82,6 +82,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String solverPath = "/Users/spaethju/PycharmProjects/epitopeSelectionScript";
   private String tmpResultPath = "/Users/spaethju/Desktop/tmp_result.txt";
   private String tmpDownloadPath = "/Users/spaethju/Desktop/tmp_download.txt";
+  private String remoteOutputPath = "";
+  private String random = "";
 
   //TODO RANDOM FOLDER!
 //  private String outputPath = new String("/tmp/output.txt");
@@ -153,7 +155,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           uploadPanel.getDatasetGrid().removeColumn("dataSetTypeCode");
           uploadPanel.getDatasetGrid().removeColumn("code");
           uploadPanel.getDatasetGrid().removeColumn("dssPath");
-          //uploadPanel.getDatasetGrid().removeColumn("type");
           uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
           uploadPanel.getDatasetGrid().setHeightByRows(5);
           uploadPanel.getDatasetGrid().setVisible(true);
@@ -296,7 +297,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
     runButton.setDescription("Computes the set of epitopes.");
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-    runButton.addClickListener((ClickListener) event -> {
+    runButton.addClickListener((ClickListener) (Button.ClickEvent event) -> {
 
       // remove the filters and set back the filters text fields
       epitopeSelectionPanel.getContainer().removeAllContainerFilters();
@@ -327,10 +328,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       if (valuesCorrect) {
         runButton.setCaption("Re-Run");
 
-        String random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+        random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
         try {
-          Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
-        } catch (IOException e) {
+          Process mkdir = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
+          mkdir.waitFor();
+        } catch (IOException | InterruptedException e) {
           MyPortletUI.logger.error("Couldn't create folder on virtual machine.");
           e.printStackTrace();
         }
@@ -395,6 +397,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
         p.add("-o");
         p.add("/home/jspaeth/"+random+"/output.txt");
+        remoteOutputPath = "/home/jspaeth/" + random + "/output.txt";
 
         p.add("-c_al");
         p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
@@ -420,12 +423,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
 
         try {
-          Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
-          scpFile.scp(inputPath, epitopeSelectorVM+random);
-          scpFile.scp(allelePath, epitopeSelectorVM+random);
-          scpFile.scp(includePath, epitopeSelectorVM+random);
-          scpFile.scp(excludePath, epitopeSelectorVM+random);
-        } catch (IOException e) {
+          Process mkdir_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
+          mkdir_random.waitFor();
+          scpFile.scpToRemote(inputPath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(allelePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(includePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(excludePath, epitopeSelectorVM+random);
+        } catch (IOException | InterruptedException e) {
+          MyPortletUI.logger.error("Could not copy the files to the VM");
           e.printStackTrace();
         }
 
@@ -629,11 +634,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         proc = pb.start();
         BufferedReader stdError =
                 new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-        String s;
-        System.out.println("Here is the standard error of the command (if any):\n");
-        while ((s = stdError.readLine()) != null) {
-          MyPortletUI.logger.error(s);
-        }
+
+        pb.redirectErrorStream();
         InputStream inputStream = proc.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
@@ -674,6 +676,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * Prepares the result to show them in the "Results" tab of the content accordion.
    */
   private void prepareResults() {
+    scpFile.scpFromRemote(epitopeSelectorVM, remoteOutputPath, outputPath);
+    try {
+      Process remove_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf "  + "~/"+random);
+      remove_random.waitFor();
+    } catch (IOException | InterruptedException e) {
+      e.printStackTrace();
+    }
     getResults();
     downloadButton.setVisible(true);
 
