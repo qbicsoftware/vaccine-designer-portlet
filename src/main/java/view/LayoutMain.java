@@ -40,17 +40,10 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
-import helper.DBFileHandler;
-import helper.ParserInputNewFiletype;
-import helper.ParserInputOldFiletype;
-import helper.ParserInputStandard;
-import helper.ParserScriptResult;
-import helper.UploaderInput;
-import helper.Utils;
-import helper.WriterResults;
-import helper.WriterScriptInput;
+import helper.*;
 import life.qbic.MyPortletUI;
 import life.qbic.openbis.openbisclient.OpenBisClient;
+import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 import model.DatasetBean;
 
 /**
@@ -85,31 +78,35 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private static Boolean hasDist;
   private OpenBisClient openbis;
   private List<Project> projects;
+  private SCPFile scpFile;
+  private RandomCharGenerator generator;
 
 
 
 // All Paths are set here
-//  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
-//  private String scriptPath =
-//      new String("/Users/spaethju/WP3-EpitopeSelector-master/NeoOptiTope.py");
-//  private String inputPath = new String("/Users/spaethju/Desktop/input.txt");
-//  private String allelePath = new String("/Users/spaethju/Desktop/alleles.txt");
-//  private String includePath = new String("/Users/spaethju/Desktop/include.txt");
-//  private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
-//  private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
-//  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
-//  private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
-
-  private String outputPath = new String("/tmp/output.txt");
+  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
   private String scriptPath =
-          new String("/usr/share/neooptitope/NeoOptiTope.py");
-  private String inputPath = new String("/tmp/input.txt");
-  private String allelePath = new String("/tmp/alleles.txt");
-  private String includePath = new String("/tmp/include.txt");
-  private String excludePath = new String("/tmp/exclude.txt");
-  private String solverPath = new String("/usr/local/sbin/");
-  private String tmpResultPath = new String("/tmp/tmp_result.txt");
-  private String tmpDownloadPath = new String("/tmp/tmp_download.txt");
+      new String("/Users/spaethju/WP3-EpitopeSelector-master/NeoOptiTope.py");
+  private String inputPath = new String("/Users/spaethju/Desktop/input.txt");
+  private String allelePath = new String("/Users/spaethju/Desktop/alleles.txt");
+  private String includePath = new String("/Users/spaethju/Desktop/include.txt");
+  private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
+  private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
+  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
+  private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
+
+  //TODO RANDOM FOLDER!
+//  private String outputPath = new String("/tmp/output.txt");
+//  private String scriptPath =
+//          new String("/usr/share/neooptitope/NeoOptiTope.py");
+//  private String inputPath = new String("/tmp/input.txt");
+//  private String allelePath = new String("/tmp/alleles.txt");
+//  private String includePath = new String("/tmp/include.txt");
+//  private String excludePath = new String("/tmp/exclude.txt");
+//  private String solverPath = new String("/usr/local/sbin/");
+//  private String tmpResultPath = new String("/tmp/tmp_result.txt");
+//  private String tmpDownloadPath = new String("/tmp/tmp_download.txt");
+  private String epitopeSelectorVM = new String("jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:");
 
 
   /**
@@ -118,6 +115,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public LayoutMain(List<Project> projects, OpenBisClient openbis) {
     this.openbis = openbis;
     this.projects = projects;
+    generator = new RandomCharGenerator();
+    scpFile = new SCPFile();
     init();
     initDatabase();
   }
@@ -187,13 +186,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       public void buttonClick(ClickEvent event) {
         String filename = uploadPanel.getSelected().getBean().getFileName();
         String code = uploadPanel.getSelected().getBean().getCode();
-
-        final Path destination = Paths.get(tmpDownloadPath);
+        Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, "result/"+filename);
           Files.copy(in, destination);
           File file = new File(tmpDownloadPath);
           processingData(file);
+          Files.delete(destination);
         } catch (IOException e) {
           e.printStackTrace();
         } catch (Exception e) {
@@ -362,72 +361,72 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         if (valuesCorrect) {
           runButton.setCaption("Re-Run");
 
-          // set up script input
-          ArrayList<String> p = new ArrayList<>();
-          p.add("python");
-          p.add(scriptPath);
-
-          p.add("-i");
-          p.add(inputPath);
-
-          p.add("-imm");
-          String immCol = uploadPanel.getImmColTf().getValue();
-          p.add(immCol);
-
-          String distCol = uploadPanel.getDistanceColTf().getValue();
-          if (!distCol.equals("")) {
-            p.add("-d");
-            p.add(uploadPanel.getDistanceColTf().getValue());
-          }
-
-          String uncCol = uploadPanel.getUncertaintyColTf().getValue();
-          if (!uncCol.equals("")) {
-            p.add("-u");
-            p.add(uploadPanel.getUncertaintyColTf().getValue());
-          }
-
-          String taaCol = uploadPanel.getTaaColTf().getValue();
-          if (!taaCol.equals("")) {
-            p.add("-taa");
-            p.add(uploadPanel.getTaaColTf().getValue());
-          }
-
-          p.add("-a");
-          p.add(allelePath);
-
-          p.add("-excl");
-          p.add(excludePath);
-
-          p.add("-incl");
-          p.add(includePath);
-
-          p.add("-k");
-          p.add(Integer.toString(parameterPanel.getKSlider().getValue().intValue()));
-
-          p.add("-ktaa");
-          p.add(Integer.toString(parameterPanel.getKtaaSlider().getValue().intValue()));
-
-          p.add("-te");
-          p.add(parameterPanel.getThreshEpitopeTF().getValue().replaceAll(",", "."));
-
-          p.add("-td");
-          p.add(parameterPanel.getThreshDistanceTF().getValue().replaceAll(",", "."));
-
-          p.add("-o");
-          p.add(outputPath);
-
-          p.add("-c_al");
-          p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
-
-          p.add("-c_a");
-          p.add(Double.toString(parameterPanel.getConsAntigenSlider().getValue()));
-
-          p.add("-c_o");
-          p.add(Integer.toString(parameterPanel.getConsOverlapSlider().getValue().intValue()));
-
-          if(parameterPanel.getRankCB().getValue() == true){
-            p.add("-r");
-          }
+//          // set up script input
+//          ArrayList<String> p = new ArrayList<>();
+//          p.add("python");
+//          p.add(scriptPath);
+//
+//          p.add("-i");
+//          p.add(inputPath);
+//
+//          p.add("-imm");
+//          String immCol = uploadPanel.getImmColTf().getValue();
+//          p.add(immCol);
+//
+//          String distCol = uploadPanel.getDistanceColTf().getValue();
+//          if (!distCol.equals("")) {
+//            p.add("-d");
+//            p.add(uploadPanel.getDistanceColTf().getValue());
+//          }
+//
+//          String uncCol = uploadPanel.getUncertaintyColTf().getValue();
+//          if (!uncCol.equals("")) {
+//            p.add("-u");
+//            p.add(uploadPanel.getUncertaintyColTf().getValue());
+//          }
+//
+//          String taaCol = uploadPanel.getTaaColTf().getValue();
+//          if (!taaCol.equals("")) {
+//            p.add("-taa");
+//            p.add(uploadPanel.getTaaColTf().getValue());
+//          }
+//
+//          p.add("-a");
+//          p.add(allelePath);
+//
+//          p.add("-excl");
+//          p.add(excludePath);
+//
+//          p.add("-incl");
+//          p.add(includePath);
+//
+//          p.add("-k");
+//          p.add(Integer.toString(parameterPanel.getKSlider().getValue().intValue()));
+//
+//          p.add("-ktaa");
+//          p.add(Integer.toString(parameterPanel.getKtaaSlider().getValue().intValue()));
+//
+//          p.add("-te");
+//          p.add(parameterPanel.getThreshEpitopeTF().getValue().replaceAll(",", "."));
+//
+//          p.add("-td");
+//          p.add(parameterPanel.getThreshDistanceTF().getValue().replaceAll(",", "."));
+//
+//          p.add("-o");
+//          p.add(outputPath);
+//
+//          p.add("-c_al");
+//          p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
+//
+//          p.add("-c_a");
+//          p.add(Double.toString(parameterPanel.getConsAntigenSlider().getValue()));
+//
+//          p.add("-c_o");
+//          p.add(Integer.toString(parameterPanel.getConsOverlapSlider().getValue().intValue()));
+//
+//          if(parameterPanel.getRankCB().getValue() == true){
+//            p.add("-r");
+//          }
 
 
           // writes alleles.txt, include.txt and exclude.txt
@@ -439,7 +438,17 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             life.qbic.MyPortletUI.logger.error("Error while writing the input data");
           }
 
-          runScript(p);
+          String random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+          try {
+            Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
+            scpFile.scp(inputPath, epitopeSelectorVM+random);
+            scpFile.scp(allelePath, epitopeSelectorVM+random);
+            scpFile.scp(includePath, epitopeSelectorVM+random);
+            scpFile.scp(excludePath, epitopeSelectorVM+random);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+
           runButton.setStyleName(null);
         }
       }
