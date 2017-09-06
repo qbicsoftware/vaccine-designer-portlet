@@ -30,13 +30,11 @@ public class ParserInputNewFiletype {
   private HashMap<String, String> alleleImmMap;
   private BufferedReader brReader;
   private File file;
-  private Boolean hasType, hasMethod = true;
+  private Boolean hasType, hasMethod;
  
 
-  public ParserInputNewFiletype(int transcriptExpression, HashMap<String, String> alleleImmMap) {
+  public ParserInputNewFiletype() {
 
-    this.transcriptExpression = transcriptExpression;
-    this.alleleImmMap = alleleImmMap;
   }
 
 
@@ -55,7 +53,7 @@ public class ParserInputNewFiletype {
     this.file = file;
 
     // initialize bean item container for epitope selection beans
-    epitopes = new BeanItemContainer<>(EpitopeSelectionBean.class);
+    epitopes = new BeanItemContainer<EpitopeSelectionBean>(EpitopeSelectionBean.class);
 
     // initialize buffered reader reading the file line by line
       correctInput();

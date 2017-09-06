@@ -542,7 +542,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         epitopeSelectionPanel.addTypeFilter();
       }
     } else if (uploadPanel.getComboInput().getValue().equals("New Filetype")) {
-      ParserInputNewFiletype parser = new ParserInputNewFiletype(transcriptExpression, alleleImmMap);
+      ParserInputNewFiletype parser = new ParserInputNewFiletype();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
               uploadPanel.getTaaColTf().getValue());
       hasMethod = parser.getHasMethod();
