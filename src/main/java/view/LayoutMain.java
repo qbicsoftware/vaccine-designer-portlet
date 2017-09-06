@@ -1,11 +1,6 @@
 package view;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +9,6 @@ import java.util.List;
 
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
@@ -26,11 +20,9 @@ import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload.SucceededEvent;
@@ -40,17 +32,10 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
-import helper.DBFileHandler;
-import helper.ParserInputNewFiletype;
-import helper.ParserInputOldFiletype;
-import helper.ParserInputStandard;
-import helper.ParserScriptResult;
-import helper.UploaderInput;
-import helper.Utils;
-import helper.WriterResults;
-import helper.WriterScriptInput;
+import helper.*;
 import life.qbic.MyPortletUI;
 import life.qbic.openbis.openbisclient.OpenBisClient;
+import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 import model.DatasetBean;
 
 /**
@@ -73,43 +58,32 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private PanelResults resultsPanel;
   private WriterScriptInput inputWriter;
   private ArrayList<File> downloadFiles;
-  private FileDownloader downloader;
   private Process proc;
   private int maxLength;
   private DBFileHandler fileHandler;
   private Boolean gridAcivated;
   private Filterable filterable;
   private static Boolean hasType;
-  private static Boolean hasMethod;
   private static Boolean hasUnc;
   private static Boolean hasDist;
   private OpenBisClient openbis;
   private List<Project> projects;
+  private SCPFile scpFile;
+  private RandomCharGenerator generator;
 
-
-
-// All Paths are set here
-//  private String outputPath = new String("/Users/spaethju/Desktop/output.txt");
-//  private String scriptPath =
-//      new String("/Users/spaethju/WP3-EpitopeSelector-master/NeoOptiTope.py");
-//  private String inputPath = new String("/Users/spaethju/Desktop/input.txt");
-//  private String allelePath = new String("/Users/spaethju/Desktop/alleles.txt");
-//  private String includePath = new String("/Users/spaethju/Desktop/include.txt");
-//  private String excludePath = new String("/Users/spaethju/Desktop/exclude.txt");
-//  private String solverPath = new String("/Users/spaethju/PycharmProjects/epitopeSelectionScript");
-//  private String tmpResultPath = new String("/Users/spaethju/Desktop/tmp_result.txt");
-//  private String tmpDownloadPath = new String("/Users/spaethju/Desktop/tmp_download.txt");
-
-  private String outputPath = new String("/tmp/output.txt");
-  private String scriptPath =
-          new String("/usr/share/neooptitope/NeoOptiTope.py");
-  private String inputPath = new String("/tmp/input.txt");
-  private String allelePath = new String("/tmp/alleles.txt");
-  private String includePath = new String("/tmp/include.txt");
-  private String excludePath = new String("/tmp/exclude.txt");
-  private String solverPath = new String("/usr/local/sbin/");
-  private String tmpResultPath = new String("/tmp/tmp_result.txt");
-  private String tmpDownloadPath = new String("/tmp/tmp_download.txt");
+  //private String tmpPath = "/Users/spaethju/Desktop/";
+  private String tmpPath = "/tmp/";
+  private String tmpPathRemote = "/home/jspaeth/";
+  private String outputPath = "";
+  private String inputPath = "";
+  private String allelePath = "";
+  private String includePath = "";
+  private String excludePath = "";
+  private String tmpResultPath = "";
+  private String tmpDownloadPath = "";
+  private String remoteOutputPath = "";
+  private String random = "";
+  private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:";
 
 
   /**
@@ -118,6 +92,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public LayoutMain(List<Project> projects, OpenBisClient openbis) {
     this.openbis = openbis;
     this.projects = projects;
+    scpFile = new SCPFile();
     init();
     initDatabase();
   }
@@ -126,7 +101,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     init();
   }
 
-  public void init() {
+  private void init() {
     this.addComponents(createContentAccordion(), createButtonsLayout());
     uploadPanel.getDataSelection().setEnabled(false);
 
@@ -137,9 +112,46 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
 
+    generator = new RandomCharGenerator();
+    random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+    File f = new File(tmpPath+LiferayAndVaadinUtils.getUser().getScreenName());
+    if(!(f.exists() && f.isDirectory())) {
+      try {
+        Runtime.getRuntime().exec("mkdir " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName());
+      } catch (IOException e) {
+        MyPortletUI.logger.error("Could not write the folder on the file system");
+        e.printStackTrace();
+      }
+    }
+//    outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
+//    inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
+//    allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
+//    includePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/include.txt";
+//    excludePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/exclude.txt";
+//    tmpResultPath = tmpPath+ LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_result.txt";
+//    tmpDownloadPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_download.txt";
+    outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
+    inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
+    allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
+    includePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/include.txt";
+    excludePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/exclude.txt";
+    tmpResultPath = tmpPath+ LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_result.txt";
+    tmpDownloadPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_download.txt";
+    try {
+      Files.deleteIfExists(Paths.get(allelePath));
+      Files.deleteIfExists(Paths.get(excludePath));
+      Files.deleteIfExists(Paths.get(includePath));
+      Files.deleteIfExists(Paths.get(outputPath));
+      Files.deleteIfExists(Paths.get(tmpDownloadPath));
+      Files.deleteIfExists(Paths.get(inputPath));
+      Files.deleteIfExists(Paths.get(tmpResultPath));
+    } catch (IOException e) {
+      MyPortletUI.logger.error("File System error: Old files could not be deleted");
+      e.printStackTrace();
+    }
   }
 
-  public void initDatabase() {
+  private void initDatabase() {
     uploadPanel.getDataSelection().setEnabled(true);
     gridAcivated = false;
     fileHandler = new DBFileHandler(openbis);
@@ -148,52 +160,45 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       uploadPanel.getProjectSelectionCB().addItem(project.getIdentifier());
     }
 
-    uploadPanel.getProjectSelectionCB().addValueChangeListener(new ValueChangeListener() {
-
-      @Override
-      public void valueChange(ValueChangeEvent event) {
-        List<DataSet> dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
-        BeanItemContainer<DatasetBean> container = fileHandler.fillTable(dataSets);
-        if (container.size() > 0) {
-          uploadPanel.getDatasetGrid().setEnabled(true);
-          uploadPanel.getDatasetGrid().setContainerDataSource(container);
-          filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
-          filterable.removeAllContainerFilters();
-          filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
-          filter("fileName", ".tsv");
-          if (!gridAcivated) {
-            uploadPanel.getDatasetGrid().removeColumn("children");
-            uploadPanel.getDatasetGrid().removeColumn("properties");
-            uploadPanel.getDatasetGrid().removeColumn("id");
-            uploadPanel.getDatasetGrid().removeColumn("projectBean");
-            uploadPanel.getDatasetGrid().removeColumn("dataSetTypeCode");
-            uploadPanel.getDatasetGrid().removeColumn("code");
-            uploadPanel.getDatasetGrid().removeColumn("dssPath");
-            //uploadPanel.getDatasetGrid().removeColumn("type");
-            uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
-            uploadPanel.getDatasetGrid().setHeightByRows(5);
-            uploadPanel.getDatasetGrid().setVisible(true);
-            gridAcivated = true;
-          }
-        } else {
-          uploadPanel.getDatasetGrid().setEnabled(false);
-          uploadPanel.getDatasetGrid().setContainerDataSource(container);
+    uploadPanel.getProjectSelectionCB().addValueChangeListener((ValueChangeListener) event -> {
+      List<DataSet> dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+      BeanItemContainer<DatasetBean> container = fileHandler.fillTable(dataSets);
+      if (container.size() > 0) {
+        uploadPanel.getDatasetGrid().setEnabled(true);
+        uploadPanel.getDatasetGrid().setContainerDataSource(container);
+        filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
+        filterable.removeAllContainerFilters();
+        filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
+        filter("fileName", ".tsv");
+        if (!gridAcivated) {
+          uploadPanel.getDatasetGrid().removeColumn("children");
+          uploadPanel.getDatasetGrid().removeColumn("properties");
+          uploadPanel.getDatasetGrid().removeColumn("id");
+          uploadPanel.getDatasetGrid().removeColumn("projectBean");
+          uploadPanel.getDatasetGrid().removeColumn("dataSetTypeCode");
+          uploadPanel.getDatasetGrid().removeColumn("code");
+          uploadPanel.getDatasetGrid().removeColumn("dssPath");
+          uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
+          uploadPanel.getDatasetGrid().setHeightByRows(5);
+          uploadPanel.getDatasetGrid().setVisible(true);
+          gridAcivated = true;
         }
+      } else {
+        uploadPanel.getDatasetGrid().setEnabled(false);
+        uploadPanel.getDatasetGrid().setContainerDataSource(container);
       }
     });
 
-      uploadPanel.getUploadButton().addClickListener(new ClickListener() {
-      @Override
-      public void buttonClick(ClickEvent event) {
+      uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
         String filename = uploadPanel.getSelected().getBean().getFileName();
         String code = uploadPanel.getSelected().getBean().getCode();
-
-        final Path destination = Paths.get(tmpDownloadPath);
+        Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, "result/"+filename);
           Files.copy(in, destination);
           File file = new File(tmpDownloadPath);
           processingData(file);
+          Files.delete(destination);
         } catch (IOException e) {
           e.printStackTrace();
         } catch (Exception e) {
@@ -201,8 +206,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
           e.printStackTrace();
         }
-      }
-    });
+      });
   }
 
 
@@ -213,7 +217,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * @return accordion with the four tabs "Upload Data", "Epitope Selection", "Parameter Settings"
    *         and "Results"
    */
-  public Accordion createContentAccordion() {
+  private Accordion createContentAccordion() {
     uploadPanel = new PanelUpload();
     uploadPanel.setImmediate(true);
     uploadPanel.getUpload().addSucceededListener(this);
@@ -251,35 +255,30 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    *
    * @return next button
    */
-  public Button createNextButton() {
+  private Button createNextButton() {
     nextButton = new Button("Next");
     nextButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
     nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
     nextButton.setDescription("Go on with the next step.");
-    nextButton.addClickListener(new ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
-        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
-          epitopeSelectionPanel.applyMethodFilter();
-          setParameterRange();
-          parameterPanel.update();
-        }
-        epitopeSelectionPanel.getGeneTf().setValue("");
-        epitopeSelectionPanel.getMutationTf().setValue("");
-        epitopeSelectionPanel.getLengthTf().setValue("");
-        epitopeSelectionPanel.getNeopeptideTf().setValue("");
-        contentAccordion.getTab(parameterPanel).setEnabled(true);
-        contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
-        contentAccordion.setSelectedTab(parameterPanel);
-
-        buttonsLayout.removeComponent(nextButton);
-        runButton = createRunButton();
-        buttonsLayout.addComponent(runButton);
+    nextButton.addClickListener((ClickListener) event -> {
+      epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+      if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+        epitopeSelectionPanel.applyMethodFilter();
         setParameterRange();
+        parameterPanel.update();
       }
+      epitopeSelectionPanel.getGeneTf().setValue("");
+      epitopeSelectionPanel.getMutationTf().setValue("");
+      epitopeSelectionPanel.getLengthTf().setValue("");
+      epitopeSelectionPanel.getNeopeptideTf().setValue("");
+      contentAccordion.getTab(parameterPanel).setEnabled(true);
+      contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
+      contentAccordion.setSelectedTab(parameterPanel);
 
+      buttonsLayout.removeComponent(nextButton);
+      runButton = createRunButton();
+      buttonsLayout.addComponent(runButton);
+      setParameterRange();
     });
     nextButton.setEnabled(false);
     return nextButton;
@@ -291,24 +290,18 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    *
    * @return reset button
    */
-  public Button createResetButton() {
+  private Button createResetButton() {
     resetButton = new Button("Reset");
     resetButton.setDescription("Reset all. Upload a new File.");
     resetButton.setIcon(FontAwesome.TIMES_CIRCLE_O);
     resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
-    resetButton.addClickListener(new ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        downloadFiles.clear();
-        resultsPanel.reset();
-        epitopeSelectionPanel.reset();
-        parameterPanel.reset();
-        reset();
-        Utils.notification("Reset", "You can now upload new data.", "success");
-      }
-
-
+    resetButton.addClickListener((ClickListener) event -> {
+      downloadFiles.clear();
+      resultsPanel.reset();
+      epitopeSelectionPanel.reset();
+      parameterPanel.reset();
+      reset();
+      Utils.notification("Reset", "You can now upload new data.", "success");
     });
     resetButton.setEnabled(false);
     return resetButton;
@@ -321,129 +314,157 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    *
    * @return run button
    */
-  public Button createRunButton() {
+  private Button createRunButton() {
 
     runButton = new Button("Run");
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
     runButton.setDescription("Computes the set of epitopes.");
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-    runButton.addClickListener(new ClickListener() {
+    runButton.addClickListener((ClickListener) (Button.ClickEvent event) -> {
 
+      // remove the filters and set back the filters text fields
+      epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+      if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+        epitopeSelectionPanel.applyMethodFilter();
+        parameterPanel.update();
+        setParameterRange();
+      }
+      epitopeSelectionPanel.getGeneTf().setValue("");
+      epitopeSelectionPanel.getMutationTf().setValue("");
+      epitopeSelectionPanel.getLengthTf().setValue("");
+      epitopeSelectionPanel.getNeopeptideTf().setValue("");
 
-      @Override
-      public void buttonClick(ClickEvent event) {
+      Boolean valuesCorrect = Boolean.FALSE;
+      try {
+        inputWriter = new WriterScriptInput(inputPath, allelePath, includePath, excludePath);
+        setParameterRange();
+        parameterPanel.getKSlider().validate();
+        parameterPanel.getConsAlleleSlider().validate();
+        parameterPanel.getConsAntigenSlider().validate();
+        parameterPanel.getConsOverlapSlider().validate();
+        valuesCorrect = true;
 
-        // remove the filters and set back the filters text fields
-        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
-        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
-          epitopeSelectionPanel.applyMethodFilter();
-          parameterPanel.update();
-          setParameterRange();
-        }
-        epitopeSelectionPanel.getGeneTf().setValue("");
-        epitopeSelectionPanel.getMutationTf().setValue("");
-        epitopeSelectionPanel.getLengthTf().setValue("");
-        epitopeSelectionPanel.getNeopeptideTf().setValue("");
-
-        Boolean valuesCorrect = new Boolean(false);
-        try {
-          inputWriter = new WriterScriptInput(inputPath, allelePath, includePath, excludePath);
-          setParameterRange();
-          parameterPanel.getKSlider().validate();
-          parameterPanel.getConsAlleleSlider().validate();
-          parameterPanel.getConsAntigenSlider().validate();
-          parameterPanel.getConsOverlapSlider().validate();
-          valuesCorrect = true;
-
-        } catch (InvalidValueException e) {
-          Notification.show(e.getMessage());
-        }
-
-        if (valuesCorrect) {
-          runButton.setCaption("Re-Run");
-
-          // set up script input
-          ArrayList<String> p = new ArrayList<>();
-          p.add("python");
-          p.add(scriptPath);
-
-          p.add("-i");
-          p.add(inputPath);
-
-          p.add("-imm");
-          String immCol = uploadPanel.getImmColTf().getValue();
-          p.add(immCol);
-
-          String distCol = uploadPanel.getDistanceColTf().getValue();
-          if (!distCol.equals("")) {
-            p.add("-d");
-            p.add(uploadPanel.getDistanceColTf().getValue());
-          }
-
-          String uncCol = uploadPanel.getUncertaintyColTf().getValue();
-          if (!uncCol.equals("")) {
-            p.add("-u");
-            p.add(uploadPanel.getUncertaintyColTf().getValue());
-          }
-
-          String taaCol = uploadPanel.getTaaColTf().getValue();
-          if (!taaCol.equals("")) {
-            p.add("-taa");
-            p.add(uploadPanel.getTaaColTf().getValue());
-          }
-
-          p.add("-a");
-          p.add(allelePath);
-
-          p.add("-excl");
-          p.add(excludePath);
-
-          p.add("-incl");
-          p.add(includePath);
-
-          p.add("-k");
-          p.add(Integer.toString(parameterPanel.getKSlider().getValue().intValue()));
-
-          p.add("-ktaa");
-          p.add(Integer.toString(parameterPanel.getKtaaSlider().getValue().intValue()));
-
-          p.add("-te");
-          p.add(parameterPanel.getThreshEpitopeTF().getValue().replaceAll(",", "."));
-
-          p.add("-td");
-          p.add(parameterPanel.getThreshDistanceTF().getValue().replaceAll(",", "."));
-
-          p.add("-o");
-          p.add(outputPath);
-
-          p.add("-c_al");
-          p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
-
-          p.add("-c_a");
-          p.add(Double.toString(parameterPanel.getConsAntigenSlider().getValue()));
-
-          p.add("-c_o");
-          p.add(Integer.toString(parameterPanel.getConsOverlapSlider().getValue().intValue()));
-
-          if(parameterPanel.getRankCB().getValue() == true){
-            p.add("-r");
-          }
-
-
-          // writes alleles.txt, include.txt and exclude.txt
-          try {
-            inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
-          } catch (IOException e) {
-            Utils.notification("Problem!",
-                    "There was a problem writing the input files. Please try again", "error");
-            life.qbic.MyPortletUI.logger.error("Error while writing the input data");
-          }
-
-          runScript(p);
-          runButton.setStyleName(null);
-        }
+      } catch (InvalidValueException e) {
+        Notification.show(e.getMessage());
       }
 
+      if (valuesCorrect) {
+        runButton.setCaption("Re-Run");
+        try {
+          Process mkdir = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
+          mkdir.waitFor();
+        } catch (IOException | InterruptedException e) {
+          MyPortletUI.logger.error("Couldn't create folder on virtual machine.");
+          e.printStackTrace();
+        }
+        // set up script input
+        ArrayList<String> p = new ArrayList<>();
+        p.add("ssh");
+        p.add("-i");
+        p.add("~/.ssh/key_rsa");
+        p.add("jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de");
+
+        p.add("singularity");
+        p.add("run");
+        p.add("--bind");
+        p.add("/root/COIN/bin/:/usr/local/bin/");
+        p.add("epitopeselector.img");
+
+        p.add("-i");
+        p.add(tmpPathRemote+random+"/input.txt");
+
+        p.add("-imm");
+        String immCol = uploadPanel.getImmColTf().getValue();
+        p.add(immCol);
+
+        String distCol = uploadPanel.getDistanceColTf().getValue();
+        if (!distCol.equals("")) {
+          p.add("-d");
+          p.add(uploadPanel.getDistanceColTf().getValue());
+        }
+
+        String uncCol = uploadPanel.getUncertaintyColTf().getValue();
+        if (!uncCol.equals("")) {
+          p.add("-u");
+          p.add(uploadPanel.getUncertaintyColTf().getValue());
+        }
+
+        String taaCol = uploadPanel.getTaaColTf().getValue();
+        if (!taaCol.equals("")) {
+          p.add("-taa");
+          p.add(uploadPanel.getTaaColTf().getValue());
+        }
+
+        p.add("-a");
+        p.add(tmpPathRemote+random+"/alleles.txt");
+
+        p.add("-excl");
+        p.add(tmpPathRemote+random+"/exclude.txt");
+
+        p.add("-incl");
+        p.add(tmpPathRemote+random+"/include.txt");
+
+        p.add("-k");
+        p.add(Integer.toString(parameterPanel.getKSlider().getValue().intValue()));
+
+        p.add("-ktaa");
+        p.add(Integer.toString(parameterPanel.getKtaaSlider().getValue().intValue()));
+
+        p.add("-te");
+        p.add(parameterPanel.getThreshEpitopeTF().getValue().replaceAll(",", "."));
+
+        p.add("-td");
+        p.add(parameterPanel.getThreshDistanceTF().getValue().replaceAll(",", "."));
+
+        p.add("-o");
+        remoteOutputPath = tmpPathRemote+random+"/output.txt";
+        p.add(remoteOutputPath);
+
+
+        p.add("-c_al");
+        p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
+
+        p.add("-c_a");
+        p.add(Double.toString(parameterPanel.getConsAntigenSlider().getValue()));
+
+        p.add("-c_o");
+        p.add(Integer.toString(parameterPanel.getConsOverlapSlider().getValue().intValue()));
+
+        if(parameterPanel.getRankCB().getValue()){
+          p.add("-r");
+        }
+
+
+        // writes alleles.txt, include.txt and exclude.txt
+        try {
+          inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
+        } catch (IOException e) {
+          Utils.notification("Problem!",
+                  "There was a problem writing the input files. Please try again", "error");
+          MyPortletUI.logger.error("Error while writing the input data");
+        }
+
+        try {
+          Process mkdir_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
+          mkdir_random.waitFor();
+          scpFile.scpToRemote(inputPath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(allelePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(includePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(excludePath, epitopeSelectorVM+random);
+        } catch (IOException | InterruptedException e) {
+          MyPortletUI.logger.error("Could not copy the files to the VM");
+          e.printStackTrace();
+        }
+
+        StringBuilder command = new StringBuilder("Execute command on virtual machine: '");
+        for (String word : p){
+          command.append(" ").append(word);
+        }
+        MyPortletUI.logger.info(command+"'");
+
+        runScript(p);
+        runButton.setStyleName(null);
+      }
     });
 
     return runButton;
@@ -454,14 +475,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    *
    * @return download button
    */
-  public Button createDownloadButton() {
+  private Button createDownloadButton() {
     downloadButton = new Button("Save");
     downloadButton.setIcon(FontAwesome.DOWNLOAD);
     downloadButton.setDescription("Save your results");
     downloadButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
     downloadButton.setVisible(false);
     Resource res = new FileResource(new File(tmpResultPath));
-    downloader = new FileDownloader(res);
+    FileDownloader downloader = new FileDownloader(res);
     downloader.extend(downloadButton);
     return downloadButton;
   }
@@ -471,12 +492,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    *
    * @return layout with buttons
    */
-  public HorizontalLayout createButtonsLayout() {
+  private HorizontalLayout createButtonsLayout() {
     buttonsLayout = new HorizontalLayout();
     buttonsLayout.setSpacing(true);
     resetButton = createResetButton();
     nextButton = createNextButton();
-    // firstNextButton = createFirstNextButton();
     downloadButton = createDownloadButton();
     buttonsLayout.addComponents(resetButton, createNextButton(), downloadButton);
     return buttonsLayout;
@@ -500,7 +520,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   }
 
-  public void processingData(File file) throws Exception {
+  private void processingData(File file) throws Exception {
+    Boolean hasMethod;
     if (uploadPanel.getComboInput().getValue().equals("Standard")) {
       ParserInputStandard parser = new ParserInputStandard();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
@@ -589,36 +610,29 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion.getTab(uploadPanel).setEnabled(false);
     contentAccordion.getTab(uploadPanel).setEnabled(false);
     contentAccordion.setSelectedTab(epitopeSelectionPanel);
-    contentAccordion.addSelectedTabChangeListener(new SelectedTabChangeListener() {
-      @Override
-      public void selectedTabChange(SelectedTabChangeEvent event) {
-        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
-        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
-          epitopeSelectionPanel.applyMethodFilter();
-          parameterPanel.update();
-          setParameterRange();
-        }
-        epitopeSelectionPanel.getGeneTf().setValue("");
-        epitopeSelectionPanel.getMutationTf().setValue("");
-        epitopeSelectionPanel.getLengthTf().setValue("");
-        epitopeSelectionPanel.getNeopeptideTf().setValue("");
+    contentAccordion.addSelectedTabChangeListener((SelectedTabChangeListener) event -> {
+      epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+      if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+        epitopeSelectionPanel.applyMethodFilter();
+        parameterPanel.update();
+        setParameterRange();
       }
+      epitopeSelectionPanel.getGeneTf().setValue("");
+      epitopeSelectionPanel.getMutationTf().setValue("");
+      epitopeSelectionPanel.getLengthTf().setValue("");
+      epitopeSelectionPanel.getNeopeptideTf().setValue("");
     });
     contentAccordion.getTab(uploadPanel).setIcon(FontAwesome.CHECK_CIRCLE);
     buttonsLayout.addComponent(nextButton);
     if (uploadPanel.getMethodColTf().getValue().equals("")) {
       nextButton.setEnabled(true);
     } else {
-      epitopeSelectionPanel.getMethodSelect().addValueChangeListener(new ValueChangeListener() {
-
-        @Override
-        public void valueChange(ValueChangeEvent event) {
-          epitopeSelectionPanel.applyMethodFilter();
-          parameterPanel.update();
-          setParameterRange();
-          epitopeSelectionPanel.getDataGrid().setEnabled(true);
-          nextButton.setEnabled(true);
-        }
+      epitopeSelectionPanel.getMethodSelect().addValueChangeListener((ValueChangeListener) event -> {
+        epitopeSelectionPanel.applyMethodFilter();
+        parameterPanel.update();
+        setParameterRange();
+        epitopeSelectionPanel.getDataGrid().setEnabled(true);
+        nextButton.setEnabled(true);
       });
     }
     Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
@@ -629,56 +643,50 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   /**
    * Runs the epitope selection script
    *
-   * @param program list of all arguments to start the script
+   * @param command list of all arguments to start the script
    */
-  public void runScript(ArrayList<String> program) {
+  public void runScript(ArrayList<String> command) {
     WindowLoading loadingWindow = new WindowLoading();
 
-    Thread t = new Thread(new Runnable() {
+    Thread t = new Thread(() -> {
 
-      @Override
-      public void run() {
+      ProcessBuilder pb = new ProcessBuilder(command);
 
-        ProcessBuilder pb = new ProcessBuilder(program);
-        pb.environment().put("PATH", solverPath);
+      try {
+        proc = pb.start();
+        BufferedReader stdError =
+                new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-        try {
-          proc = pb.start();
-          BufferedReader stdError =
-                  new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-          String s;
-          System.out.println("Here is the standard error of the command (if any):\n");
-          while ((s = stdError.readLine()) != null) {
-            life.qbic.MyPortletUI.logger.error(s);
-          }
-          if (0 == proc.waitFor()) {
-            proc.destroyForcibly();
-            prepareResults();
-            cleanFiles();
-            loadingWindow.success();
-          } else {
-            proc.destroyForcibly();
-            loadingWindow.failure();
-            cleanFiles();
-          }
-        } catch (IOException e) {
-          life.qbic.MyPortletUI.logger.error("NeoOptiTope could not be found");
-          loadingWindow.failure();
-        } catch (InterruptedException e) {
-          Utils.notification("Computation interrupted!", "", "error");
-          life.qbic.MyPortletUI.logger.error("Computation interrupted");
+        pb.redirectErrorStream();
+        InputStream inputStream = proc.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = null;
+        while((line = reader.readLine())!= null) {
+          System.out.println(line);
         }
+        if (0 == proc.waitFor()) {
+          proc.destroyForcibly();
+          prepareResults();
+          cleanFiles();
+          loadingWindow.success();
+        } else {
+          proc.destroyForcibly();
+          loadingWindow.failure();
+          cleanFiles();
+        }
+      } catch (IOException e) {
+        MyPortletUI.logger.error("NeoOptiTope could not be found");
+        loadingWindow.failure();
+      } catch (InterruptedException e) {
+        Utils.notification("Computation interrupted!", "", "error");
+        MyPortletUI.logger.error("Computation interrupted");
       }
     });
 
-    loadingWindow.getCancelBu().addClickListener(new ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        t.interrupt();
-        proc.destroyForcibly();
-        loadingWindow.close();
-      }
+    loadingWindow.getCancelBu().addClickListener((ClickListener) event -> {
+      t.interrupt();
+      proc.destroyForcibly();
+      loadingWindow.close();
     });
 
     t.start();
@@ -689,7 +697,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   /**
    * Prepares the result to show them in the "Results" tab of the content accordion.
    */
-  public void prepareResults() {
+  private void prepareResults() {
+    scpFile.scpFromRemote(epitopeSelectorVM, remoteOutputPath, outputPath);
     getResults();
     downloadButton.setVisible(true);
 
@@ -697,24 +706,21 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion.getTab(parameterPanel).setEnabled(true);
     contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
     contentAccordion.setSelectedTab(resultsPanel);
-    contentAccordion.addSelectedTabChangeListener(new SelectedTabChangeListener() {
-      @Override
-      public void selectedTabChange(SelectedTabChangeEvent event) {
-        epitopeSelectionPanel.getContainer().removeAllContainerFilters();
-        if (!uploadPanel.getMethodColTf().getValue().equals("")) {
-          epitopeSelectionPanel.applyMethodFilter();
-          setParameterRange();
-          parameterPanel.update();
-        }
-        epitopeSelectionPanel.getGeneTf().setValue("");
-        epitopeSelectionPanel.getMutationTf().setValue("");
-        epitopeSelectionPanel.getLengthTf().setValue("");
-        epitopeSelectionPanel.getNeopeptideTf().setValue("");
-        for (TabResult tr : resultsPanel.getTabs()) {
-          tr.getFilterable().removeAllContainerFilters();
-        }
+    contentAccordion.addSelectedTabChangeListener((SelectedTabChangeListener) event -> {
+      epitopeSelectionPanel.getContainer().removeAllContainerFilters();
+      if (!uploadPanel.getMethodColTf().getValue().equals("")) {
+        epitopeSelectionPanel.applyMethodFilter();
         setParameterRange();
+        parameterPanel.update();
       }
+      epitopeSelectionPanel.getGeneTf().setValue("");
+      epitopeSelectionPanel.getMutationTf().setValue("");
+      epitopeSelectionPanel.getLengthTf().setValue("");
+      epitopeSelectionPanel.getNeopeptideTf().setValue("");
+      for (TabResult tr : resultsPanel.getTabs()) {
+        tr.getFilterable().removeAllContainerFilters();
+      }
+      setParameterRange();
     });
 
   }
@@ -723,8 +729,15 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * Deletes all files needed by the epitope selection script: allele file, exclude file, include
    * file, and the ouput file.
    */
-  public void cleanFiles() {
+  private void cleanFiles() {
     try {
+      try {
+        Process remove_randomRemote = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf "  + tmpPathRemote+random);
+        remove_randomRemote.waitFor();
+        random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
       Files.deleteIfExists(Paths.get(allelePath));
       Files.deleteIfExists(Paths.get(excludePath));
       Files.deleteIfExists(Paths.get(includePath));
@@ -739,7 +752,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * Get all the results and add a new result to the downloadable file. Reads the output file and
    * shows it in a tab. Prepares the downloadable result file.
    */
-  public void getResults() {
+  private void getResults() {
     File resultsFile = new File(outputPath);
     downloadFiles.add(resultsFile);
     ParserScriptResult rp = new ParserScriptResult();
@@ -752,20 +765,19 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   /**
    * Resets the main layout to the settings from the beginning
    */
-  public void reset() {
+  private void reset() {
     this.removeAllComponents();
     init();
     initDatabase();
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
-
   }
 
   /**
    * Sets the range of the parameters which can be adjusted by the user in the "Parameter Settings"
    * tab of the accordion
    */
-  public void setParameterRange() {
+  private void setParameterRange() {
     double numberOfIncluded = epitopeSelectionPanel.getIncludedBeans().size();
     double numberOfExcluded = epitopeSelectionPanel.getExcludedBeans().size();
     double numberOfPeptides = epitopeSelectionPanel.getDataGrid().getContainerDataSource().size();
@@ -792,7 +804,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * @param column to filter
    * @param filter string to filter the column
    */
-  public void filter(String column, String filter) {
+  private void filter(String column, String filter) {
     Filter tmpFilter = new SimpleStringFilter(column, filter, false, false);
     if (!filterable.getContainerFilters().contains(tmpFilter)) {
       filterable.addContainerFilter(tmpFilter);
@@ -802,32 +814,15 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   }
 
-  public static Boolean getHasMethod() {
-    return hasMethod;
-  }
-
   public static Boolean getHasType() {
     return hasType;
-  }
-
-  public static void setHasType(Boolean hasType) {
-    LayoutMain.hasType = hasType;
   }
 
   public static Boolean getHasUnc() {
     return hasUnc;
   }
 
-  public static void setHasUnc(Boolean hasUnc) {
-    LayoutMain.hasUnc = hasUnc;
-  }
-
   public static Boolean getHasDist() {
     return hasDist;
   }
-
-  public static void setHasDist(Boolean hasDist) {
-    LayoutMain.hasDist = hasDist;
-  }
-
 }
