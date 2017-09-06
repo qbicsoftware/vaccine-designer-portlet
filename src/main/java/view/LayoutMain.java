@@ -35,6 +35,7 @@ import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
 import helper.*;
 import life.qbic.MyPortletUI;
 import life.qbic.openbis.openbisclient.OpenBisClient;
+import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 import model.DatasetBean;
 
 /**
@@ -63,7 +64,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private Boolean gridAcivated;
   private Filterable filterable;
   private static Boolean hasType;
-  private static Boolean hasMethod;
   private static Boolean hasUnc;
   private static Boolean hasDist;
   private OpenBisClient openbis;
@@ -71,17 +71,15 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private SCPFile scpFile;
   private RandomCharGenerator generator;
 
-
-
-// All Paths are set here
-  private String outputPath = "/Users/spaethju/Desktop/output.txt";
-  private String inputPath = "/Users/spaethju/Desktop/input.txt";
-  private String allelePath = "/Users/spaethju/Desktop/alleles.txt";
-  private String includePath = "/Users/spaethju/Desktop/include.txt";
-  private String excludePath = "/Users/spaethju/Desktop/exclude.txt";
-  private String solverPath = "/Users/spaethju/PycharmProjects/epitopeSelectionScript";
-  private String tmpResultPath = "/Users/spaethju/Desktop/tmp_result.txt";
-  private String tmpDownloadPath = "/Users/spaethju/Desktop/tmp_download.txt";
+  private String tmpPath = "/Users/spaethju/Desktop/";
+  private String tmpPathRemote = "/home/jspaeth/";
+  private String outputPath = "";
+  private String inputPath = "";
+  private String allelePath = "";
+  private String includePath = "";
+  private String excludePath = "";
+  private String tmpResultPath = "";
+  private String tmpDownloadPath = "";
   private String remoteOutputPath = "";
   private String random = "";
 
@@ -105,7 +103,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public LayoutMain(List<Project> projects, OpenBisClient openbis) {
     this.openbis = openbis;
     this.projects = projects;
-    generator = new RandomCharGenerator();
     scpFile = new SCPFile();
     init();
     initDatabase();
@@ -126,6 +123,36 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
 
+    generator = new RandomCharGenerator();
+    random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+    File f = new File(tmpPath+LiferayAndVaadinUtils.getUser().getScreenName());
+    if(!(f.exists() && f.isDirectory())) {
+      try {
+        Runtime.getRuntime().exec("mkdir " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName());
+      } catch (IOException e) {
+        MyPortletUI.logger.error("Could not write the folder on the file system");
+        e.printStackTrace();
+      }
+    }
+    outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
+    inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
+    allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
+    includePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/include.txt";
+    excludePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/exclude.txt";
+    tmpResultPath = tmpPath+ LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_result.txt";
+    tmpDownloadPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_download.txt";
+    try {
+      Files.deleteIfExists(Paths.get(allelePath));
+      Files.deleteIfExists(Paths.get(excludePath));
+      Files.deleteIfExists(Paths.get(includePath));
+      Files.deleteIfExists(Paths.get(outputPath));
+      Files.deleteIfExists(Paths.get(tmpDownloadPath));
+      Files.deleteIfExists(Paths.get(inputPath));
+      Files.deleteIfExists(Paths.get(tmpResultPath));
+    } catch (IOException e) {
+      MyPortletUI.logger.error("File System error: Old files could not be deleted");
+      e.printStackTrace();
+    }
   }
 
   private void initDatabase() {
@@ -327,8 +354,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
       if (valuesCorrect) {
         runButton.setCaption("Re-Run");
-
-        random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
         try {
           Process mkdir = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
           mkdir.waitFor();
@@ -350,7 +375,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         p.add("epitopeselector.img");
 
         p.add("-i");
-        p.add("/home/jspaeth/"+random+"/input.txt");
+        p.add(tmpPathRemote+random+"/input.txt");
 
         p.add("-imm");
         String immCol = uploadPanel.getImmColTf().getValue();
@@ -375,13 +400,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
 
         p.add("-a");
-        p.add("/home/jspaeth/"+random+"/alleles.txt");
+        p.add(tmpPathRemote+random+"/alleles.txt");
 
         p.add("-excl");
-        p.add("/home/jspaeth/"+random+"/exclude.txt");
+        p.add(tmpPathRemote+random+"/exclude.txt");
 
         p.add("-incl");
-        p.add("/home/jspaeth/"+random+"/include.txt");
+        p.add(tmpPathRemote+random+"/include.txt");
 
         p.add("-k");
         p.add(Integer.toString(parameterPanel.getKSlider().getValue().intValue()));
@@ -396,8 +421,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         p.add(parameterPanel.getThreshDistanceTF().getValue().replaceAll(",", "."));
 
         p.add("-o");
-        p.add("/home/jspaeth/"+random+"/output.txt");
-        remoteOutputPath = "/home/jspaeth/" + random + "/output.txt";
+        remoteOutputPath = tmpPathRemote+random+"/output.txt";
+        p.add(remoteOutputPath);
+
 
         p.add("-c_al");
         p.add(Double.toString(parameterPanel.getConsAlleleSlider().getValue()));
@@ -423,7 +449,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
 
         try {
-          Process mkdir_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
+          Process mkdir_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
           mkdir_random.waitFor();
           scpFile.scpToRemote(inputPath, epitopeSelectorVM+random);
           scpFile.scpToRemote(allelePath, epitopeSelectorVM+random);
@@ -434,14 +460,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           e.printStackTrace();
         }
 
-        String command = "Execute command on virtual machine: '";
+        StringBuilder command = new StringBuilder("Execute command on virtual machine: '");
         for (String word : p){
-          command = command + " " + word;
+          command.append(" ").append(word);
         }
         MyPortletUI.logger.info(command+"'");
 
         runScript(p);
-
         runButton.setStyleName(null);
       }
     });
@@ -500,6 +525,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   }
 
   private void processingData(File file) throws Exception {
+    Boolean hasMethod;
     if (uploadPanel.getComboInput().getValue().equals("Standard")) {
       ParserInputStandard parser = new ParserInputStandard();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
@@ -677,12 +703,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   private void prepareResults() {
     scpFile.scpFromRemote(epitopeSelectorVM, remoteOutputPath, outputPath);
-    try {
-      Process remove_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf "  + "~/"+random);
-      remove_random.waitFor();
-    } catch (IOException | InterruptedException e) {
-      e.printStackTrace();
-    }
     getResults();
     downloadButton.setVisible(true);
 
@@ -715,6 +735,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   private void cleanFiles() {
     try {
+      try {
+        Process remove_randomRemote = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf "  + tmpPathRemote+random);
+        remove_randomRemote.waitFor();
+        random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+      }
       Files.deleteIfExists(Paths.get(allelePath));
       Files.deleteIfExists(Paths.get(excludePath));
       Files.deleteIfExists(Paths.get(includePath));
@@ -748,7 +775,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     initDatabase();
     contentAccordion.setSelectedTab(uploadPanel);
     downloadFiles = new ArrayList<>();
-
   }
 
   /**
@@ -803,5 +829,4 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   public static Boolean getHasDist() {
     return hasDist;
   }
-
 }
