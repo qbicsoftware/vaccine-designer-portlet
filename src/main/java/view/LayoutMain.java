@@ -71,7 +71,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private SCPFile scpFile;
   private RandomCharGenerator generator;
 
-  private String tmpPath = "/Users/spaethju/Desktop/";
+  //private String tmpPath = "/Users/spaethju/Desktop/";
+  private String tmpPath = "/tmp/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
@@ -82,18 +83,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String tmpDownloadPath = "";
   private String remoteOutputPath = "";
   private String random = "";
-
-  //TODO RANDOM FOLDER!
-//  private String outputPath = new String("/tmp/output.txt");
-//  private String scriptPath =
-//          new String("/usr/share/neooptitope/NeoOptiTope.py");
-//  private String inputPath = new String("/tmp/input.txt");
-//  private String allelePath = new String("/tmp/alleles.txt");
-//  private String includePath = new String("/tmp/include.txt");
-//  private String excludePath = new String("/tmp/exclude.txt");
-//  private String solverPath = new String("/usr/local/sbin/");
-//  private String tmpResultPath = new String("/tmp/tmp_result.txt");
-//  private String tmpDownloadPath = new String("/tmp/tmp_download.txt");
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:";
 
 
@@ -134,6 +123,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         e.printStackTrace();
       }
     }
+//    outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
+//    inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
+//    allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
+//    includePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/include.txt";
+//    excludePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/exclude.txt";
+//    tmpResultPath = tmpPath+ LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_result.txt";
+//    tmpDownloadPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_download.txt";
     outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
     inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
     allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
