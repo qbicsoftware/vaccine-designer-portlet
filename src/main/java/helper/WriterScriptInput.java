@@ -181,12 +181,4 @@ public class WriterScriptInput {
     return alleleString;
   }
 
-  /**
-   * @param container bean item container containing all neopeptides from the uploaded input file.
-   * @return number of all included beans
-   */
-  public int getNumberOfIncludedBeans(BeanItemContainer<EpitopeSelectionBean> container) {
-    return getIncludedBeans(container).size();
-  }
-
 }
