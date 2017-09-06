@@ -57,6 +57,7 @@ public class WriterResults {
     } catch (IOException ex) {
       Utils.notification("Result Error",
           "An problem occured while saving the results. Please try again", "error");
+      ex.printStackTrace();
     }
 
   }

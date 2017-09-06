@@ -27,33 +27,23 @@ public class DBFileHandler {
   
   /**
    * Returns a Container with the informations of de.uni_tuebingen.qbic.beans.DatasetBean.
-   * 
-   * @param datasets
-   * @return
    */
   public BeanItemContainer<DatasetBean> fillTable(
       List<DataSet> datasets) {
-    HashMap<String, DataSet> dataMap =
-        new HashMap<String, DataSet>();
-    BeanItemContainer<DatasetBean> container =
-        new BeanItemContainer<DatasetBean>(DatasetBean.class);
+    HashMap<String, DataSet> dataMap = new HashMap<>();
+    BeanItemContainer<DatasetBean> container;
+    container = new BeanItemContainer<>(DatasetBean.class);
 
     for (DataSet ds : datasets) {
       dataMap.put(ds.getCode(), ds);
     }
 
-    List<model.DatasetBean> datasetBeans = new ArrayList<model.DatasetBean>();
-    datasetBeans = queryDatasetsForFiles(datasets);
+    List<model.DatasetBean> datasetBeans = queryDatasetsForFiles(datasets);
 
-    List<String> fileNames = new ArrayList<String>();
+    List<String> fileNames = new ArrayList<>();
 
     for (model.DatasetBean bean : datasetBeans) {
       fileNames.add(bean.getFileName());
-
-//      DatasetBean newBean =
-//          new DatasetBean(bean.getFileName(), dataMap.get(bean.getCode()).getDataSetTypeCode(),
-//              bean.getCode(), bean.getDssPath(), dataMap.get(bean.getCode())
-//                  .getSampleIdentifierOrNull());
 
       if (dataMap.get(bean.getCode()).getProperties() != null) {
         bean.setProperties(dataMap.get(bean.getCode()).getProperties());
@@ -70,13 +60,13 @@ public class DBFileHandler {
    * @return A list of DatasetBeans denoting the roots of the folder structure of each dataset.
    *         Subfolders and files can be reached by calling the getChildren() function on each Bean.
    */
-  public List<DatasetBean> queryDatasetsForFolderStructure(
-      List<DataSet> datasets) {
-    Map<String, List<String>> params = new HashMap<String, List<String>>();
-    List<String> dsCodes = new ArrayList<String>();
-    Map<String, String> types = new HashMap<String, String>();
+  private List<DatasetBean> queryDatasetsForFolderStructure(
+          List<DataSet> datasets) {
+    Map<String, List<String>> params = new HashMap<>();
+    List<String> dsCodes = new ArrayList<>();
+    Map<String, String> types = new HashMap<>();
 
-    Map<String, Map<String, String>> props = new LinkedHashMap<String, Map<String, String>>();
+    Map<String, Map<String, String>> props = new LinkedHashMap<>();
 
     for (DataSet ds : datasets) {
       dsCodes.add(ds.getCode());
@@ -88,8 +78,8 @@ public class DBFileHandler {
     QueryTableModel res = openbis.queryFileInformation(params);
 
     // TODO this should work, but here starts the new code in case it doesn't 07.08.15 - Andreas
-    Map<String, List<DatasetBean>> folderStructure = new HashMap<String, List<DatasetBean>>();
-    Map<String, DatasetBean> fileNames = new HashMap<String, DatasetBean>();
+    Map<String, List<DatasetBean>> folderStructure = new HashMap<>();
+    Map<String, DatasetBean> fileNames = new HashMap<>();
 
     for (Serializable[] ss : res.getRows()) {
 
@@ -115,7 +105,7 @@ public class DBFileHandler {
       if (folderStructure.containsKey(folderKey)) {
         folderStructure.get(folderKey).add(b);
       } else {
-        List<DatasetBean> inFolder = new ArrayList<DatasetBean>();
+        List<DatasetBean> inFolder = new ArrayList<>();
         inFolder.add(b);
         folderStructure.put(folderKey, inFolder);
       }
@@ -133,8 +123,8 @@ public class DBFileHandler {
     // Remove empty folders
     List<DatasetBean> level = roots;
     while (!level.isEmpty()) {
-      List<DatasetBean> collect = new ArrayList<DatasetBean>();
-      List<DatasetBean> toRemove = new ArrayList<DatasetBean>();
+      List<DatasetBean> collect = new ArrayList<>();
+      List<DatasetBean> toRemove = new ArrayList<>();
       for (DatasetBean b : level) {
         if (b.hasChildren()) {
           collect.addAll(b.getChildren());
@@ -151,7 +141,7 @@ public class DBFileHandler {
     // TODO remove following lines if it works, this is for debug
     level = roots;
     while (!level.isEmpty()) {
-      List<DatasetBean> collect = new ArrayList<DatasetBean>();
+      List<DatasetBean> collect = new ArrayList<>();
       for (DatasetBean b : level) {
         if (b.hasChildren())
           collect.addAll(b.getChildren());
@@ -172,8 +162,8 @@ public class DBFileHandler {
       found.add(root);
 
     } else {
-      for (int i = 0; i < current.size(); i++) {
-        getAllFiles(found, current.get(i));
+      for (DatasetBean aCurrent : current) {
+        getAllFiles(found, aCurrent);
       }
     }
     return found;
@@ -182,13 +172,13 @@ public class DBFileHandler {
 
   public List<DatasetBean> queryDatasetsForFiles(
       List<DataSet> datasets) {
-    List<DatasetBean> results = new ArrayList<DatasetBean>();
+    List<DatasetBean> results = new ArrayList<>();
 
     if (datasets.size() > 0) {
       List<DatasetBean> roots = queryDatasetsForFolderStructure(datasets);
 
       for (DatasetBean ds : roots) {
-        List<DatasetBean> startList = new ArrayList<DatasetBean>();
+        List<DatasetBean> startList = new ArrayList<>();
         results.addAll(getAllFiles(startList, ds));
       }
     }
