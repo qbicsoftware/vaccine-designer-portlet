@@ -260,6 +260,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private Button createNextButton() {
     nextButton = new Button("Next");
     nextButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+    nextButton.addStyleName(ValoTheme.BUTTON_SMALL);
     nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
     nextButton.setDescription("Go on with the next step.");
     nextButton.addClickListener((ClickListener) event -> {
@@ -309,6 +310,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     resetButton.setDescription("Reset all. Upload a new File.");
     resetButton.setIcon(FontAwesome.TIMES_CIRCLE_O);
     resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
+    resetButton.addStyleName(ValoTheme.BUTTON_SMALL);
     resetButton.addClickListener((ClickListener) event -> {
       downloadFiles.clear();
       resultsPanel.reset();
@@ -334,6 +336,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
     runButton.setDescription("Computes the set of epitopes.");
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+    runButton.addStyleName(ValoTheme.BUTTON_SMALL);
     runButton.addClickListener((ClickListener) (Button.ClickEvent event) -> {
 
       // remove the filters and set back the filters text fields
@@ -478,6 +481,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
         runScript(p);
         runButton.setStyleName(null);
+        runButton.addStyleName(ValoTheme.BUTTON_SMALL);
       }
     });
 
@@ -494,6 +498,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     downloadButton.setIcon(FontAwesome.DOWNLOAD);
     downloadButton.setDescription("Save your results");
     downloadButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+    downloadButton.addStyleName(ValoTheme.BUTTON_SMALL);
     downloadButton.setVisible(false);
     Resource res = new FileResource(new File(tmpResultPath));
     FileDownloader downloader = new FileDownloader(res);
