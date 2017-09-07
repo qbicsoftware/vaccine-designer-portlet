@@ -4,7 +4,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.vaadin.data.Container.Filter;
@@ -49,7 +51,7 @@ import model.DatasetBean;
 @SuppressWarnings("serial")
 public class LayoutMain extends VerticalLayout implements SucceededListener {
 
-  private Button nextButton, runButton, downloadButton, resetButton;
+  private Button nextButton, runButton, downloadButton, resetButton, registerButton;
   private HorizontalLayout buttonsLayout;
   private Accordion contentAccordion;
   private PanelUpload uploadPanel;
@@ -70,10 +72,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private List<Project> projects;
   private SCPFile scpFile;
   private RandomCharGenerator generator;
+  private String code;
 
-  //private String tmpPath = "/Users/spaethju/Desktop/";
-  private String tmpPath = "/tmp/";
-  private String homePath = "/home/luser/";
+  private String tmpPath = "/Users/spaethju/Desktop/";
+  //private String tmpPath = "/tmp/";
+  private String homePath = "/Users/spaethju/";
+ // private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
@@ -85,6 +89,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String remoteOutputPath = "";
   private String random = "";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:";
+  private String registerPath = "qeana08@data.qbic.uni-tuebingen.de:/mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming";
+
 
 
   /**
@@ -124,13 +130,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         e.printStackTrace();
       }
     }
-//    outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
-//    inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
-//    allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
-//    includePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/include.txt";
-//    excludePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/exclude.txt";
-//    tmpResultPath = tmpPath+ LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_result.txt";
-//    tmpDownloadPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_download.txt";
     outputPath = tmpPath +LiferayAndVaadinUtils.getUser().getScreenName() +"/output.txt";
     inputPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/input.txt";
     allelePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/alleles.txt";
@@ -192,7 +191,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
         String filename = uploadPanel.getSelected().getBean().getFileName();
-        String code = uploadPanel.getSelected().getBean().getCode();
+        code = uploadPanel.getSelected().getBean().getCode();
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, "result/"+filename);
@@ -259,6 +258,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private Button createNextButton() {
     nextButton = new Button("Next");
     nextButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+    nextButton.addStyleName(ValoTheme.BUTTON_SMALL);
     nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
     nextButton.setDescription("Go on with the next step.");
     nextButton.addClickListener((ClickListener) event -> {
@@ -285,6 +285,34 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     return nextButton;
   }
 
+  private Button createRegisterButton() {
+    registerButton = new Button("Register");
+    registerButton.setDescription("Register result in database.");
+    registerButton.setIcon(FontAwesome.UPLOAD);
+    registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
+    registerButton.addClickListener((ClickListener) event -> {
+        try {
+          String timeStamp = new SimpleDateFormat("yyyy_MM_dd-HH_mm").format(new Date());
+          String resultName = "/" + code + "_" + timeStamp + "_epitopeselection_result" + ".txt";
+          Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+          copy_result.waitFor();
+          MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+          scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName, registerPath);
+          Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+          remove_result.waitFor();
+          MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+        } catch (IOException | InterruptedException e) {
+          MyPortletUI.logger.error("Could not write the folder on the file system");
+          Utils.notification("Error", "Please try again.", "error");
+          e.printStackTrace();
+        }
+      Utils.notification("Results registered", "SUCCESS", "success");
+      MyPortletUI.logger.info("Result registered");
+    });
+    registerButton.setVisible(false);
+    return registerButton;
+  }
+
   /**
    * Creates a button which resets the whole progress and allows a new upload of the data. The user
    * starts from the beginning again.
@@ -296,6 +324,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     resetButton.setDescription("Reset all. Upload a new File.");
     resetButton.setIcon(FontAwesome.TIMES_CIRCLE_O);
     resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
+    resetButton.addStyleName(ValoTheme.BUTTON_SMALL);
     resetButton.addClickListener((ClickListener) event -> {
       downloadFiles.clear();
       resultsPanel.reset();
@@ -321,6 +350,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
     runButton.setDescription("Computes the set of epitopes.");
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+    runButton.addStyleName(ValoTheme.BUTTON_SMALL);
     runButton.addClickListener((ClickListener) (Button.ClickEvent event) -> {
 
       // remove the filters and set back the filters text fields
@@ -445,26 +475,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           MyPortletUI.logger.error("Error while writing the input data");
         }
 
-        try {
-          Process mkdir_random = Runtime.getRuntime().exec("ssh -i "+homePath+".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
-          mkdir_random.waitFor();
-          scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM+random);
-          scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM+random);
-          scpFile.scpToRemote(homePath, includePath, epitopeSelectorVM+random);
-          scpFile.scpToRemote(homePath, excludePath, epitopeSelectorVM+random);
-        } catch (IOException | InterruptedException e) {
-          MyPortletUI.logger.error("Could not copy the files to the VM");
-          e.printStackTrace();
-        }
-
-        StringBuilder command = new StringBuilder("Execute command on virtual machine: '");
-        for (String word : p){
-          command.append(" ").append(word);
-        }
-        MyPortletUI.logger.info(command+"'");
-
         runScript(p);
         runButton.setStyleName(null);
+        runButton.addStyleName(ValoTheme.BUTTON_SMALL);
       }
     });
 
@@ -481,6 +494,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     downloadButton.setIcon(FontAwesome.DOWNLOAD);
     downloadButton.setDescription("Save your results");
     downloadButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+    downloadButton.addStyleName(ValoTheme.BUTTON_SMALL);
     downloadButton.setVisible(false);
     Resource res = new FileResource(new File(tmpResultPath));
     FileDownloader downloader = new FileDownloader(res);
@@ -499,7 +513,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     resetButton = createResetButton();
     nextButton = createNextButton();
     downloadButton = createDownloadButton();
-    buttonsLayout.addComponents(resetButton, createNextButton(), downloadButton);
+    registerButton = createRegisterButton();
+    buttonsLayout.addComponents(resetButton, nextButton, downloadButton, registerButton);
     return buttonsLayout;
   }
 
@@ -654,6 +669,23 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       ProcessBuilder pb = new ProcessBuilder(command);
 
       try {
+        try {
+          Process mkdir_random = Runtime.getRuntime().exec("ssh -i "+homePath+".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
+          mkdir_random.waitFor();
+          scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, includePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, excludePath, epitopeSelectorVM+random);
+        } catch (IOException | InterruptedException e) {
+          MyPortletUI.logger.error("Could not copy the files to the VM");
+          e.printStackTrace();
+        }
+
+        StringBuilder c = new StringBuilder("Execute command on virtual machine: '");
+        for (String word : command){
+          c.append(" ").append(word);
+        }
+        MyPortletUI.logger.info(command+"'");
         proc = pb.start();
         BufferedReader stdError =
                 new BufferedReader(new InputStreamReader(proc.getErrorStream()));
@@ -702,6 +734,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
     getResults();
     downloadButton.setVisible(true);
+    if (uploadPanel.getDataSelection().getValue().equals("Database")) {
+      registerButton.setVisible(true);
+    }
 
     contentAccordion.getTab(resultsPanel).setEnabled(true);
     contentAccordion.getTab(parameterPanel).setEnabled(true);
