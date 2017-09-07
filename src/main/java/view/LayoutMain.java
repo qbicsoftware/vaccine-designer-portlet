@@ -89,6 +89,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String remoteOutputPath = "";
   private String random = "";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:";
+  private String dropbox = "qeana08@data.qbic.uni-tuebingen.de";
   private String registerPath = "qeana08@data.qbic.uni-tuebingen.de:/mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming";
 
 
@@ -292,15 +293,16 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
     registerButton.addClickListener((ClickListener) event -> {
         try {
-          String timeStamp = new SimpleDateFormat("yyyy_MM_dd-HH_mm").format(new Date());
-          String resultName = "/" + code + "_" + timeStamp + "_epitopeselection_result" + ".txt";
-          Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+          String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
+          String resultName = code + "_" + timeStamp + "_epitopeselection_result" + ".txt";
+          Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
           copy_result.waitFor();
-          MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
-          scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName, registerPath);
-          Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+          MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
+          scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName, registerPath);
+          Process markAsFinished = Runtime.getRuntime().exec("ssh -i "+ homePath +".ssh/key_rsa " + dropbox + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_" + resultName);
+          Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
           remove_result.waitFor();
-          MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + resultName);
+          MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
         } catch (IOException | InterruptedException e) {
           MyPortletUI.logger.error("Could not write the folder on the file system");
           Utils.notification("Error", "Please try again.", "error");
