@@ -105,42 +105,37 @@ public class PanelUpload extends CustomComponent {
     inputLayout.setSpacing(true);
     
     comboInput = new NativeSelect("Select Input Type");
-    
     comboInput.setNullSelectionAllowed(false);
     comboInput.addItems("Standard", "Old Filetype","New Filetype");
     comboInput.setRequired(true);
     comboInput.setValue("Standard");
     
-    comboInput.addValueChangeListener(new ValueChangeListener() {
-      
-      @Override
-      public void valueChange(ValueChangeEvent event) {
-        if (comboInput.getValue().equals("New Filetype")) {
-          immColTf.setValue("");
-          immColTf.setVisible(false);
-          distanceColTf.setValue("");
-          distanceColTf.setVisible(false);
-          uncertaintyColTf.setValue("");
-          uncertaintyColTf.setVisible(false);
-        } else {
-          immColTf.setVisible(true);
-          distanceColTf.setVisible(true);
-          uncertaintyColTf.setVisible(true);
-        }
-        
+    comboInput.addValueChangeListener((ValueChangeListener) event -> {
+      if (comboInput.getValue().equals("New Filetype")) {
+        immColTf.setValue("");
+        immColTf.setVisible(false);
+        distanceColTf.setValue("");
+        distanceColTf.setVisible(false);
+        uncertaintyColTf.setValue("");
+        uncertaintyColTf.setVisible(false);
+      } else {
+        immColTf.setVisible(true);
+        distanceColTf.setVisible(true);
+        uncertaintyColTf.setVisible(true);
       }
+
     });
     
     // method column
     methodColTf = new TextField("Method Column");
-    methodColTf.setStyleName(ValoTheme.TEXTFIELD_TINY);
+    methodColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     methodColTf.setImmediate(true);
     methodColTf.setValue("");
     methodColTf.setDescription("Column name of the prediction method");
     
  // taa column
     taaColTf = new TextField("TAA Column");
-    taaColTf.setStyleName(ValoTheme.TEXTFIELD_TINY);
+    taaColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     taaColTf.setImmediate(true);
     taaColTf.setValue("");
     taaColTf.setDescription(
@@ -148,7 +143,7 @@ public class PanelUpload extends CustomComponent {
 
     // immunogenicity column
     immColTf = new TextField("Immunogenicity Column");
-    immColTf.setStyleName(ValoTheme.TEXTFIELD_TINY);
+    immColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     immColTf.setImmediate(true);
     immColTf.setValue("HLA_class1_binding_prediction");
     immColTf.setDescription("Column name of peptide immunogenicity");
@@ -157,14 +152,14 @@ public class PanelUpload extends CustomComponent {
 
     // distance column
     distanceColTf = new TextField("Distance Column");
-    distanceColTf.setStyleName(ValoTheme.TEXTFIELD_TINY);
+    distanceColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     distanceColTf.setImmediate(true);
     distanceColTf.setValue("");
     distanceColTf.setDescription("Column name of distance-to-self calculation");
 
     // uncertainty column
     uncertaintyColTf = new TextField("Uncertainty Column");
-    uncertaintyColTf.setStyleName(ValoTheme.TEXTFIELD_TINY);
+    uncertaintyColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     uncertaintyColTf.setImmediate(true);
     uncertaintyColTf.setValue("");
     uncertaintyColTf.setDescription("Column name of prediction uncertainty");
@@ -187,19 +182,15 @@ public class PanelUpload extends CustomComponent {
     dataSelection.addItem("Database");
     dataSelection.setNullSelectionItemId("Upload");
     
-    dataSelection.addValueChangeListener(new ValueChangeListener() {
-      
-      @Override
-      public void valueChange(ValueChangeEvent event) {
-        if(dataSelection.getValue().equals("Upload")){
-          panelContent.removeComponent(databaseLayout);
-          panelContent.addComponent(uploadLayout);
-        } else if (dataSelection.getValue().equals("Database")) {
-          panelContent.removeComponent(uploadLayout);
-          panelContent.addComponent(createDatabaseSelection());
-        }
-        
+    dataSelection.addValueChangeListener((ValueChangeListener) event -> {
+      if(dataSelection.getValue().equals("Upload")){
+        panelContent.removeComponent(databaseLayout);
+        panelContent.addComponent(uploadLayout);
+      } else if (dataSelection.getValue().equals("Database")) {
+        panelContent.removeComponent(uploadLayout);
+        panelContent.addComponent(createDatabaseSelection());
       }
+
     });
     
     dataSelectionLayout.addComponent(dataSelection);
@@ -221,20 +212,15 @@ public class PanelUpload extends CustomComponent {
     datasetGrid.setVisible(false);
     datasetGrid.setImmediate(true);
     datasetGrid.setSelectionMode(SelectionMode.SINGLE);
-    datasetGrid.addSelectionListener(new SelectionListener() {
-
-      @SuppressWarnings("unchecked")
-      @Override
-         public void select(SelectionEvent event) {
-             Notification.show("Select row: "+datasetGrid.getSelectedRow());
-             Object selected = ((SingleSelectionModel) datasetGrid.getSelectionModel()).getSelectedRow();
-             setSelected((BeanItem<DatasetBean>) datasetGrid.getContainerDataSource().getItem(selected));
-             uploadButton.setEnabled(true);
-             if (selected == null) {
-               uploadButton.setEnabled(false);
-             }
-         }
-      });
+    datasetGrid.addSelectionListener((SelectionListener) event -> {
+           Notification.show("Select row: "+datasetGrid.getSelectedRow());
+           Object selected = ((SingleSelectionModel) datasetGrid.getSelectionModel()).getSelectedRow();
+           setSelected((BeanItem<DatasetBean>) datasetGrid.getContainerDataSource().getItem(selected));
+           uploadButton.setEnabled(true);
+           if (selected == null) {
+             uploadButton.setEnabled(false);
+           }
+       });
     
     
     databaseLayout.addComponent(dataBaseSelection);
@@ -245,10 +231,6 @@ public class PanelUpload extends CustomComponent {
 
   public Grid getDatasetGrid() {
     return datasetGrid;
-  }
-
-  public void setDatasetGrid(Grid datasetGrid) {
-    this.datasetGrid = datasetGrid;
   }
 
   /**
@@ -301,40 +283,16 @@ public class PanelUpload extends CustomComponent {
     return comboInput;
   }
 
-  public void setComboInput(NativeSelect comboInput) {
-    this.comboInput = comboInput;
-  }
-
   public OptionGroup getDataSelection() {
     return dataSelection;
-  }
-
-  public void setDataSelection(OptionGroup dataSelection) {
-    this.dataSelection = dataSelection;
   }
 
   public ComboBox getProjectSelectionCB() {
     return projectSelectionCB;
   }
 
-  public void setProjectSelectionCB(ComboBox selectionCB) {
-    this.projectSelectionCB = selectionCB;
-  }
-  
-  public ComboBox getFileSelectionCB() {
-    return fileSelectionCB;
-  }
-
-  public void setFileSelectionCB(ComboBox selectionCB) {
-    this.fileSelectionCB = selectionCB;
-  }
-
   public Button getUploadButton() {
     return uploadButton;
-  }
-
-  public void setUploadButton(Button uploadButton) {
-    this.uploadButton = uploadButton;
   }
 
   public BeanItem<DatasetBean> getSelected() {
