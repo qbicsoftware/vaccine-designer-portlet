@@ -49,7 +49,7 @@ import model.DatasetBean;
 @SuppressWarnings("serial")
 public class LayoutMain extends VerticalLayout implements SucceededListener {
 
-  private Button nextButton, runButton, downloadButton, resetButton;
+  private Button nextButton, runButton, downloadButton, resetButton, registerButton;
   private HorizontalLayout buttonsLayout;
   private Accordion contentAccordion;
   private PanelUpload uploadPanel;
@@ -71,9 +71,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private SCPFile scpFile;
   private RandomCharGenerator generator;
 
-  //private String tmpPath = "/Users/spaethju/Desktop/";
-  private String tmpPath = "/tmp/";
-  private String homePath = "/home/luser/";
+  private String tmpPath = "/Users/spaethju/Desktop/";
+  //private String tmpPath = "/tmp/";
+  private String homePath = "/Users/spaethju/";
+ // private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
@@ -283,6 +284,18 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     });
     nextButton.setEnabled(false);
     return nextButton;
+  }
+
+  private Button createRegisterButton() {
+    registerButton = new Button("Register");
+    registerButton.setDescription("Register result in database.");
+    registerButton.setIcon(FontAwesome.UPLOAD);
+    registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
+    registerButton.addClickListener((ClickListener) event -> {
+      Utils.notification("Click", "", "success");
+    });
+    registerButton.setVisible(false);
+    return registerButton;
   }
 
   /**
@@ -499,7 +512,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     resetButton = createResetButton();
     nextButton = createNextButton();
     downloadButton = createDownloadButton();
-    buttonsLayout.addComponents(resetButton, createNextButton(), downloadButton);
+    registerButton = createRegisterButton();
+    buttonsLayout.addComponents(resetButton, nextButton, downloadButton, registerButton);
     return buttonsLayout;
   }
 
@@ -702,6 +716,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
     getResults();
     downloadButton.setVisible(true);
+    registerButton.setVisible(true);
 
     contentAccordion.getTab(resultsPanel).setEnabled(true);
     contentAccordion.getTab(parameterPanel).setEnabled(true);
