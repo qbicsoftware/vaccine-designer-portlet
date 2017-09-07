@@ -73,6 +73,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   //private String tmpPath = "/Users/spaethju/Desktop/";
   private String tmpPath = "/tmp/";
+  private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
@@ -351,7 +352,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       if (valuesCorrect) {
         runButton.setCaption("Re-Run");
         try {
-          Process mkdir = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + "~/"+random);
+          Process mkdir = Runtime.getRuntime().exec("ssh -i "+ homePath +".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
           mkdir.waitFor();
         } catch (IOException | InterruptedException e) {
           MyPortletUI.logger.error("Couldn't create folder on virtual machine.");
@@ -361,7 +362,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         ArrayList<String> p = new ArrayList<>();
         p.add("ssh");
         p.add("-i");
-        p.add("~/.ssh/key_rsa");
+        p.add(homePath+".ssh/key_rsa");
         p.add("jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de");
 
         p.add("singularity");
@@ -445,12 +446,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
 
         try {
-          Process mkdir_random = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
+          Process mkdir_random = Runtime.getRuntime().exec("ssh -i "+homePath+".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
           mkdir_random.waitFor();
-          scpFile.scpToRemote(inputPath, epitopeSelectorVM+random);
-          scpFile.scpToRemote(allelePath, epitopeSelectorVM+random);
-          scpFile.scpToRemote(includePath, epitopeSelectorVM+random);
-          scpFile.scpToRemote(excludePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, includePath, epitopeSelectorVM+random);
+          scpFile.scpToRemote(homePath, excludePath, epitopeSelectorVM+random);
         } catch (IOException | InterruptedException e) {
           MyPortletUI.logger.error("Could not copy the files to the VM");
           e.printStackTrace();
@@ -698,7 +699,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * Prepares the result to show them in the "Results" tab of the content accordion.
    */
   private void prepareResults() {
-    scpFile.scpFromRemote(epitopeSelectorVM, remoteOutputPath, outputPath);
+    scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
     getResults();
     downloadButton.setVisible(true);
 
@@ -732,7 +733,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private void cleanFiles() {
     try {
       try {
-        Process remove_randomRemote = Runtime.getRuntime().exec("ssh -i ~/.ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf "  + tmpPathRemote+random);
+        Process remove_randomRemote = Runtime.getRuntime().exec("ssh -i "+homePath+".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf "  + tmpPathRemote+random);
         remove_randomRemote.waitFor();
         random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
       } catch (IOException | InterruptedException e) {
