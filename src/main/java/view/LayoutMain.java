@@ -74,7 +74,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private RandomCharGenerator generator;
   private String code;
 
-  gprivate String tmpPath = "/Users/spaethju/Desktop/";
+  private String tmpPath = "/Users/spaethju/Desktop/";
   //private String tmpPath = "/tmp/";
   private String homePath = "/Users/spaethju/";
   //private String homePath = "/home/luser/";
