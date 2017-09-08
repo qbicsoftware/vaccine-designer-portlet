@@ -72,6 +72,7 @@ public class MyPortletUI extends UI {
             success = false;
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
+            Utils.notification("No user found", "Please log-in to use the Vaccine Designer and all of its features.", "error");
         }
 
         if (success) {
