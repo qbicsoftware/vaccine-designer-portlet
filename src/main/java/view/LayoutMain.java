@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -193,9 +194,21 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     });
 
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
+          Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+          MyPortletUI.logger.info(project.getIdentifier());
+          List<Sample> allSamples =
+                  openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
+          MyPortletUI.logger.info(allSamples.size());
+          for (Sample sample : allSamples) {
+              MyPortletUI.logger.info(sample.getSampleTypeCode());
+              MyPortletUI.logger.info(sample.getCode());
+              if (sample.getSampleTypeCode().equals("Q_NGS_SINGLE_SAMPLE_RUN")){
+                  sampleBarcode = sample.getCode();
+              }
+          }
         String filename = uploadPanel.getSelected().getBean().getFileName();
         code = uploadPanel.getSelected().getBean().getCode();
-        sampleBarcode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getParents().get(0).getCode();
+        MyPortletUI.logger.info(sampleBarcode);
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, "result/"+filename);

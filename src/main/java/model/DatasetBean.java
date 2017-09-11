@@ -12,6 +12,7 @@ public class DatasetBean {
   private List<DatasetBean> children;
   private Map<String, String> properties;
   private Date registrationDate;
+  private List<String> parents;
  
   public DatasetBean() {
  
@@ -108,5 +109,13 @@ public class DatasetBean {
 
   public String getSampleIdentifier(){
     return sampleIdentifier;
+  }
+
+  public void setParents(List parents){
+    this.parents = parents;
+  }
+
+  public List<String> getParents(){
+    return parents;
   }
 }
