@@ -194,7 +194,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
         String filename = uploadPanel.getSelected().getBean().getFileName();
-        code = uploadPanel.getSelected().getBean().getSampleIdentifier();
+        code = uploadPanel.getSelected().getBean().getCode();
         sampleBarcode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getCode();
         Path destination = Paths.get(tmpDownloadPath);
         try {
