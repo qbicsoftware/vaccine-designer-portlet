@@ -7,7 +7,7 @@ import java.util.Map;
 public class DatasetBean {
 
   private ProjectBean projectBean;
-  private String code, dataSetTypeCode, type, dssPath, name;
+  private String code, dataSetTypeCode, type, dssPath, name, sampleIdentifier;
   private long id, fileSize;
   private List<DatasetBean> children;
   private Map<String, String> properties;
@@ -100,5 +100,13 @@ public class DatasetBean {
 
   public void setRegistrationDate(Date registrationDate) {
     this.registrationDate = registrationDate;
+  }
+
+  public void setSampleIdentifier(String sampleIdentifier){
+    this.sampleIdentifier = sampleIdentifier;
+  }
+
+  public String getSampleIdentifier(){
+    return sampleIdentifier;
   }
 }

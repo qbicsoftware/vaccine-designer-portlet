@@ -14,6 +14,7 @@ import com.vaadin.data.util.BeanItemContainer;
 
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.plugin.query.shared.api.v1.dto.QueryTableModel;
+import life.qbic.MyPortletUI;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 import model.DatasetBean;
 
@@ -68,8 +69,12 @@ public class DBFileHandler {
 
     Map<String, Map<String, String>> props = new LinkedHashMap<>();
 
+    Map<String, String> samples = new HashMap<>();
+
     for (DataSet ds : datasets) {
+
       dsCodes.add(ds.getCode());
+      samples.put(ds.getCode(), ds.getSampleIdentifierOrNull());
       types.put(ds.getCode(), ds.getDataSetTypeCode());
       props.put(ds.getCode(), ds.getProperties());
     }
@@ -82,7 +87,6 @@ public class DBFileHandler {
     Map<String, DatasetBean> fileNames = new HashMap<>();
 
     for (Serializable[] ss : res.getRows()) {
-
       DatasetBean b = new DatasetBean();
       String code = (String) ss[0];
       String fileName = (String) ss[2];
@@ -94,6 +98,7 @@ public class DBFileHandler {
       b.setFileSize(size);
       b.setRegistrationDate(parseDate((String) ss[5]));
       b.setProperties(props.get(code));
+      b.setSampleIdentifier(samples.get(code));
 
       // both code and filename are needed for the keys to be unique
       fileNames.put(code + fileName, b);
