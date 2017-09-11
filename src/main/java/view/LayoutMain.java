@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -193,9 +194,21 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     });
 
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
+          Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+          MyPortletUI.logger.info(project.getIdentifier());
+          List<Sample> allSamples =
+                  openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
+          MyPortletUI.logger.info(allSamples.size());
+          for (Sample sample : allSamples) {
+              MyPortletUI.logger.info(sample.getSampleTypeCode());
+              MyPortletUI.logger.info(sample.getCode());
+              if (sample.getSampleTypeCode().equals("Q_NGS_SINGLE_SAMPLE_RUN")){
+                  sampleBarcode = sample.getCode();
+              }
+          }
         String filename = uploadPanel.getSelected().getBean().getFileName();
         code = uploadPanel.getSelected().getBean().getCode();
-        sampleBarcode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getParents().get(0).getCode();
+        MyPortletUI.logger.info(sampleBarcode);
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, "result/"+filename);
@@ -296,8 +309,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
     registerButton.addClickListener((ClickListener) event -> {
         try {
-          String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
-          String resultName = sampleBarcode + "_" + timeStamp + "_epitopeselection_result" + ".txt";
+          String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
+          String resultName = sampleBarcode + "_" + code + "_" + timeStamp + "_epitopeselection_result" + ".txt";
           Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
           copy_result.waitFor();
           MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);

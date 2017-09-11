@@ -71,6 +71,9 @@ public class DBFileHandler {
 
     Map<String, String> samples = new HashMap<>();
 
+    Map<String, List<String>> parents = new HashMap<>();
+
+
     for (DataSet ds : datasets) {
 
       dsCodes.add(ds.getCode());
