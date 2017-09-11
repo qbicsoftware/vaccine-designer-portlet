@@ -75,6 +75,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private RandomCharGenerator generator;
   private String code;
   private String sampleBarcode;
+  private String sampleCode;
 
   //private String tmpPath = "/Users/spaethju/Desktop/";
   private String tmpPath = "/tmp/";
@@ -207,7 +208,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
               }
           }
         String filename = uploadPanel.getSelected().getBean().getFileName();
-        code = uploadPanel.getSelected().getBean().getCode();
+        code = code = uploadPanel.getSelected().getBean().getCode();
+        sampleCode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getCode();
         MyPortletUI.logger.info(sampleBarcode);
         Path destination = Paths.get(tmpDownloadPath);
         try {
@@ -310,7 +312,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     registerButton.addClickListener((ClickListener) event -> {
         try {
           String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
-          String resultName = sampleBarcode + "_" + code + "_" + timeStamp + "_epitopeselection_result" + ".txt";
+          String resultName = sampleBarcode + "_" + sampleCode + "_" + timeStamp + "_epitopeselection_result" + ".txt";
           Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
           copy_result.waitFor();
           MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
