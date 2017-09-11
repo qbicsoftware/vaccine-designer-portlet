@@ -309,8 +309,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
     registerButton.addClickListener((ClickListener) event -> {
         try {
-          String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
-          String resultName = sampleBarcode + "_" + timeStamp + "_epitopeselection_result" + ".txt";
+          String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
+          String resultName = sampleBarcode + "_" + code + "_" + timeStamp + "_epitopeselection_result" + ".txt";
           Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
           copy_result.waitFor();
           MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
