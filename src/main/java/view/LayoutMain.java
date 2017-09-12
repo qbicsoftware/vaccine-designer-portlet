@@ -194,38 +194,38 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       }
     });
 
-      uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
-          Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
-          MyPortletUI.logger.info(project.getIdentifier());
-          List<Sample> allSamples =
-                  openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
-          MyPortletUI.logger.info(allSamples.size());
-          for (Sample sample : allSamples) {
-              MyPortletUI.logger.info(sample.getSampleTypeCode());
-              MyPortletUI.logger.info(sample.getCode());
-              if (sample.getSampleTypeCode().equals("Q_NGS_SINGLE_SAMPLE_RUN")){
-                  sampleBarcode = sample.getCode();
-              }
-          }
-        String filename = uploadPanel.getSelected().getBean().getFileName();
-        code = code = uploadPanel.getSelected().getBean().getCode();
-        sampleCode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getCode();
-        MyPortletUI.logger.info(sampleBarcode);
-        Path destination = Paths.get(tmpDownloadPath);
-        try {
-          InputStream in = openbis.getDatasetStream(code, "result/"+filename);
-          Files.copy(in, destination);
-          File file = new File(tmpDownloadPath);
-          processingData(file);
-          Files.delete(destination);
-        } catch (IOException e) {
-          e.printStackTrace();
-        } catch (Exception e) {
-          MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
-          Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
-          e.printStackTrace();
+    uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
+      Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+      MyPortletUI.logger.info(project.getIdentifier());
+      List<Sample> allSamples =
+              openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
+      MyPortletUI.logger.info(allSamples.size());
+      for (Sample sample : allSamples) {
+        MyPortletUI.logger.info(sample.getSampleTypeCode());
+        MyPortletUI.logger.info(sample.getCode());
+        if (sample.getSampleTypeCode().equals("Q_NGS_SINGLE_SAMPLE_RUN")){
+          sampleBarcode = sample.getCode();
         }
-      });
+      }
+      String filename = uploadPanel.getSelected().getBean().getFileName();
+      code = code = uploadPanel.getSelected().getBean().getCode();
+      sampleCode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getCode();
+      MyPortletUI.logger.info(sampleBarcode);
+      Path destination = Paths.get(tmpDownloadPath);
+      try {
+        InputStream in = openbis.getDatasetStream(code, "result/"+filename);
+        Files.copy(in, destination);
+        File file = new File(tmpDownloadPath);
+        processingData(file);
+        Files.delete(destination);
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (Exception e) {
+        MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
+        Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
+        e.printStackTrace();
+      }
+    });
   }
 
 
@@ -310,22 +310,22 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     registerButton.setIcon(FontAwesome.UPLOAD);
     registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
     registerButton.addClickListener((ClickListener) event -> {
-        try {
-          String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
-          String resultName = sampleBarcode + "_" + sampleCode + "_" + timeStamp + "_epitopeselection_result" + ".txt";
-          Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
-          copy_result.waitFor();
-          MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
-          scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName, registerPath);
-          Process markAsFinished = Runtime.getRuntime().exec("ssh -i "+ homePath +".ssh/key_rsa " + dropbox + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_" + resultName);
-          Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
-          remove_result.waitFor();
-          MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
-        } catch (IOException | InterruptedException e) {
-          MyPortletUI.logger.error("Could not write the folder on the file system");
-          Utils.notification("Error", "Please try again.", "error");
-          e.printStackTrace();
-        }
+      try {
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
+        String resultName = sampleBarcode + "_" + sampleCode + "_" + timeStamp + "_epitopeselection_result" + ".txt";
+        Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
+        copy_result.waitFor();
+        MyPortletUI.logger.info("cp " + tmpResultPath + " " +  tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
+        scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName, registerPath);
+        Process markAsFinished = Runtime.getRuntime().exec("ssh -i "+ homePath +".ssh/key_rsa " + dropbox + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_" + resultName);
+        Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
+        remove_result.waitFor();
+        MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
+      } catch (IOException | InterruptedException e) {
+        MyPortletUI.logger.error("Could not write the folder on the file system");
+        Utils.notification("Error", "Please try again.", "error");
+        e.printStackTrace();
+      }
       Utils.notification("Results registered", "SUCCESS", "success");
       MyPortletUI.logger.info("Result registered");
     });
@@ -737,6 +737,16 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     });
 
     loadingWindow.getCancelBu().addClickListener((ClickListener) event -> {
+      try {
+        Process cancel_process = Runtime.getRuntime().exec("ssh -i "+homePath+".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de kill $!");
+        cancel_process.waitFor();
+      } catch (InterruptedException e) {
+        MyPortletUI.logger.error("Canceling the computation was not possible");
+
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       t.interrupt();
       proc.destroyForcibly();
       loadingWindow.close();
