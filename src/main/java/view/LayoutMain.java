@@ -77,10 +77,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String sampleBarcode;
   private String sampleCode;
 
-  //private String tmpPath = "/Users/spaethju/Desktop/";
-  private String tmpPath = "/tmp/";
-  //private String homePath = "/Users/spaethju/";
-  private String homePath = "/home/luser/";
+  private String tmpPath = "/Users/spaethju/Desktop/";
+  //private String tmpPath = "/tmp/";
+  private String homePath = "/Users/spaethju/";
+  //private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
@@ -740,11 +740,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       try {
         Process cancel_process = Runtime.getRuntime().exec("ssh -i "+homePath+".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de kill $!");
         cancel_process.waitFor();
-      } catch (InterruptedException e) {
+      } catch (InterruptedException | IOException e) {
         MyPortletUI.logger.error("Canceling the computation was not possible");
-
-        e.printStackTrace();
-      } catch (IOException e) {
+        Utils.notification("Error", "Canceling was not possible", "error");
         e.printStackTrace();
       }
       t.interrupt();
