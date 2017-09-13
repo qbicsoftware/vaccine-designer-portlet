@@ -353,7 +353,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       reset();
       Utils.notification("Reset", "You can now upload new data.", "success");
     });
-    resetButton.setEnabled(false);
     return resetButton;
   }
 
