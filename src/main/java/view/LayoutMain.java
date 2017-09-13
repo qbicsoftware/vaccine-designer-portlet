@@ -196,13 +196,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
           Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
-          MyPortletUI.logger.info(project.getIdentifier());
           List<Sample> allSamples =
                   openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
-          MyPortletUI.logger.info(allSamples.size());
           for (Sample sample : allSamples) {
-              MyPortletUI.logger.info(sample.getSampleTypeCode());
-              MyPortletUI.logger.info(sample.getCode());
               if (sample.getSampleTypeCode().equals("Q_NGS_SINGLE_SAMPLE_RUN")){
                   sampleBarcode = sample.getCode();
               }
@@ -210,7 +206,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         String filename = uploadPanel.getSelected().getBean().getFileName();
         code = code = uploadPanel.getSelected().getBean().getCode();
         sampleCode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getCode();
-        MyPortletUI.logger.info(sampleBarcode);
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, "result/"+filename);
@@ -220,10 +215,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           Files.delete(destination);
         } catch (IOException e) {
           e.printStackTrace();
+          reset();
         } catch (Exception e) {
           MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
           Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
           e.printStackTrace();
+          reset();
         }
       });
   }
@@ -346,10 +343,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
     resetButton.addStyleName(ValoTheme.BUTTON_SMALL);
     resetButton.addClickListener((ClickListener) event -> {
-      downloadFiles.clear();
-      resultsPanel.reset();
-      epitopeSelectionPanel.reset();
-      parameterPanel.reset();
       reset();
       Utils.notification("Reset", "You can now upload new data.", "success");
     });
@@ -551,6 +544,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       processingData(uploader.getTempFile());
     } catch (Exception e){
       Utils.notification("Upload failed", "Something went wrong. Make sure you have selected an appropriate file and described its parameters correctly ", "error");
+      reset();
     }
 
   }
@@ -704,7 +698,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         for (String word : command){
           c.append(" ").append(word);
         }
-        MyPortletUI.logger.info(command+"'");
+        MyPortletUI.logger.info(command);
         proc = pb.start();
         BufferedReader stdError =
                 new BufferedReader(new InputStreamReader(proc.getErrorStream()));
@@ -821,6 +815,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    * Resets the main layout to the settings from the beginning
    */
   private void reset() {
+    downloadFiles.clear();
+    resultsPanel.reset();
+    epitopeSelectionPanel.reset();
+    parameterPanel.reset();
     this.removeAllComponents();
     init();
     initDatabase();
