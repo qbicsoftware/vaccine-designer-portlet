@@ -35,18 +35,18 @@ public class PanelUpload extends CustomComponent {
   private UploaderInput inputReceiver;
   private Upload inputUpload;
   private Panel uploadPanel;
-  private VerticalLayout panelContent, databaseLayout,hlaExpressionLayout, columnLayout, dataLayout, fileTypeSelectionLayout, uploadLayout;
-  private HorizontalLayout buttonLayout;
+  private VerticalLayout panelContent, databaseLayout,hlaExpressionLayout, columnLayout, dataLayout, fileTypeSelectionLayout, uploadLayout, alleleFileSelection;
+  private HorizontalLayout buttonLayout, alleleTFLayout;
   private TextField immColTf, distanceColTf, uncertaintyColTf, taaColTf,methodColTf, hlaA1TF, hlaB1TF, hlaC1TF, hlaA2TF, hlaB2TF, hlaC2TF, hlaAEVTF, hlaBEVTF, hlaCEVTF;
   private ComboBox projectSelectionCB;
-  private Button uploadButton;
-  private Button dataSelectionUploadButton;
-  private Button dataSelectionDatabaseButton;
+  private ComboBox alleleFileSelectionCB;
+  private Button uploadButton, dataSelectionUploadButton, dataSelectionDatabaseButton, manualButton, databaseButton, nextButton;
   private Grid datasetGrid;
   private BeanItem<DatasetBean> selected;
-  private Boolean useDatabase, hlaAsColumns;
-  private HashMap<String, String> alleles;
-  private HashMap<String, String> allele_expressions;
+  private Boolean useDatabase;
+  private Boolean hlaAsColumns;
+  private Boolean alleleFileUpload;
+  private HashMap<String, String> alleles, allele_expressions;
 
   /**
    * Constructor
@@ -85,10 +85,12 @@ public class PanelUpload extends CustomComponent {
     databaseLayout.setVisible(false);
     dataLayout = createDataSelection();
     dataLayout.setVisible(true);
+    alleleFileSelection = createAlleleFileSelection();
+    alleleFileSelection.setVisible(false);
     fileTypeSelectionLayout = createFileTypeSelection();
     fileTypeSelectionLayout.setVisible(false);
 
-    panelContent.addComponents(dataLayout, fileTypeSelectionLayout, uploadLayout, columnLayout, hlaExpressionLayout, databaseLayout, buttonLayout);
+    panelContent.addComponents(dataLayout, alleleFileSelection, fileTypeSelectionLayout, uploadLayout, columnLayout, hlaExpressionLayout, databaseLayout, buttonLayout);
     panelContent.setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
 
 
@@ -125,7 +127,7 @@ public class PanelUpload extends CustomComponent {
     backButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     backButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
     backButton.addStyleName(ValoTheme.BUTTON_HUGE);
-    Button nextButton = new Button("Next");
+    nextButton = new Button("Next");
     nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
     nextButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     nextButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
@@ -137,13 +139,17 @@ public class PanelUpload extends CustomComponent {
 
     backButton.addClickListener((Button.ClickListener) event -> {
       if (dataLayout.isVisible()){
+      } else if (alleleFileSelection.isVisible()) {
+        alleleFileSelection.setVisible(false);
+        dataLayout.setVisible(true);
+        buttonLayout.setVisible(false);
       } else if (fileTypeSelectionLayout.isVisible()) {
         fileTypeSelectionLayout.setVisible(false);
-        buttonsLayout.setVisible(false);
-        dataLayout.setVisible(true);
+        nextButton.setVisible(false);
+        alleleFileSelection.setVisible(true);
       } else if (columnLayout.isVisible()) {
-        fileTypeSelectionLayout.setVisible(true);
         columnLayout.setVisible(false);
+        fileTypeSelectionLayout.setVisible(true);
       } else if (hlaExpressionLayout.isVisible()) {
         hlaExpressionLayout.setVisible(false);
         columnLayout.setVisible(true);
@@ -151,14 +157,14 @@ public class PanelUpload extends CustomComponent {
         uploadLayout.setVisible(false);
         databaseLayout.setVisible(false);
         hlaExpressionLayout.setVisible(true);
-        nextButton.setEnabled(true);
+        nextButton.setVisible(true);
       }
     });
 
     nextButton.addClickListener((Button.ClickListener) event -> {
       if (dataLayout.isVisible()) {
-        dataLayout.setVisible(false);
-        columnLayout.setVisible(true);
+      } else if (alleleFileSelection.isVisible()){
+
       } else if (fileTypeSelectionLayout.isVisible()) {
         if (hlaAsColumns != null) {
           fileTypeSelectionLayout.setVisible(false);
@@ -167,6 +173,11 @@ public class PanelUpload extends CustomComponent {
       } else if (columnLayout.isVisible()) {
         columnLayout.setVisible(false);
         hlaExpressionLayout.setVisible(true);
+        if (!alleleFileUpload) {
+          alleleTFLayout.setVisible(false);
+        } else {
+          alleleTFLayout.setVisible(true);
+        }
       } else if (hlaExpressionLayout.isVisible()) {
         alleles.put("A1",hlaA1TF.getValue());
         alleles.put("A2",hlaA2TF.getValue());
@@ -178,7 +189,7 @@ public class PanelUpload extends CustomComponent {
         allele_expressions.put("B", hlaBEVTF.getValue());
         allele_expressions.put("C", hlaCEVTF.getValue());
         hlaExpressionLayout.setVisible(false);
-        nextButton.setEnabled(false);
+        nextButton.setVisible(false);
         if (useDatabase) {
           databaseLayout.setVisible(true);
         } else if (!useDatabase) {
@@ -255,7 +266,9 @@ public class PanelUpload extends CustomComponent {
   public VerticalLayout createHlaExpressionTextFields() {
     VerticalLayout allAlleleLayout = new VerticalLayout();
     Label description = createDescriptionLabel("Please specify the corresponding HLA-alleles and the allele expression values.");
-    HorizontalLayout alleleTFLayout = new HorizontalLayout();
+    alleleTFLayout = new HorizontalLayout();
+    HorizontalLayout alleleEVTFLayout = new HorizontalLayout();
+    alleleEVTFLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
     alleleTFLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
 
     VerticalLayout hlaALayout = new VerticalLayout();
@@ -291,7 +304,7 @@ public class PanelUpload extends CustomComponent {
     hlaAEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, null));
     hlaAEVTF.setValue("10,0");
     hlaAEVTF.setNullSettingAllowed(false);
-    hlaALayout.addComponents(hlaALabel, hlaA1TF, hlaA2TF, hlaAEVTF);
+    hlaALayout.addComponents(hlaALabel, hlaA1TF, hlaA2TF);
 
     VerticalLayout hlaBLayout = new VerticalLayout();
     hlaBLayout.setSpacing(true);
@@ -323,7 +336,7 @@ public class PanelUpload extends CustomComponent {
     hlaBEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, null));
     hlaBEVTF.setValue("10,0");
     hlaBEVTF.setNullSettingAllowed(false);
-    hlaBLayout.addComponents(hlaBLabel, hlaB1TF, hlaB2TF, hlaBEVTF);
+    hlaBLayout.addComponents(hlaBLabel, hlaB1TF, hlaB2TF);
 
     VerticalLayout hlaCLayout = new VerticalLayout();
     hlaCLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
@@ -355,11 +368,15 @@ public class PanelUpload extends CustomComponent {
     hlaCEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, null));
     hlaCEVTF.setValue("10,0");
     hlaCEVTF.setNullSettingAllowed(false);
-    hlaCLayout.addComponents(hlaCLabel, hlaC1TF, hlaC2TF, hlaCEVTF);
+    hlaCLayout.addComponents(hlaCLabel, hlaC1TF, hlaC2TF);
 
     alleleTFLayout.addComponents(hlaALayout, hlaBLayout, hlaCLayout);
+    alleleEVTFLayout.addComponents(hlaAEVTF, hlaBEVTF, hlaCEVTF);
+    alleleEVTFLayout.setSpacing(true);
+    alleleEVTFLayout.setMargin(new MarginInfo(false, true, false, true));
+    alleleEVTFLayout.setSizeFull();
 
-    allAlleleLayout.addComponents(description, alleleTFLayout);
+    allAlleleLayout.addComponents(description, alleleTFLayout, alleleEVTFLayout);
 
     return allAlleleLayout;
   }
@@ -381,7 +398,8 @@ public class PanelUpload extends CustomComponent {
       useDatabase = false;
       dataLayout.setVisible(false);
       buttonLayout.setVisible(true);
-      fileTypeSelectionLayout.setVisible(true);
+      nextButton.setVisible(false);
+      alleleFileSelection.setVisible(true);
     });
 
     dataSelectionDatabaseButton = new Button("Database");
@@ -391,7 +409,8 @@ public class PanelUpload extends CustomComponent {
       useDatabase = true;
       dataLayout.setVisible(false);
       buttonLayout.setVisible(true);
-      fileTypeSelectionLayout.setVisible(true);
+      nextButton.setVisible(false);
+      alleleFileSelection.setVisible(true);
     });
     
     dataSelectionLayout.addComponents(dataSelectionUploadButton, dataSelectionDatabaseButton);
@@ -409,26 +428,33 @@ public class PanelUpload extends CustomComponent {
     projectSelectionCB = new ComboBox("Choose Project");
     projectSelectionCB.setRequired(true);
 
+    alleleFileSelectionCB = new ComboBox("Choose Allele-file");
+    alleleFileSelectionCB.setVisible(false);
+    alleleFileSelectionCB.setRequired(true);
     VerticalLayout databaseLayout = new VerticalLayout();
 
     HorizontalLayout dataBaseSelection = new HorizontalLayout();
     dataBaseSelection.setMargin(true);
     dataBaseSelection.setSpacing(true);
-    dataBaseSelection.addComponents(projectSelectionCB, uploadButton);
+    dataBaseSelection.addComponents(projectSelectionCB, alleleFileSelectionCB, uploadButton);
     dataBaseSelection.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
-    
+
+
     datasetGrid = new Grid();
     datasetGrid.setSizeFull();
     datasetGrid.setVisible(false);
     datasetGrid.setImmediate(true);
     datasetGrid.setSelectionMode(SelectionMode.SINGLE);
     datasetGrid.addSelectionListener((SelectionListener) event -> {
-           Notification.show("Select row: "+datasetGrid.getSelectedRow());
            Object selected = ((SingleSelectionModel) datasetGrid.getSelectionModel()).getSelectedRow();
            setSelected((BeanItem<DatasetBean>) datasetGrid.getContainerDataSource().getItem(selected));
            uploadButton.setEnabled(true);
+           if (alleleFileUpload) {
+             alleleFileSelectionCB.setVisible(true);
+           }
            if (selected == null) {
              uploadButton.setEnabled(false);
+             alleleFileSelectionCB.setVisible(false);
            }
        });
     
@@ -436,6 +462,45 @@ public class PanelUpload extends CustomComponent {
     databaseLayout.addComponents(description, dataBaseSelection, datasetGrid);
     
     return databaseLayout;
+  }
+
+  public VerticalLayout createAlleleFileSelection() {
+
+    VerticalLayout allAlleleFileSelectionLayout = new VerticalLayout();
+    Label description = createDescriptionLabel("Do you want specify the allele file manually or to choose an allele file from the database later?");
+
+    HorizontalLayout alleleFileSelectionLayout = new HorizontalLayout();
+    alleleFileSelectionLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+    alleleFileSelectionLayout.setSizeFull();
+    alleleFileSelectionLayout.setSpacing(true);
+
+    manualButton = new Button("Manual");
+    manualButton.setStyleName(ValoTheme.BUTTON_LARGE);
+    manualButton.setIcon(FontAwesome.KEYBOARD_O);
+    manualButton.addClickListener((Button.ClickListener) event -> {
+      this.alleleFileSelection.setVisible(false);
+      this.fileTypeSelectionLayout.setVisible(true);
+      this.nextButton.setVisible(true);
+      alleleFileUpload = false;
+    });
+
+    databaseButton = new Button("Database");
+    databaseButton.setStyleName(ValoTheme.BUTTON_LARGE);
+    databaseButton.setIcon(FontAwesome.DATABASE);
+    databaseButton.addClickListener((Button.ClickListener) event -> {
+      this.alleleFileSelection.setVisible(false);
+      alleleFileUpload = true;
+      this.fileTypeSelectionLayout.setVisible(true);
+      this.nextButton.setVisible(true);
+    });
+
+    alleleFileSelectionLayout.addComponents(manualButton, databaseButton);
+    alleleFileSelectionLayout.setComponentAlignment(manualButton, Alignment.MIDDLE_CENTER);
+    alleleFileSelectionLayout.setComponentAlignment(databaseButton, Alignment.MIDDLE_CENTER);
+
+    allAlleleFileSelectionLayout.addComponents(description, alleleFileSelectionLayout);
+
+    return allAlleleFileSelectionLayout;
   }
 
   public VerticalLayout createFileTypeSelection() {
@@ -560,6 +625,14 @@ public class PanelUpload extends CustomComponent {
 
   public HashMap<String, String> getAllele_expressions() {
     return allele_expressions;
+  }
+
+  public Boolean getAlleleFileUpload() {
+    return alleleFileUpload;
+  }
+
+  public ComboBox getAlleleFileSelectionCB() {
+    return alleleFileSelectionCB;
   }
 
 }

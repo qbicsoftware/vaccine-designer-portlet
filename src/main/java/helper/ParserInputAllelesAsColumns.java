@@ -30,17 +30,11 @@ public class ParserInputAllelesAsColumns {
   private HashMap<String, String> alleleImmMap;
   private BufferedReader brReader;
   private File file;
-  private Boolean hasType, hasMethod;
+  private Boolean hasType, hasMethod, hasTranscriptExpression;
  
 
   public ParserInputAllelesAsColumns() {
-    method = 0;
-    mutation = 0;
-    gene = 0;
-    transcript = 0;
-    transcriptExpression = 0;
-    neopeptide=0;
-    type=0;
+    hasTranscriptExpression = false;
   }
 
 
@@ -121,19 +115,20 @@ public class ParserInputAllelesAsColumns {
         if (h.equalsIgnoreCase("pos")) {
           mutation = counter;
           counter = counter + 1;
-        } else if (h.equals("gene")) {
+        } else if (h.equalsIgnoreCase("gene")) {
           gene = counter;
           counter = counter + 1;
-        } else if (h.equals("transcript") || h.equals("transcripts")) {
+        } else if (h.equalsIgnoreCase("transcript") || h.equalsIgnoreCase("transcripts")) {
           transcript = counter;
           counter = counter + 1;
-        } else if (h.equals("transcript_expression")) {
+        } else if (h.equalsIgnoreCase("transcript_expression")) {
             transcriptExpression = counter;
             counter = counter + 1;
-        } else if (h.equals("sequence")) {
+            hasTranscriptExpression = true;
+        } else if (h.equalsIgnoreCase("sequence")) {
           neopeptide = counter;
           counter = counter + 1;
-        } else if (h.equals("length")) {
+        } else if (h.equalsIgnoreCase("length")) {
           counter = counter + 1;
         } else if (h.startsWith("A*") && h.endsWith("score") && (a == 0)) {
           hlaA1 = counter;
@@ -294,7 +289,7 @@ public class ParserInputAllelesAsColumns {
       newBean.setMutation(otherMap.get(key).get("mutation"));
       newBean.setGene(otherMap.get(key).get("gene"));
       newBean.setTranscript(otherMap.get(key).get("transcript"));
-      if (transcriptExpression != 0 ) {
+      if (hasTranscriptExpression) {
         newBean.setTranscriptExpression(Float.parseFloat(otherMap.get(key).get("transcriptExpression")));
       } else {
         newBean.setTranscriptExpression(1f);

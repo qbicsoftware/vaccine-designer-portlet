@@ -29,20 +29,10 @@ public class ParserInputAllelesAsRows {
   private HashMap<String, HashMap<String, String>> immMap, uncMap, distMap, otherMap;
   private BufferedReader brReader;
   private File file;
-  private Boolean hasType, hasDist, hasImm, hasUnc, hasMethod;
+  private Boolean hasType, hasDist, hasImm, hasUnc, hasMethod, hasTranscriptExpression;
   
   public ParserInputAllelesAsRows() {
-    method = 0;
-    mutation = 0;
-    gene = 0;
-    transcript = 0;
-    transcriptExpression = 0;
-    neopeptide=0;
-    hla=0;
-    hla1BindingPrediction = 0;
-    uncertainty=0;
-    distance=0;
-    type=0;
+    hasTranscriptExpression = false;
   }
 
 
@@ -122,24 +112,26 @@ public class ParserInputAllelesAsRows {
     // counter + 1
     
     for (String h : headers) {
-      if (h.equals("mutation")) {
+      MyPortletUI.logger.info(h);
+      if (h.equalsIgnoreCase("mutation") || h.equalsIgnoreCase("POS")) {
         mutation = counter;
         counter = counter + 1;
-      } else if (h.equals("gene")) {
+      } else if (h.equalsIgnoreCase("gene")) {
         gene = counter;
         counter = counter + 1;
-      } else if (h.equals("transcript") || h.equals("transcripts")) {
+      } else if (h.equalsIgnoreCase("transcript") || h.equals("transcripts")) {
         transcript = counter;
         counter = counter + 1;
-      } else if (h.equals("transcript_expression")) {
+      } else if (h.equalsIgnoreCase("transcript_expression")) {
         transcriptExpression = counter;
         counter = counter + 1;
-      } else if (h.equals("neopeptide") || h.equals("mut_pep")) {
+        hasTranscriptExpression = true;
+      } else if (h.equalsIgnoreCase("neopeptide") || h.equalsIgnoreCase("mut_pep") || h.equalsIgnoreCase("peptide")) {
         neopeptide = counter;
         counter = counter + 1;
-      } else if (h.equals("length_of_neopeptide")) {
+      } else if (h.equalsIgnoreCase("length_of_neopeptide") || h.equalsIgnoreCase("length")) {
         counter = counter + 1;
-      } else if (h.equals("HLA") || h.equals("ALLELE")) {
+      } else if (h.equalsIgnoreCase("HLA") || h.equals("ALLELE")) {
         hla = counter;
         counter = counter + 1;
       } else if (h.equals(immCol)) {
@@ -278,7 +270,7 @@ public class ParserInputAllelesAsRows {
    */
   public void setBean() {
     for (String key : immMap.keySet()) {
-
+      MyPortletUI.logger.info(key);
       // initialize new epitope selection bean
       EpitopeSelectionBean newBean = new EpitopeSelectionBean();
 
@@ -312,7 +304,7 @@ public class ParserInputAllelesAsRows {
         newBean.setType(otherMap.get(key).get("type"));
       }
 
-      if (transcriptExpression != 0) {
+      if (hasTranscriptExpression) {
         newBean.setTranscriptExpression(Float.parseFloat((otherMap.get(key).get("transcriptExpression"))));
       } else {
         newBean.setTranscriptExpression(1f);

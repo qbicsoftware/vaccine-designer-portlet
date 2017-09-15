@@ -170,6 +170,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       BeanItemContainer<DatasetBean> container = fileHandler.fillTable(dataSets);
       if (container.size() > 0) {
         uploadPanel.getDatasetGrid().setEnabled(true);
+        if (uploadPanel.getAlleleFileUpload()) {
+          uploadPanel.getAlleleFileSelectionCB().setVisible(true);
+        }
         uploadPanel.getDatasetGrid().setContainerDataSource(container);
         filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
         filterable.removeAllContainerFilters();
