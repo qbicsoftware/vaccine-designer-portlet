@@ -12,14 +12,14 @@ import model.EpitopeSelectionBean;
 
 /**
  * 
- * The class {@link ParserInputNewFiletype} is responsible for the parsing of the uploaded epitope
+ * The class {@link ParserInputAllelesAsColumns} is responsible for the parsing of the uploaded epitope
  * prediction input data.
  * 
  * @author spaethju
  * 
  * 
  */
-public class ParserInputNewFiletype {
+public class ParserInputAllelesAsColumns {
 
   private BeanItemContainer<EpitopeSelectionBean> epitopes;
   private String line;
@@ -33,8 +33,14 @@ public class ParserInputNewFiletype {
   private Boolean hasType, hasMethod;
  
 
-  public ParserInputNewFiletype() {
-
+  public ParserInputAllelesAsColumns() {
+    method = 0;
+    mutation = 0;
+    gene = 0;
+    transcript = 0;
+    transcriptExpression = 0;
+    neopeptide=0;
+    type=0;
   }
 
 
@@ -121,6 +127,9 @@ public class ParserInputNewFiletype {
         } else if (h.equals("transcript") || h.equals("transcripts")) {
           transcript = counter;
           counter = counter + 1;
+        } else if (h.equals("transcript_expression")) {
+            transcriptExpression = counter;
+            counter = counter + 1;
         } else if (h.equals("sequence")) {
           neopeptide = counter;
           counter = counter + 1;
@@ -285,10 +294,14 @@ public class ParserInputNewFiletype {
       newBean.setMutation(otherMap.get(key).get("mutation"));
       newBean.setGene(otherMap.get(key).get("gene"));
       newBean.setTranscript(otherMap.get(key).get("transcript"));
+      if (transcriptExpression != 0 ) {
+        newBean.setTranscriptExpression(Float.parseFloat(otherMap.get(key).get("transcriptExpression")));
+      } else {
+        newBean.setTranscriptExpression(1f);
+      }
       if (!(typeCol.equals("")) && hasType) {
         newBean.setType(otherMap.get(key).get("type"));
       }
-      newBean.setTranscriptExpression(1f);
 
       epitopes.addBean(newBean);
 

@@ -32,8 +32,8 @@ import java.util.HashMap;
 @SuppressWarnings("serial")
 public class PanelUpload extends CustomComponent {
 
-  private UploaderInput receiver;
-  private Upload upload;
+  private UploaderInput inputReceiver;
+  private Upload inputUpload;
   private Panel uploadPanel;
   private VerticalLayout panelContent, databaseLayout,hlaExpressionLayout, columnLayout, dataLayout, fileTypeSelectionLayout, uploadLayout;
   private HorizontalLayout buttonLayout;
@@ -45,7 +45,6 @@ public class PanelUpload extends CustomComponent {
   private Grid datasetGrid;
   private BeanItem<DatasetBean> selected;
   private Boolean useDatabase, hlaAsColumns;
-  private NativeSelect comboInput;
   private HashMap<String, String> alleles;
   private HashMap<String, String> allele_expressions;
 
@@ -57,18 +56,17 @@ public class PanelUpload extends CustomComponent {
   }
 
   public void init() {
-    comboInput = new NativeSelect();
     useDatabase = null;
     hlaAsColumns = null;
     alleles = new HashMap<>();
     allele_expressions = new HashMap<>();
     // Create the upload component and handle all its events
-    receiver = new UploaderInput();
+    inputReceiver = new UploaderInput();
     //receiver.getProgress().setVisible(false);
-    upload = new Upload("Please Upload your Data", receiver);
-    upload.setSizeFull();
-    upload.addProgressListener(receiver);
-    upload.addFailedListener(receiver);
+    inputUpload = new Upload("Please Upload your Data", inputReceiver);
+    inputUpload.setSizeFull();
+    inputUpload.addProgressListener(inputReceiver);
+    inputUpload.addFailedListener(inputReceiver);
 
     // Create the Upload Layout
     panelContent = new VerticalLayout();
@@ -110,7 +108,7 @@ public class PanelUpload extends CustomComponent {
     HorizontalLayout uploadLayout = new HorizontalLayout();
     uploadLayout.setMargin(true);
     uploadLayout.setSpacing(true);
-    uploadLayout.addComponents(upload, uploadButton);
+    uploadLayout.addComponents(inputUpload, uploadButton);
 
     allUploadLayout.addComponents(description, uploadLayout);
 
@@ -126,12 +124,12 @@ public class PanelUpload extends CustomComponent {
     backButton.setIcon(FontAwesome.ARROW_CIRCLE_O_LEFT);
     backButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     backButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-    backButton.addStyleName("button_huge");
+    backButton.addStyleName(ValoTheme.BUTTON_HUGE);
     Button nextButton = new Button("Next");
     nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
     nextButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     nextButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-    nextButton.addStyleName("button_huge");
+    nextButton.addStyleName(ValoTheme.BUTTON_HUGE);
 
     buttonsLayout.addComponents(backButton, nextButton);
     buttonsLayout.setComponentAlignment(backButton, Alignment.MIDDLE_CENTER);
@@ -221,7 +219,7 @@ public class PanelUpload extends CustomComponent {
     immColTf = new TextField("Immunogenicity Column");
     immColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     immColTf.setImmediate(true);
-    immColTf.setValue("HLA_class1_binding_prediction");
+    immColTf.setValue("SCORE");
     immColTf.setDescription("Column name of peptide immunogenicity");
     immColTf.addValidator(new StringLengthValidator("Please enter a column name", 1, 100, true));
     immColTf.setRequired(true);
@@ -273,14 +271,14 @@ public class PanelUpload extends CustomComponent {
     hlaA1TF = new TextField();
     hlaA1TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
     hlaA1TF.setImmediate(true);
-    hlaA1TF.setValue("HLA-A*");
+    hlaA1TF.setValue("HLA-A*24:02");
     hlaA1TF.setRequired(true);
     hlaA1TF.addValidator(hlaValidator);
     hlaA1TF.setDescription("HLA-A Allele");
     hlaA2TF = new TextField();
     hlaA2TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
     hlaA2TF.setImmediate(true);
-    hlaA2TF.setValue("HLA-A*");
+    hlaA2TF.setValue("HLA-A*29:02");
     hlaA2TF.setDescription("HLA-A Allele");
     hlaA2TF.setRequired(true);
     hlaA2TF.addValidator(hlaValidator);
@@ -305,14 +303,14 @@ public class PanelUpload extends CustomComponent {
     hlaB1TF = new TextField();
     hlaB1TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
     hlaB1TF.setImmediate(true);
-    hlaB1TF.setValue("HLA-B*");
+    hlaB1TF.setValue("HLA-B*37:01");
     hlaB1TF.setDescription("HLA-B Allele");
     hlaB1TF.setRequired(true);
     hlaB1TF.addValidator(hlaValidator);
     hlaB2TF = new TextField();
     hlaB2TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
     hlaB2TF.setImmediate(true);
-    hlaB2TF.setValue("HLA-B*");
+    hlaB2TF.setValue("HLA-B*44:03");
     hlaB2TF.setDescription("HLA-B Allele");
     hlaB2TF.setRequired(true);
     hlaB2TF.addValidator(hlaValidator);
@@ -337,14 +335,14 @@ public class PanelUpload extends CustomComponent {
     hlaC1TF = new TextField();
     hlaC1TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
     hlaC1TF.setImmediate(true);
-    hlaC1TF.setValue("HLA-C*");
+    hlaC1TF.setValue("HLA-C*16:01");
     hlaC1TF.setDescription("HLA-C Allele");
     hlaC1TF.setRequired(true);
     hlaC1TF.addValidator(hlaValidator);
     hlaC2TF = new TextField();
     hlaC2TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
     hlaC2TF.setImmediate(true);
-    hlaC2TF.setValue("HLA-C*");
+    hlaC2TF.setValue("HLA-C*06:02");
     hlaC2TF.setDescription("HLA-C Allele");
     hlaC2TF.setRequired(true);
     hlaC2TF.addValidator(hlaValidator);
@@ -377,7 +375,7 @@ public class PanelUpload extends CustomComponent {
     dataSelectionLayout.setSpacing(true);
 
     dataSelectionUploadButton = new Button("Directory");
-    dataSelectionUploadButton.setStyleName(ValoTheme.BUTTON_HUGE);
+    dataSelectionUploadButton.setStyleName(ValoTheme.BUTTON_LARGE);
     dataSelectionUploadButton.setIcon(FontAwesome.DESKTOP);
     dataSelectionUploadButton.addClickListener((Button.ClickListener) event -> {
       useDatabase = false;
@@ -387,7 +385,7 @@ public class PanelUpload extends CustomComponent {
     });
 
     dataSelectionDatabaseButton = new Button("Database");
-    dataSelectionDatabaseButton.setStyleName(ValoTheme.BUTTON_HUGE);
+    dataSelectionDatabaseButton.setStyleName(ValoTheme.BUTTON_LARGE);
     dataSelectionDatabaseButton.setIcon(FontAwesome.DATABASE);
     dataSelectionDatabaseButton.addClickListener((Button.ClickListener) event -> {
       useDatabase = true;
@@ -468,7 +466,6 @@ public class PanelUpload extends CustomComponent {
     Image colImage = new Image(null, colRe);
     colImage.addClickListener((MouseEvents.ClickListener) event -> {
       hlaAsColumns = true;
-      immColTf.setValue("");
       immColTf.setVisible(false);
       distanceColTf.setValue("");
       distanceColTf.setVisible(false);
@@ -499,11 +496,6 @@ public class PanelUpload extends CustomComponent {
     return descriptionLabel;
   }
 
-
-  public NativeSelect getComboInput() {
-    return comboInput;
-  }
-
   public Grid getDatasetGrid() {
     return datasetGrid;
   }
@@ -528,12 +520,12 @@ public class PanelUpload extends CustomComponent {
     return methodColTf;
   }
 
-  public UploaderInput getReceiver() {
-    return receiver;
+  public UploaderInput getInputReceiver() {
+    return inputReceiver;
   }
 
-  public Upload getUpload() {
-    return upload;
+  public Upload getInputUpload() {
+    return inputUpload;
   }
 
   public ComboBox getProjectSelectionCB() {

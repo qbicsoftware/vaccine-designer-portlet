@@ -239,7 +239,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private Accordion createContentAccordion() {
     uploadPanel = new PanelUpload();
     uploadPanel.setImmediate(true);
-    uploadPanel.getUpload().addSucceededListener(this);
+    uploadPanel.getInputUpload().addSucceededListener(this);
 
     epitopeSelectionPanel = new PanelEpitopeSelection();
     epitopeSelectionPanel.setImmediate(true);
@@ -392,6 +392,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
       } catch (InvalidValueException e) {
         Notification.show(e.getMessage());
+        e.printStackTrace();
       }
 
       if (valuesCorrect) {
@@ -483,11 +484,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
         // writes alleles.txt, include.txt and exclude.txt
         try {
-          inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
+          inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(), uploadPanel.getAllele_expressions(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
         } catch (IOException e) {
           Utils.notification("Problem!",
                   "There was a problem writing the input files. Please try again", "error");
           MyPortletUI.logger.error("Error while writing the input data");
+          e.printStackTrace();
         }
 
         runScript(p);
@@ -541,12 +543,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   @Override
   public void uploadSucceeded(SucceededEvent event) {
-    UploaderInput uploader = uploadPanel.getReceiver();
+    UploaderInput uploader = uploadPanel.getInputReceiver();
     uploader.getProgress().setVisible(false);
     try {
       processingData(uploader.getTempFile());
     } catch (Exception e){
       Utils.notification("Upload failed", "Something went wrong. Make sure you have selected an appropriate file and described its parameters correctly ", "error");
+      e.printStackTrace();
       reset();
     }
 
@@ -554,9 +557,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   private void processingData(File file) throws Exception {
     Boolean hasMethod;
-    //TODO no combo input anymore
-    if (uploadPanel.getComboInput().getValue().equals("Standard")) {
-      ParserInputStandard parser = new ParserInputStandard();
+    if (!uploadPanel.getHlaAsColumns()) {
+      ParserInputAllelesAsRows parser = new ParserInputAllelesAsRows();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
               uploadPanel.getImmColTf().getValue(),
               uploadPanel.getUncertaintyColTf().getValue(),
@@ -574,30 +576,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       } else {
         epitopeSelectionPanel.addTypeFilter();
       }
-    } else if (uploadPanel.getComboInput().getValue().equals("Old Filetype")) {
-
-      ParserInputOldFiletype parser = new ParserInputOldFiletype();
-
-      parser.parse(file, uploadPanel.getMethodColTf().getValue(),
-              uploadPanel.getImmColTf().getValue(),
-              uploadPanel.getUncertaintyColTf().getValue(),
-              uploadPanel.getDistanceColTf().getValue(),
-              uploadPanel.getTaaColTf().getValue());
-
-      hasMethod = parser.getHasMethod();
-      hasType = parser.getHasType();
-      hasDist = parser.getHasDist();
-      hasUnc = parser.getHasUnc();
-      epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-              uploadPanel.getMethodColTf().getValue());
-      maxLength = parser.getMaxLength();
-      if (uploadPanel.getTaaColTf().getValue().equals("")) {
-        epitopeSelectionPanel.getDataGrid().removeColumn("type");
-      } else {
-        epitopeSelectionPanel.addTypeFilter();
-      }
-    } else if (uploadPanel.getComboInput().getValue().equals("New Filetype")) {
-      ParserInputNewFiletype parser = new ParserInputNewFiletype();
+    } else if (uploadPanel.getHlaAsColumns()) {
+      ParserInputAllelesAsColumns parser = new ParserInputAllelesAsColumns();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
               uploadPanel.getTaaColTf().getValue());
       hasMethod = parser.getHasMethod();
@@ -614,9 +594,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     String distCol = uploadPanel.getDistanceColTf().getValue();
     String uncCol = uploadPanel.getUncertaintyColTf().getValue();
-    if (!uploadPanel.getComboInput().getValue().equals("Standard")) {
-      epitopeSelectionPanel.getDataGrid().removeColumn("transcriptExpression");
-    }
     if ((!uncCol.equals("")) || (!distCol.equals(""))) {
       epitopeSelectionPanel.joinHeader();
     }
