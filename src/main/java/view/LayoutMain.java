@@ -114,7 +114,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   private void init() {
     this.addComponents(createContentAccordion(), createButtonsLayout());
-    uploadPanel.getDataSelection().setEnabled(false);
+    uploadPanel.getDataSelectionDatabaseButton().setEnabled(false);
 
     this.setMargin(true);
     this.setSpacing(true);
@@ -156,7 +156,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   }
 
   private void initDatabase() {
-    uploadPanel.getDataSelection().setEnabled(true);
+    uploadPanel.getDataSelectionDatabaseButton().setEnabled(true);
     gridAcivated = false;
     fileHandler = new DBFileHandler(openbis);
 
@@ -177,6 +177,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         filter("fileName", ".tsv");
         if (!gridAcivated) {
           uploadPanel.getDatasetGrid().removeColumn("children");
+          uploadPanel.getDatasetGrid().removeColumn("parents");
+          uploadPanel.getDatasetGrid().removeColumn("sampleIdentifier");
+          uploadPanel.getDatasetGrid().removeColumn("type");
           uploadPanel.getDatasetGrid().removeColumn("properties");
           uploadPanel.getDatasetGrid().removeColumn("id");
           uploadPanel.getDatasetGrid().removeColumn("projectBean");
@@ -551,6 +554,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   private void processingData(File file) throws Exception {
     Boolean hasMethod;
+    //TODO no combo input anymore
     if (uploadPanel.getComboInput().getValue().equals("Standard")) {
       ParserInputStandard parser = new ParserInputStandard();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
@@ -747,7 +751,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
     getResults();
     downloadButton.setVisible(true);
-    if (uploadPanel.getDataSelection().getValue().equals("Database")) {
+    if (uploadPanel.getUseDatabase()) {
       registerButton.setVisible(true);
     }
 
