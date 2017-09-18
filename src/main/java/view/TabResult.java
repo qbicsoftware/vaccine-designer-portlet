@@ -239,23 +239,16 @@ public class TabResult extends VerticalLayout {
     filterLayout.addComponent(typeChart);
     ChartGene geneChart = new ChartGene(resultBean);
     filterLayout.addComponent(geneChart);
-    // ChartChromosome chromChart = new ChartChromosome(resultBean);
-    // filterLayout.addComponent(chromChart);
 
     typeChart.addPointClickListener((PointClickListener) event -> {
       setFilter("type", typeChart.getDataSeriesObject(event));
-      // chromChart.unselect();
       geneChart.unselect();
     });
 
 
-    geneChart.addPointClickListener(new PointClickListener() {
-      @Override
-      public void onClick(com.vaadin.addon.charts.PointClickEvent event) {
-        setFilter("genes", geneChart.getDataSeriesObject(event));
-        typeChart.unselect();
-        // chromChart.unselect();
-      }
+    geneChart.addPointClickListener((PointClickListener) event -> {
+      setFilter("genes", geneChart.getDataSeriesObject(event));
+      typeChart.unselect();
     });
 
     filterLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
@@ -417,7 +410,7 @@ public class TabResult extends VerticalLayout {
       listSeries.addData(Float.parseFloat(map.get(key)));
     }
 
-    ArrayList<Series> series = new ArrayList<Series>();
+    ArrayList<Series> series = new ArrayList<>();
     series.add(listSeries);
     conf.setSeries(series);
 

@@ -11,6 +11,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import helper.DescriptionHandler;
 
 /**
  * The class {@link WindowLoading} represents a window showing the current state of computation. It
@@ -27,6 +28,7 @@ public class WindowLoading extends Window {
   private ProgressBar loadingBar;
   private Label loadingLa;
   private Button cancelBu;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    *  Constructor, creates a window showing the computation in progress state
@@ -42,7 +44,7 @@ public class WindowLoading extends Window {
 
     loadingLayout = new VerticalLayout();
 
-    loadingLa = new Label("Computation in progress...");
+    loadingLa = new Label(dh.getWindow_loading());
     loadingBar = new ProgressBar();
     loadingBar.setIndeterminate(true);
     cancelBu = new Button("Cancel");
@@ -66,7 +68,7 @@ public class WindowLoading extends Window {
    */
   public void success() {
     loadingLayout.removeAllComponents();
-    Label successLabel = new Label("The selection of epitopes finished successfully.");
+    Label successLabel = new Label(dh.getWindow_success());
     successLabel.addStyleName(ValoTheme.LABEL_SUCCESS);
     Button closeBu = new Button("OK");
     closeBu.setStyleName(ValoTheme.BUTTON_FRIENDLY);
@@ -84,8 +86,7 @@ public class WindowLoading extends Window {
    */
   public void failure() {
     loadingLayout.removeAllComponents();
-    Label failureLabel = new Label(
-        "Computation couln't finish successfully. Please try again using different parameters");
+    Label failureLabel = new Label(dh.getWindow_fail());
     failureLabel.addStyleName(ValoTheme.LABEL_FAILURE);
     Button closeBu = new Button("Back");
     closeBu.setStyleName(ValoTheme.BUTTON_DANGER);

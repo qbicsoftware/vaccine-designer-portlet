@@ -72,22 +72,14 @@ public class PanelResults extends CustomComponent {
     resultsTab.setSelectedTab(resultCounter - 1);
     resultCounter++;
     tabs.add(tabResult);
-    resultsTab.addSelectedTabChangeListener(new SelectedTabChangeListener() {
-
-      @Override
-      public void selectedTabChange(SelectedTabChangeEvent event) {
-        for (TabResult tr : tabs) {
-          tr.getFilterable().removeAllContainerFilters();
-        }
+    resultsTab.addSelectedTabChangeListener((SelectedTabChangeListener) event -> {
+      for (TabResult tr : tabs) {
+        tr.getFilterable().removeAllContainerFilters();
       }
     });
-    tabResult.getOptionTab().addSelectedTabChangeListener(new SelectedTabChangeListener() {
-
-      @Override
-      public void selectedTabChange(SelectedTabChangeEvent event) {
-        for (TabResult tr : tabs) {
-          tr.getFilterable().removeAllContainerFilters();
-        }
+    tabResult.getOptionTab().addSelectedTabChangeListener((SelectedTabChangeListener) event -> {
+      for (TabResult tr : tabs) {
+        tr.getFilterable().removeAllContainerFilters();
       }
     });
   }

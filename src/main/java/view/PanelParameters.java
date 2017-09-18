@@ -7,6 +7,7 @@ import com.vaadin.data.validator.DoubleRangeValidator;
 import com.vaadin.data.validator.FloatRangeValidator;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import helper.DescriptionHandler;
 
 /**
  * 
@@ -25,6 +26,7 @@ public class PanelParameters extends CustomComponent {
   private TextField threshEpitopeTF, threshDistanceTF;
   private Label kLabel, consAlleleLabel, consAntigenLabel, consOverlapLabel, ktaaLabel;
   private CheckBox rankCB;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    * Constructor
@@ -49,7 +51,7 @@ public class PanelParameters extends CustomComponent {
     kLayout.setImmediate(true);
     kSlider = new Slider("Number of Epitopes");
     kSlider.setImmediate(true);
-    kSlider.setDescription("Specifies the number of epitopes to select.");
+    kSlider.setDescription(dh.getParameter_numberOfEpitopes());
     kSlider.setImmediate(true);
     kSlider.setResolution(0);
     kSlider.setValue(10.0);
@@ -57,16 +59,14 @@ public class PanelParameters extends CustomComponent {
     kLabel = new Label("10");
     kLabel.setImmediate(true);
     kLabel.setStyleName("parameter");
-    kSlider.addValueChangeListener(new Property.ValueChangeListener() {
-      public void valueChange(ValueChangeEvent event) {
-        int value = kSlider.getValue().intValue();
-        // Use the value
-        kLabel.setValue(String.valueOf(value));
-        //change ktaa
-        ktaaSlider.setMax(value);
-        if (ktaaSlider.getValue().intValue() > value) {
-          ktaaSlider.setValue((double) value);
-        }
+    kSlider.addValueChangeListener((Property.ValueChangeListener) event -> {
+      int value = kSlider.getValue().intValue();
+      // Use the value
+      kLabel.setValue(String.valueOf(value));
+      //change ktaa
+      ktaaSlider.setMax(value);
+      if (ktaaSlider.getValue().intValue() > value) {
+        ktaaSlider.setValue((double) value);
       }
     });
     kLayout.addComponents(kSlider, kLabel);
@@ -77,7 +77,7 @@ public class PanelParameters extends CustomComponent {
     VerticalLayout consAlleleLayout = new VerticalLayout();
     consAlleleSlider = new Slider("Allele Constraint");
     consAlleleSlider
-        .setDescription("Activates allele coverage constraint with specified threshold.");
+        .setDescription(dh.getParameter_alleleConstraint());
     consAlleleSlider.setImmediate(true);
     consAlleleSlider.setValue(0.0);
     consAlleleSlider.setMax(1.0);
@@ -87,15 +87,13 @@ public class PanelParameters extends CustomComponent {
     consAlleleSlider.setWidth("150px");
     consAlleleLabel = new Label("deactivated");
     consAlleleLabel.setStyleName("parameter");
-    consAlleleSlider.addValueChangeListener(new Property.ValueChangeListener() {
-      public void valueChange(ValueChangeEvent event) {
-        double value = consAlleleSlider.getValue();
-        // Use the value
-        if (value == 0) {
-          consAlleleLabel.setValue("deactivated");
-        } else {
-          consAlleleLabel.setValue(String.valueOf(value));
-        }
+    consAlleleSlider.addValueChangeListener((Property.ValueChangeListener) event -> {
+      double value = consAlleleSlider.getValue();
+      // Use the value
+      if (value == 0) {
+        consAlleleLabel.setValue("deactivated");
+      } else {
+        consAlleleLabel.setValue(String.valueOf(value));
       }
     });
     consAlleleLayout.addComponents(consAlleleSlider, consAlleleLabel);
@@ -106,7 +104,7 @@ public class PanelParameters extends CustomComponent {
     VerticalLayout consAntigenLayout = new VerticalLayout();
     consAntigenSlider = new Slider("Antigen Constraint");
     consAntigenSlider
-        .setDescription("Activates antigen coverage constraint with specified threshold");
+        .setDescription(dh.getParameter_antigenConstraint());
     consAntigenSlider.setImmediate(true);
     consAntigenSlider.setValue(0.0);
     consAntigenSlider.setMax(1.0);
@@ -116,15 +114,13 @@ public class PanelParameters extends CustomComponent {
     consAntigenSlider.setWidth("150px");
     consAntigenLabel = new Label("deactivated");
     consAntigenLabel.setStyleName("parameter");
-    consAntigenSlider.addValueChangeListener(new Property.ValueChangeListener() {
-      public void valueChange(ValueChangeEvent event) {
-        double value = consAntigenSlider.getValue();
-        // Use the value
-        if (value == 0) {
-          consAntigenLabel.setValue("deactivated");
-        } else {
-          consAntigenLabel.setValue(String.valueOf(value));
-        }
+    consAntigenSlider.addValueChangeListener((Property.ValueChangeListener) event -> {
+      double value = consAntigenSlider.getValue();
+      // Use the value
+      if (value == 0) {
+        consAntigenLabel.setValue("deactivated");
+      } else {
+        consAntigenLabel.setValue(String.valueOf(value));
       }
     });
     consAntigenLayout.addComponents(consAntigenSlider, consAntigenLabel);
@@ -135,22 +131,20 @@ public class PanelParameters extends CustomComponent {
     VerticalLayout consOverlapLayout = new VerticalLayout();
     consOverlapSlider = new Slider("Overlap Constraint");
     consOverlapSlider
-        .setDescription("Activates epitope overlapping constraint with specified threshold");
+        .setDescription(dh.getParameter_overlapConstraint());
     consOverlapSlider.setImmediate(true);
     consOverlapSlider.setValue(0.0);
     consOverlapSlider.setWidth("150px");
     consOverlapLabel = new Label("deactivated");
     consOverlapLabel.setStyleName("parameter");
-    consOverlapSlider.addValueChangeListener(new Property.ValueChangeListener() {
-      public void valueChange(ValueChangeEvent event) {
-        int value = consOverlapSlider.getValue().intValue();
-        if (value == 0) {
-          consOverlapLabel.setValue("deactivated");
-        } else {
-          consOverlapLabel.setValue(String.valueOf(value));
-        }
-
+    consOverlapSlider.addValueChangeListener((Property.ValueChangeListener) event -> {
+      int value = consOverlapSlider.getValue().intValue();
+      if (value == 0) {
+        consOverlapLabel.setValue("deactivated");
+      } else {
+        consOverlapLabel.setValue(String.valueOf(value));
       }
+
     });
     consOverlapLayout.addComponents(consOverlapSlider, consOverlapLabel);
     consOverlapLayout.setComponentAlignment(consOverlapLabel, Alignment.MIDDLE_CENTER);
@@ -159,19 +153,17 @@ public class PanelParameters extends CustomComponent {
     // Specifies the number of TAA epitopes that are allowed to select
     VerticalLayout ktaaLayout = new VerticalLayout();
     ktaaSlider = new Slider("Number of TAA");
-    ktaaSlider.setDescription("Specifies the number of TAA epitopes that are allowed to select");
+    ktaaSlider.setDescription(dh.getParameter_numberOfTAA());
     ktaaSlider.setImmediate(true);
     ktaaSlider.setValue(0.0);
     ktaaSlider.setWidth("150px");
     ktaaLabel = new Label("0");
     ktaaLabel.setStyleName("parameter");
-    ktaaSlider.addValueChangeListener(new Property.ValueChangeListener() {
-      public void valueChange(ValueChangeEvent event) {
-        int value = ktaaSlider.getValue().intValue();
+    ktaaSlider.addValueChangeListener((Property.ValueChangeListener) event -> {
+      int value = ktaaSlider.getValue().intValue();
 
-        // Use the value
-        ktaaLabel.setValue(String.valueOf(value));
-      }
+      // Use the value
+      ktaaLabel.setValue(String.valueOf(value));
     });
     ktaaLayout.addComponents(ktaaSlider, ktaaLabel);
     ktaaLayout.setComponentAlignment(ktaaLabel, Alignment.MIDDLE_CENTER);
@@ -181,7 +173,7 @@ public class PanelParameters extends CustomComponent {
     VerticalLayout threshEpitopeLayout = new VerticalLayout();
     threshEpitopeTF = new TextField("Epitope Threshold");
     threshEpitopeTF
-        .setDescription("Specifies the binding/immunogenicity threshold for all alleles");
+        .setDescription(dh.getParameter_epitopeTreshold());
     threshEpitopeTF.setConverter(new StringToFloatConverter());
     threshEpitopeTF
         .addValidator(new FloatRangeValidator("Please enter a float number", null, null));
@@ -195,7 +187,7 @@ public class PanelParameters extends CustomComponent {
     // Specifies the distance-to-self threshold for all alleles
     VerticalLayout threshDistanceLayout = new VerticalLayout();
     threshDistanceTF = new TextField("Distance Threshold");
-    threshDistanceTF.setDescription("Specifies the distance-to-self threshold for all alleles.");
+    threshDistanceTF.setDescription(dh.getParameter_distanceThreshold());
     threshDistanceLayout.addComponent(threshDistanceTF);
     threshDistanceTF.setConverter(new StringToFloatConverter());
     threshDistanceTF
@@ -208,7 +200,7 @@ public class PanelParameters extends CustomComponent {
 
     VerticalLayout rankLayout = new VerticalLayout();
     rankCB = new CheckBox("Rank");
-    rankCB.setDescription("Immunggenicity estimates are rank based.");
+    rankCB.setDescription(dh.getParameter_rank());
     rankLayout.addComponent(rankCB);
     rankCB.setValue(false);
     rankLayout.addStyleName("padded");
@@ -231,9 +223,7 @@ public class PanelParameters extends CustomComponent {
   public VerticalLayout createInfo() {
     VerticalLayout infoLayout = new VerticalLayout();
 
-    Label infoLa = new Label("Please adjust the parameters for epitope selection.");
-    infoLa.addStyleName(ValoTheme.LABEL_BOLD);
-    infoLa.addStyleName(ValoTheme.LABEL_COLORED);
+    Label infoLa = new Label(dh.getParameterSettings());
 
     infoLayout.addComponents(infoLa);
 

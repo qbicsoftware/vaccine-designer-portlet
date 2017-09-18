@@ -27,6 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
+import helper.DescriptionHandler;
 import model.EpitopeSelectionBean;
 
 /**
@@ -50,6 +51,7 @@ public class PanelEpitopeSelection extends CustomComponent {
   private Filterable filterable;
   private NativeSelect methodSelect;
   private String methodColumn;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    * Constructor
@@ -88,12 +90,12 @@ public class PanelEpitopeSelection extends CustomComponent {
     // Set Allele Names for Headers
     String[] alleleNames =
         container.getItem(container.firstItemId()).getBean().prepareAlleleNames();
-    hlaA1 = new String(alleleNames[0]);
-    hlaA2 = new String(alleleNames[1]);
-    hlaB1 = new String(alleleNames[2]);
-    hlaB2 = new String(alleleNames[3]);
-    hlaC1 = new String(alleleNames[4]);
-    hlaC2 = new String(alleleNames[5]);
+    hlaA1 = alleleNames[0];
+    hlaA2 = alleleNames[1];
+    hlaB1 = alleleNames[2];
+    hlaB2 = alleleNames[3];
+    hlaC1 = alleleNames[4];
+    hlaC2 = alleleNames[5];
 
 
     // set epitope selection bean item container as container data source
@@ -304,16 +306,9 @@ public class PanelEpitopeSelection extends CustomComponent {
   public VerticalLayout createInfo() {
     infoLayout = new VerticalLayout();
 
-    Label infoLa = new Label("Select your epitopes:");
+    Label infoLa = new Label(dh.getEpitopeSelection());
 
-    Label outLa = new Label("'Out' labeled epitopes will be excluded from the set of epitopes.");
-    outLa.addStyleName("out");
-    Label inLa =
-        new Label("'In' labeled epitopes will be definitely included in the set of epitopes.");
-    inLa.addStyleName("in");
-    infoLa.addStyleName(ValoTheme.LABEL_BOLD);
-
-    infoLayout.addComponents(infoLa, inLa, outLa);
+    infoLayout.addComponent(infoLa);
 
     return infoLayout;
   }
@@ -394,7 +389,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     ArrayList<String> included = new ArrayList<>();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
-      if (bean.getIncluded() == true) {
+      if (bean.getIncluded()) {
         included.add(bean.getNeopeptide());
       }
     }
@@ -411,7 +406,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     ArrayList<String> excluded = new ArrayList<>();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
-      if (bean.getIncluded() == true) {
+      if (bean.getIncluded()) {
         excluded.add(bean.getNeopeptide());
       }
     }

@@ -14,6 +14,14 @@ public class DescriptionHandler {
     private String uploadData_databaseUploadAndAllele = "Choose the project containing your epitope prediction file and select the file. Finally choose the corresponding allele file and press 'Upload'.";
     private String uploadData_databaseUpload = "Choose the project containing your epitope prediction file, select the file and finally press 'Upload'.";
     private String uploadData_upload = "Choose your epitope prediction file from your computer's directory and press 'Upload'.";
+    private String uploadData_immValidatorDescription = "Please enter the column name of the immunogenicity to continue.";
+    private String uploadData_hlaValidatorDescription = "Please enter valid HLA alleles.";
+    private String uploadData_hlaExprValidatorDescription = "Please enter valid HLA expression values.";
+    private String uploadData_columnMethod = "Column name of the prediction method.";
+    private String uploadData_columnImm = "Column name of peptide immunogenicity.";
+    private String uploadData_columnUncertainty = "Column name of prediction uncertainty";
+    private String uploadData_columnDistance = "Column name of distance-to-self calculation";
+    private String uploadData_columnTAA = "Column name specifying whether the peptide is a TAA or TSA (if not specified all peptides are assumed to be TSAs).";
 
     // PanelEpitopeSelection
     private String epitopeSelection = "Select the peptide sequences you would like to exclude or include in your final solution. Double click on the corresponding peptide and check one of the boxes. Click next to continue with the parameter settings.";
@@ -24,7 +32,7 @@ public class DescriptionHandler {
     private String parameter_numberOfTAA = "Specifies the maximum number of TAAs to select.";
     private String parameter_alleleConstraint = "Activates an allele coverage constraint with specified threshold.";
     private String parameter_antigenConstraint = "Activates an antigen coverage constraint with specified threshold.";
-    private String parameter_overlapConstraing = "Activates an epitope overlapping constraint with specified threshold.";
+    private String parameter_overlapConstraint = "Activates an epitope overlapping constraint with specified threshold.";
     private String parameter_epitopeTreshold = "Specifies the binding/immunogenicity threshold for all alleles.";
     private String parameter_distanceThreshold = "Specifies the distance-to-self threshold for all alleles.";
     private String parameter_rank = "Activates rank based estimation of immunogenicity .";
@@ -129,8 +137,8 @@ public class DescriptionHandler {
         return parameter_antigenConstraint;
     }
 
-    public String getParameter_overlapConstraing() {
-        return parameter_overlapConstraing;
+    public String getParameter_overlapConstraint() {
+        return parameter_overlapConstraint;
     }
 
     public String getParameter_epitopeTreshold() {
@@ -227,5 +235,37 @@ public class DescriptionHandler {
 
     public String getComputationError() {
         return computationError;
+    }
+
+    public String getUploadData_hlaValidatorDescription() {
+        return uploadData_hlaValidatorDescription;
+    }
+
+    public String getUploadData_hlaExprValidatorDescription() {
+        return uploadData_hlaExprValidatorDescription;
+    }
+
+    public String getUploadData_immValidatorDescription() {
+        return uploadData_immValidatorDescription;
+    }
+
+    public String getUploadData_columnMethod() {
+        return uploadData_columnMethod;
+    }
+
+    public String getUploadData_columnImm() {
+        return uploadData_columnImm;
+    }
+
+    public String getUploadData_columnUncertainty() {
+        return uploadData_columnUncertainty;
+    }
+
+    public String getUploadData_columnDistance() {
+        return uploadData_columnDistance;
+    }
+
+    public String getUploadData_columnTAA() {
+        return uploadData_columnTAA;
     }
 }

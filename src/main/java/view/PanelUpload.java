@@ -15,6 +15,7 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Grid.SingleSelectionModel;
 import com.vaadin.ui.themes.ValoTheme;
 
+import helper.DescriptionHandler;
 import helper.UploaderInput;
 import helper.Utils;
 import model.DatasetBean;
@@ -49,6 +50,7 @@ public class PanelUpload extends CustomComponent {
   private Boolean hlaAsColumns;
   private Boolean alleleFileUpload;
   private HashMap<String, String> alleles, allele_expressions;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    * Constructor
@@ -107,7 +109,7 @@ public class PanelUpload extends CustomComponent {
     uploadButton.setEnabled(false);
 
     VerticalLayout allUploadLayout = new VerticalLayout();
-    Label description = createDescriptionLabel("Choose a file from your file system and press upload");
+    Label description = createDescriptionLabel(dh.getUploadData_selectUpload());
 
     HorizontalLayout uploadLayout = new HorizontalLayout();
     uploadLayout.setMargin(true);
@@ -187,7 +189,7 @@ public class PanelUpload extends CustomComponent {
             alleleTFLayout.setVisible(true);
           }
         } else {
-          Utils.notification("Error", "Please enter a column name for the immunogenicity/score", "error");
+          Utils.notification("Error", dh.getUploadData_immValidatorDescription(), "error");
         }
       } else if (hlaExpressionLayout.isVisible()) {
         if (isHlaExpressionlValid()) {
@@ -200,7 +202,7 @@ public class PanelUpload extends CustomComponent {
               alleles.put("C1", hlaA1TF.getValue());
               alleles.put("C2", hlaA1TF.getValue());
             } else {
-              Utils.notification("Error", "Please enter valid HLA-alleles", "error");
+              Utils.notification("Error", dh.getUploadData_hlaValidatorDescription(), "error");
             }
           }
           allele_expressions.put("A", hlaAEVTF.getValue());
@@ -214,7 +216,7 @@ public class PanelUpload extends CustomComponent {
           uploadLayout.setVisible(true);
         }
       } } else {
-        Utils.notification("Error", "Please enter valid HLA-expression values", "error");
+        Utils.notification("Error", dh.getUploadData_hlaExprValidatorDescription(), "error");
       }
     });
     return buttonsLayout;
@@ -226,7 +228,7 @@ public class PanelUpload extends CustomComponent {
    */
   public VerticalLayout createColumnTextFields() {
     VerticalLayout allColumnLayout = new VerticalLayout();
-    Label description = createDescriptionLabel("Specify the columns of your file.");
+    Label description = createDescriptionLabel(dh.getUploadData_specifyColumns());
 
     HorizontalLayout columnTFLayout = new HorizontalLayout();
     columnTFLayout.setSpacing(true);
@@ -236,22 +238,21 @@ public class PanelUpload extends CustomComponent {
     methodColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     methodColTf.setImmediate(true);
     methodColTf.setValue("");
-    methodColTf.setDescription("Column name of the prediction method");
+    methodColTf.setDescription(dh.getUploadData_columnMethod());
     
  // taa column
     taaColTf = new TextField("TAA Column");
     taaColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     taaColTf.setImmediate(true);
     taaColTf.setValue("");
-    taaColTf.setDescription(
-        "Column name specifying whether the peptide is a TAA or TSA. (if not specified all peptides are assumed to be TSAs)");
+    taaColTf.setDescription(dh.getUploadData_columnTAA());
 
     // immunogenicity column
     immColTf = new TextField("Immunogenicity Column");
     immColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     immColTf.setImmediate(true);
     immColTf.setValue("SCORE");
-    immColTf.setDescription("Column name of peptide immunogenicity");
+    immColTf.setDescription(dh.getUploadData_columnImm());
     immColTf.addValidator(new StringLengthValidator("Please enter a column name", 1, 100, true));
     immColTf.setRequired(true);
 
@@ -260,21 +261,14 @@ public class PanelUpload extends CustomComponent {
     distanceColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     distanceColTf.setImmediate(true);
     distanceColTf.setValue("");
-    distanceColTf.setDescription("Column name of distance-to-self calculation");
+    distanceColTf.setDescription(dh.getUploadData_columnDistance());
 
     // uncertainty column
     uncertaintyColTf = new TextField("Uncertainty Column");
     uncertaintyColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
     uncertaintyColTf.setImmediate(true);
     uncertaintyColTf.setValue("");
-    uncertaintyColTf.setDescription("Column name of prediction uncertainty");
-
-    // uncertainty column
-    uncertaintyColTf = new TextField("Uncertainty Column");
-    uncertaintyColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
-    uncertaintyColTf.setImmediate(true);
-    uncertaintyColTf.setValue("");
-    uncertaintyColTf.setDescription("Column name of prediction uncertainty");
+    uncertaintyColTf.setDescription(dh.getUploadData_columnUncertainty());
 
     columnTFLayout.setStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
     columnTFLayout.addComponents(methodColTf, taaColTf, distanceColTf, uncertaintyColTf, immColTf);
@@ -285,7 +279,7 @@ public class PanelUpload extends CustomComponent {
 
   public VerticalLayout createHlaExpressionTextFields() {
     VerticalLayout allAlleleLayout = new VerticalLayout();
-    Label description = createDescriptionLabel("Please specify the corresponding HLA-alleles and the allele expression values.");
+    Label description = createDescriptionLabel(dh.getUploadData_specifyAlleleExpression());
     alleleTFLayout = new HorizontalLayout();
     HorizontalLayout alleleEVTFLayout = new HorizontalLayout();
     alleleEVTFLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
@@ -404,7 +398,7 @@ public class PanelUpload extends CustomComponent {
   public VerticalLayout createDataSelection() {
 
     VerticalLayout allDataSelectionLayout = new VerticalLayout();
-    Label description = createDescriptionLabel("Welcome to the Interactive Vaccine Designer. Where is your epitope prediction file located?");
+    Label description = createDescriptionLabel(dh.getUploadData_upload());
     
     HorizontalLayout dataSelectionLayout = new HorizontalLayout();
     dataSelectionLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
@@ -448,7 +442,7 @@ public class PanelUpload extends CustomComponent {
   }
 
   public VerticalLayout createDatabaseSelection() {
-    Label description = createDescriptionLabel("Choose a file from the database and press upload.");
+    Label description = createDescriptionLabel(dh.getUploadData_databaseUpload());
 
     projectSelectionCB = new ComboBox("Choose Project");
     projectSelectionCB.setRequired(true);
@@ -498,7 +492,7 @@ public class PanelUpload extends CustomComponent {
   public VerticalLayout createAlleleFileSelection() {
 
     VerticalLayout allAlleleFileSelectionLayout = new VerticalLayout();
-    Label description = createDescriptionLabel("Do you want specify the allele file manually or to choose an allele file from the database later?");
+    Label description = createDescriptionLabel(dh.getUploadData_selectAlleleUpload());
 
     HorizontalLayout alleleFileSelectionLayout = new HorizontalLayout();
     alleleFileSelectionLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
@@ -537,7 +531,7 @@ public class PanelUpload extends CustomComponent {
 
   public VerticalLayout createFileTypeSelection() {
     VerticalLayout fileLayout = new VerticalLayout();
-    Label description = createDescriptionLabel("How is your epitope prediction file structured?");
+    Label description = createDescriptionLabel(dh.getUploadData_selectStructure());
 
     HorizontalLayout imagesLayout = new HorizontalLayout();
     imagesLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
