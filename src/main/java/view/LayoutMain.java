@@ -20,6 +20,7 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.validator.BeanValidator;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
@@ -193,7 +194,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
               uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("fileName"));
             }
           }
-          uploadPanel.getAlleleFileSelectionCB().addValidator(new BeanValidator(DatasetBean.class, "fileName"));
         }
         uploadPanel.getDatasetGrid().setContainerDataSource(container);
         filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();

@@ -459,6 +459,8 @@ public class PanelUpload extends CustomComponent {
     alleleFileSelectionCB.setVisible(false);
     alleleFileSelectionCB.setRequired(true);
     alleleFileSelectionCB.setFilteringMode(FilteringMode.CONTAINS);
+    NullValidator nv = new NullValidator("Please choose an allele file from the database", false);
+    alleleFileSelectionCB.addValidator(nv);
 
     VerticalLayout databaseLayout = new VerticalLayout();
 
