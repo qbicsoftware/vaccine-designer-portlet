@@ -12,14 +12,14 @@ import model.EpitopeSelectionBean;
 
 /**
  * 
- * The class {@link ParserInputNewFiletype} is responsible for the parsing of the uploaded epitope
+ * The class {@link ParserInputAllelesAsColumns} is responsible for the parsing of the uploaded epitope
  * prediction input data.
  * 
  * @author spaethju
  * 
  * 
  */
-public class ParserInputNewFiletype {
+public class ParserInputAllelesAsColumns {
 
   private BeanItemContainer<EpitopeSelectionBean> epitopes;
   private String line;
@@ -30,11 +30,11 @@ public class ParserInputNewFiletype {
   private HashMap<String, String> alleleImmMap;
   private BufferedReader brReader;
   private File file;
-  private Boolean hasType, hasMethod;
+  private Boolean hasType, hasMethod, hasTranscriptExpression;
  
 
-  public ParserInputNewFiletype() {
-
+  public ParserInputAllelesAsColumns() {
+    hasTranscriptExpression = false;
   }
 
 
@@ -115,16 +115,20 @@ public class ParserInputNewFiletype {
         if (h.equalsIgnoreCase("pos")) {
           mutation = counter;
           counter = counter + 1;
-        } else if (h.equals("gene")) {
+        } else if (h.equalsIgnoreCase("gene")) {
           gene = counter;
           counter = counter + 1;
-        } else if (h.equals("transcript") || h.equals("transcripts")) {
+        } else if (h.equalsIgnoreCase("transcript") || h.equalsIgnoreCase("transcripts")) {
           transcript = counter;
           counter = counter + 1;
-        } else if (h.equals("sequence")) {
+        } else if (h.equalsIgnoreCase("transcript_expression")) {
+            transcriptExpression = counter;
+            counter = counter + 1;
+            hasTranscriptExpression = true;
+        } else if (h.equalsIgnoreCase("sequence")) {
           neopeptide = counter;
           counter = counter + 1;
-        } else if (h.equals("length")) {
+        } else if (h.equalsIgnoreCase("length")) {
           counter = counter + 1;
         } else if (h.startsWith("A*") && h.endsWith("score") && (a == 0)) {
           hlaA1 = counter;
@@ -285,10 +289,14 @@ public class ParserInputNewFiletype {
       newBean.setMutation(otherMap.get(key).get("mutation"));
       newBean.setGene(otherMap.get(key).get("gene"));
       newBean.setTranscript(otherMap.get(key).get("transcript"));
+      if (hasTranscriptExpression) {
+        newBean.setTranscriptExpression(Float.parseFloat(otherMap.get(key).get("transcriptExpression")));
+      } else {
+        newBean.setTranscriptExpression(1f);
+      }
       if (!(typeCol.equals("")) && hasType) {
         newBean.setType(otherMap.get(key).get("type"));
       }
-      newBean.setTranscriptExpression(1f);
 
       epitopes.addBean(newBean);
 

@@ -4,14 +4,11 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import com.vaadin.data.util.BeanItemContainer;
 
+import life.qbic.MyPortletUI;
 import model.EpitopeSelectionBean;
 import view.LayoutMain;
 
@@ -26,16 +23,16 @@ public class WriterScriptInput {
 
   private BufferedWriter inputWriter, includeWriter, excludeWriter, allelesWriter;
   private ArrayList<String> includedBeans, excludedBeans;
-  private String type, uncertainty, distance, imm, input, alleles, include, exclude;
+  private String type, uncertainty, distance, imm, inputPath, allelePath, includePath, excludePath;
 
   /**
    * Constructor
    */
-  public WriterScriptInput(String input, String alleles, String include, String exclude) {
-    this.input = input;
-    this.alleles = alleles;
-    this.include = include;
-    this.exclude = exclude;
+  public WriterScriptInput(String inputPath, String allelePath, String includePath, String excludePath) {
+    this.inputPath = inputPath;
+    this.allelePath = allelePath;
+    this.includePath = includePath;
+    this.excludePath = excludePath;
   }
 
   /**
@@ -45,21 +42,21 @@ public class WriterScriptInput {
    * @param container bean item container containing all neopeptides from the uploaded input file.
    * @throws IOException
    */
-  public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, String imm, String type, String uncertainty, String distance) throws IOException {
+  public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String imm, String type, String uncertainty, String distance) throws IOException {
     this.imm = imm;
     this.type = type;
     this.uncertainty = uncertainty;
     this.distance = distance;
     inputWriter = new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream(input), "utf-8"));
+        new FileOutputStream(inputPath), "utf-8"));
     allelesWriter = new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream(alleles), "utf-8"));
+        new FileOutputStream(allelePath), "utf-8"));
 
     includeWriter = new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream(include), "utf-8"));
+        new FileOutputStream(includePath), "utf-8"));
 
     excludeWriter = new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream(exclude), "utf-8"));
+        new FileOutputStream(excludePath), "utf-8"));
 
     includedBeans = getIncludedBeans(container);
     excludedBeans = getExcludedBeans(container);
@@ -75,9 +72,11 @@ public class WriterScriptInput {
 
     String allelesHeadline =
         new String("A1\tA2\tB1\tB2\tC1\tC2\tA_expression\tB_expression\tC_expression");
+    MyPortletUI.logger.info(allelesHeadline);
+    MyPortletUI.logger.info(setAlleleRow(alleles, allele_expressions));
     allelesWriter.write(allelesHeadline);
     allelesWriter.newLine();
-    allelesWriter.write(getAlleles(container));
+    allelesWriter.write(setAlleleRow(alleles, allele_expressions));
 
     allelesWriter.close();
     includeWriter.close();
@@ -158,25 +157,24 @@ public class WriterScriptInput {
   }
 
   /**
-   * @param container bean item container containing all neopeptides from the uploaded input file.
    * @return string with all alleles seperated by tab
    */
-  public String getAlleles(BeanItemContainer<EpitopeSelectionBean> container) {
-    Set<String> alleles = new HashSet<String>();
-    for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
-      EpitopeSelectionBean bean = i.next();
-      for (String key : bean.getImm().keySet()) {
-        alleles.add(key);
-      }
-
-    }
-    ArrayList<String> sortedList = new ArrayList<String>(alleles);
-    Collections.sort(sortedList);
-    Collections.reverse(sortedList);
-    String alleleString = new String("10\t10\t10");
-    for (String allele : sortedList) {
-      alleleString = allele + "\t" + alleleString;
-    }
+  public String setAlleleRow(HashMap<String, String> alleles, HashMap<String, String> allele_expressions) {
+      String alleleString = alleles.get("A1") + "\t" +
+              alleles.get("A2") + "\t" +
+              alleles.get("B1") + "\t" +
+              alleles.get("B2") + "\t" +
+              alleles.get("C1") + "\t" +
+              alleles.get("C2") + "\t" +
+              allele_expressions.get("A") + "\t" +
+              allele_expressions.get("B") + "\t" +
+              allele_expressions.get("C") + "\t";
+              MyPortletUI.logger.info(alleles.get("A1"));
+              MyPortletUI.logger.info(alleles.get("A2"));
+    MyPortletUI.logger.info(alleles.get("B1"));
+    MyPortletUI.logger.info(alleles.get("B2"));
+    MyPortletUI.logger.info(alleles.get("C1"));
+    MyPortletUI.logger.info(alleles.get("C2"));
 
     return alleleString;
   }
