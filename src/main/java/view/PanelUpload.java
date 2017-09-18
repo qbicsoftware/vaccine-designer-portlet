@@ -9,6 +9,7 @@ import com.vaadin.event.MouseEvents;
 import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Grid.SingleSelectionModel;
@@ -146,7 +147,12 @@ public class PanelUpload extends CustomComponent {
       } else if (fileTypeSelectionLayout.isVisible()) {
         fileTypeSelectionLayout.setVisible(false);
         nextButton.setVisible(false);
-        alleleFileSelection.setVisible(true);
+        if (!useDatabase) {
+          dataLayout.setVisible(true);
+          buttonLayout.setVisible(false);
+        } else {
+          alleleFileSelection.setVisible(true);
+        }
       } else if (columnLayout.isVisible()) {
         columnLayout.setVisible(false);
         fileTypeSelectionLayout.setVisible(true);
@@ -173,7 +179,7 @@ public class PanelUpload extends CustomComponent {
       } else if (columnLayout.isVisible()) {
         columnLayout.setVisible(false);
         hlaExpressionLayout.setVisible(true);
-        if (!alleleFileUpload) {
+        if (alleleFileUpload) {
           alleleTFLayout.setVisible(false);
         } else {
           alleleTFLayout.setVisible(true);
@@ -398,8 +404,9 @@ public class PanelUpload extends CustomComponent {
       useDatabase = false;
       dataLayout.setVisible(false);
       buttonLayout.setVisible(true);
-      nextButton.setVisible(false);
-      alleleFileSelection.setVisible(true);
+      nextButton.setVisible(true);
+      alleleFileUpload = false;
+      fileTypeSelectionLayout.setVisible(true);
     });
 
     dataSelectionDatabaseButton = new Button("Database");
@@ -427,10 +434,13 @@ public class PanelUpload extends CustomComponent {
 
     projectSelectionCB = new ComboBox("Choose Project");
     projectSelectionCB.setRequired(true);
+    projectSelectionCB.setFilteringMode(FilteringMode.CONTAINS);
 
     alleleFileSelectionCB = new ComboBox("Choose Allele-file");
     alleleFileSelectionCB.setVisible(false);
     alleleFileSelectionCB.setRequired(true);
+    alleleFileSelectionCB.setFilteringMode(FilteringMode.CONTAINS);
+
     VerticalLayout databaseLayout = new VerticalLayout();
 
     HorizontalLayout dataBaseSelection = new HorizontalLayout();
@@ -490,6 +500,7 @@ public class PanelUpload extends CustomComponent {
     databaseButton.addClickListener((Button.ClickListener) event -> {
       this.alleleFileSelection.setVisible(false);
       alleleFileUpload = true;
+      alleles = new HashMap<>();
       this.fileTypeSelectionLayout.setVisible(true);
       this.nextButton.setVisible(true);
     });
@@ -633,6 +644,10 @@ public class PanelUpload extends CustomComponent {
 
   public ComboBox getAlleleFileSelectionCB() {
     return alleleFileSelectionCB;
+  }
+
+  public void setAlleles(HashMap<String, String> alleles) {
+    this.alleles = alleles;
   }
 
 }

@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.vaadin.data.util.BeanItemContainer;
 
+import life.qbic.MyPortletUI;
 import model.EpitopeSelectionBean;
 import view.LayoutMain;
 
@@ -71,6 +72,8 @@ public class WriterScriptInput {
 
     String allelesHeadline =
         new String("A1\tA2\tB1\tB2\tC1\tC2\tA_expression\tB_expression\tC_expression");
+    MyPortletUI.logger.info(allelesHeadline);
+    MyPortletUI.logger.info(setAlleleRow(alleles, allele_expressions));
     allelesWriter.write(allelesHeadline);
     allelesWriter.newLine();
     allelesWriter.write(setAlleleRow(alleles, allele_expressions));

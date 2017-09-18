@@ -112,7 +112,6 @@ public class ParserInputAllelesAsRows {
     // counter + 1
     
     for (String h : headers) {
-      MyPortletUI.logger.info(h);
       if (h.equalsIgnoreCase("mutation") || h.equalsIgnoreCase("POS")) {
         mutation = counter;
         counter = counter + 1;
@@ -270,7 +269,6 @@ public class ParserInputAllelesAsRows {
    */
   public void setBean() {
     for (String key : immMap.keySet()) {
-      MyPortletUI.logger.info(key);
       // initialize new epitope selection bean
       EpitopeSelectionBean newBean = new EpitopeSelectionBean();
 

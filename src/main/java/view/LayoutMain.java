@@ -1,6 +1,7 @@
 package view;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,8 @@ import java.util.List;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
@@ -20,6 +23,7 @@ import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
@@ -73,13 +77,15 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private List<Project> projects;
   private SCPFile scpFile;
   private RandomCharGenerator generator;
-  private String code;
+  private String code, path, folder;
   private String sampleBarcode;
   private String sampleCode;
+  private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
+  private BeanItemContainer<DatasetBean> container, alleleFileContainer;
 
   //private String tmpPath = "/Users/spaethju/Desktop/";
   private String tmpPath = "/tmp/";
-  //private String homePath = "/Users/spaethju/";
+  //gprivate String homePath = "/Users/spaethju/";
   private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
@@ -90,6 +96,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String tmpResultPath = "";
   private String tmpDownloadPath = "";
   private String remoteOutputPath = "";
+  private String tmpAllelesPath = "";
   private String random = "";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:";
   private String dropbox = "qeana08@data.qbic.uni-tuebingen.de";
@@ -141,6 +148,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     excludePath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/exclude.txt";
     tmpResultPath = tmpPath+ LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_result.txt";
     tmpDownloadPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_download.txt";
+    tmpAllelesPath = tmpPath+LiferayAndVaadinUtils.getUser().getScreenName()+"/tmp_alleles.txt";
     try {
       Files.deleteIfExists(Paths.get(allelePath));
       Files.deleteIfExists(Paths.get(excludePath));
@@ -149,6 +157,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       Files.deleteIfExists(Paths.get(tmpDownloadPath));
       Files.deleteIfExists(Paths.get(inputPath));
       Files.deleteIfExists(Paths.get(tmpResultPath));
+      Files.deleteIfExists(Paths.get(tmpAllelesPath));
     } catch (IOException e) {
       MyPortletUI.logger.error("File System error: Old files could not be deleted");
       e.printStackTrace();
@@ -167,11 +176,22 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     uploadPanel.getProjectSelectionCB().addValueChangeListener((ValueChangeListener) event -> {
       List<DataSet> dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
-      BeanItemContainer<DatasetBean> container = fileHandler.fillTable(dataSets);
+      container = fileHandler.fillTable(dataSets);
+      alleleFileContainer = fileHandler.fillTable(dataSets);
       if (container.size() > 0) {
         uploadPanel.getDatasetGrid().setEnabled(true);
         if (uploadPanel.getAlleleFileUpload()) {
           uploadPanel.getAlleleFileSelectionCB().setVisible(true);
+          uploadPanel.getAlleleFileSelectionCB().setValue("");
+          uploadPanel.getAlleleFileSelectionCB().setInputPrompt("");
+          for (Object itemId : alleleFileContainer.getItemIds()) {
+            Item item = alleleFileContainer.getItem(itemId);
+            String type = item.getItemProperty("type").toString();
+            String filename = item.getItemProperty("fileName").toString();
+            if (type.equalsIgnoreCase("Q_WF_NGS_HLATYPING_RESULTS") && (filename.contains(".txt") || filename.contains(".tsv")) ) {
+              uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("fileName"));
+            }
+          }
         }
         uploadPanel.getDatasetGrid().setContainerDataSource(container);
         filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
@@ -200,6 +220,18 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       }
     });
 
+    uploadPanel.getAlleleFileSelectionCB().addValueChangeListener((ValueChangeListener) event -> {
+      for (Object itemId : alleleFileContainer.getItemIds()) {
+        Item item = alleleFileContainer.getItem(itemId);
+        String filename = item.getItemProperty("fileName").toString();
+        if (filename.equalsIgnoreCase(uploadPanel.getAlleleFileSelectionCB().getValue().toString())) {
+          alleleFileName = item.getItemProperty("fileName").toString();
+          alleleFileCode = item.getItemProperty("code").toString();
+          alleleDssPath = item.getItemProperty("dssPath").toString();
+        }
+      }
+    });
+
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
           Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
           List<Sample> allSamples =
@@ -210,13 +242,24 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
               }
           }
         String filename = uploadPanel.getSelected().getBean().getFileName();
-        code = code = uploadPanel.getSelected().getBean().getCode();
+        code = uploadPanel.getSelected().getBean().getCode();
+        path = uploadPanel.getSelected().getBean().getDssPath();
+        folder = path.replace("original/","").replace(filename,"");
         sampleCode = openbis.getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier()).getCode();
         Path destination = Paths.get(tmpDownloadPath);
         try {
-          InputStream in = openbis.getDatasetStream(code, "result/"+filename);
+          InputStream in = openbis.getDatasetStream(code, folder + filename);
           Files.copy(in, destination);
           File file = new File(tmpDownloadPath);
+          if (uploadPanel.getAlleleFileUpload()) {
+            alleleFileFolder = alleleDssPath.replace("original/","").replace(alleleFileName,"");
+            InputStream inAllele = openbis.getDatasetStream(alleleFileCode, alleleFileFolder + alleleFileName);
+            Files.copy(inAllele, Paths.get(tmpAllelesPath));
+            File alleleFile = new File(tmpAllelesPath);
+            ParserAlleleFile alleleParser = new ParserAlleleFile();
+            uploadPanel.setAlleles(alleleParser.parse(alleleFile));
+            Files.deleteIfExists(Paths.get(tmpAllelesPath));
+          }
           processingData(file);
           Files.delete(destination);
         } catch (IOException e) {
@@ -776,6 +819,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       Files.deleteIfExists(Paths.get(includePath));
       Files.deleteIfExists(Paths.get(outputPath));
       Files.deleteIfExists(Paths.get(tmpDownloadPath));
+      Files.deleteIfExists(Paths.get(tmpAllelesPath));
     } catch (IOException e) {
       life.qbic.MyPortletUI.logger.error("At least one file could not have been deleted");
     }
