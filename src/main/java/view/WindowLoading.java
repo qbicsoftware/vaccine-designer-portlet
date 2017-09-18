@@ -41,10 +41,8 @@ public class WindowLoading extends Window {
     this.setIcon(FontAwesome.ROCKET);
 
     loadingLayout = new VerticalLayout();
-    loadingLayout.setSizeFull();
 
     loadingLa = new Label("Computation in progress...");
-    loadingLa.setSizeFull();
     loadingBar = new ProgressBar();
     loadingBar.setIndeterminate(true);
     cancelBu = new Button("Cancel");
