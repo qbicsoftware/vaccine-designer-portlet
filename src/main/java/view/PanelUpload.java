@@ -1,10 +1,10 @@
 package view;
 
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
-import com.vaadin.data.validator.DoubleRangeValidator;
-import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.data.validator.*;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.*;
@@ -16,6 +16,7 @@ import com.vaadin.ui.Grid.SingleSelectionModel;
 import com.vaadin.ui.themes.ValoTheme;
 
 import helper.UploaderInput;
+import helper.Utils;
 import model.DatasetBean;
 
 import java.io.File;
@@ -177,30 +178,43 @@ public class PanelUpload extends CustomComponent {
           columnLayout.setVisible(true);
         } else {}
       } else if (columnLayout.isVisible()) {
-        columnLayout.setVisible(false);
-        hlaExpressionLayout.setVisible(true);
-        if (alleleFileUpload) {
-          alleleTFLayout.setVisible(false);
+        if (immColTf.isValid()) {
+          columnLayout.setVisible(false);
+          hlaExpressionLayout.setVisible(true);
+          if (alleleFileUpload) {
+            alleleTFLayout.setVisible(false);
+          } else {
+            alleleTFLayout.setVisible(true);
+          }
         } else {
-          alleleTFLayout.setVisible(true);
+          Utils.notification("Error", "Please enter a column name for the immunogenicity/score", "error");
         }
       } else if (hlaExpressionLayout.isVisible()) {
-        alleles.put("A1",hlaA1TF.getValue());
-        alleles.put("A2",hlaA2TF.getValue());
-        alleles.put("B1",hlaB1TF.getValue());
-        alleles.put("B2",hlaB2TF.getValue());
-        alleles.put("C1",hlaA1TF.getValue());
-        alleles.put("C2",hlaA1TF.getValue());
-        allele_expressions.put("A", hlaAEVTF.getValue());
-        allele_expressions.put("B", hlaBEVTF.getValue());
-        allele_expressions.put("C", hlaCEVTF.getValue());
-        hlaExpressionLayout.setVisible(false);
-        nextButton.setVisible(false);
+        if (isHlaExpressionlValid()) {
+          if (!alleleFileUpload) {
+            if (isHlalValid()) {
+              alleles.put("A1", hlaA1TF.getValue());
+              alleles.put("A2", hlaA2TF.getValue());
+              alleles.put("B1", hlaB1TF.getValue());
+              alleles.put("B2", hlaB2TF.getValue());
+              alleles.put("C1", hlaA1TF.getValue());
+              alleles.put("C2", hlaA1TF.getValue());
+            } else {
+              Utils.notification("Error", "Please enter valid HLA-alleles", "error");
+            }
+          }
+          allele_expressions.put("A", hlaAEVTF.getValue());
+          allele_expressions.put("B", hlaBEVTF.getValue());
+          allele_expressions.put("C", hlaCEVTF.getValue());
+          hlaExpressionLayout.setVisible(false);
+          nextButton.setVisible(false);
         if (useDatabase) {
           databaseLayout.setVisible(true);
         } else if (!useDatabase) {
           uploadLayout.setVisible(true);
         }
+      } } else {
+        Utils.notification("Error", "Please enter valid HLA-expression values", "error");
       }
     });
     return buttonsLayout;
@@ -307,7 +321,7 @@ public class PanelUpload extends CustomComponent {
     hlaAEVTF.setDescription("HLA-A expression");
     hlaAEVTF.setRequired(true);
     hlaAEVTF.setConverter(new StringToDoubleConverter());
-    hlaAEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, null));
+    hlaAEVTF.addValidator(new DoubleRangeValidator("Please enter a float value", 0.0, 1000.0));
     hlaAEVTF.setValue("10,0");
     hlaAEVTF.setNullSettingAllowed(false);
     hlaALayout.addComponents(hlaALabel, hlaA1TF, hlaA2TF);
@@ -339,7 +353,7 @@ public class PanelUpload extends CustomComponent {
     hlaBEVTF.setDescription("HLA-B expression");
     hlaBEVTF.setRequired(true);
     hlaBEVTF.setConverter(new StringToDoubleConverter());
-    hlaBEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, null));
+    hlaBEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, 1000.0));
     hlaBEVTF.setValue("10,0");
     hlaBEVTF.setNullSettingAllowed(false);
     hlaBLayout.addComponents(hlaBLabel, hlaB1TF, hlaB2TF);
@@ -371,7 +385,7 @@ public class PanelUpload extends CustomComponent {
     hlaCEVTF.setDescription("HLA-C expression");
     hlaCEVTF.setRequired(true);
     hlaCEVTF.setConverter(new StringToDoubleConverter());
-    hlaCEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, null));
+    hlaCEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, 1000.0));
     hlaCEVTF.setValue("10,0");
     hlaCEVTF.setNullSettingAllowed(false);
     hlaCLayout.addComponents(hlaCLabel, hlaC1TF, hlaC2TF);
@@ -428,13 +442,18 @@ public class PanelUpload extends CustomComponent {
     
     return allDataSelectionLayout;
   }
-  
+
+  public Panel getUploadPanel() {
+    return uploadPanel;
+  }
+
   public VerticalLayout createDatabaseSelection() {
     Label description = createDescriptionLabel("Choose a file from the database and press upload.");
 
     projectSelectionCB = new ComboBox("Choose Project");
     projectSelectionCB.setRequired(true);
     projectSelectionCB.setFilteringMode(FilteringMode.CONTAINS);
+    projectSelectionCB.setValidationVisible(true);
 
     alleleFileSelectionCB = new ComboBox("Choose Allele-file");
     alleleFileSelectionCB.setVisible(false);
@@ -650,4 +669,23 @@ public class PanelUpload extends CustomComponent {
     this.alleles = alleles;
   }
 
+  public Boolean isHlalValid() {
+    Boolean isAllValid;
+    if (hlaA1TF.isValid() && hlaA2TF.isValid() && hlaB1TF.isValid() && hlaB2TF.isValid() && hlaC1TF.isValid() && hlaC2TF.isValid()) {
+      isAllValid = true;
+    } else {
+      isAllValid = false;
+    }
+    return isAllValid;
+  }
+
+  public Boolean isHlaExpressionlValid() {
+    Boolean isAllValid;
+    if (hlaAEVTF.isValid() && hlaBEVTF.isValid() && hlaCEVTF.isValid()) {
+      isAllValid = true;
+    } else {
+      isAllValid = false;
+    }
+    return isAllValid;
+  }
 }

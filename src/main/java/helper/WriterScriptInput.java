@@ -169,6 +169,12 @@ public class WriterScriptInput {
               allele_expressions.get("A") + "\t" +
               allele_expressions.get("B") + "\t" +
               allele_expressions.get("C") + "\t";
+              MyPortletUI.logger.info(alleles.get("A1"));
+              MyPortletUI.logger.info(alleles.get("A2"));
+    MyPortletUI.logger.info(alleles.get("B1"));
+    MyPortletUI.logger.info(alleles.get("B2"));
+    MyPortletUI.logger.info(alleles.get("C1"));
+    MyPortletUI.logger.info(alleles.get("C2"));
 
     return alleleString;
   }

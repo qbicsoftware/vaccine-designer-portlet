@@ -19,6 +19,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
@@ -83,10 +84,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
   private BeanItemContainer<DatasetBean> container, alleleFileContainer;
 
-  private String tmpPath = "/Users/spaethju/Desktop/";
-  //private String tmpPath = "/tmp/";
-  private String homePath = "/Users/spaethju/";
-  //private String homePath = "/home/luser/";
+  //private String tmpPath = "/Users/spaethju/Desktop/";
+  private String tmpPath = "/tmp/";
+  //private String homePath = "/Users/spaethju/";
+  private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
@@ -192,6 +193,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
               uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("fileName"));
             }
           }
+          uploadPanel.getAlleleFileSelectionCB().addValidator(new BeanValidator(DatasetBean.class, "fileName"));
         }
         uploadPanel.getDatasetGrid().setContainerDataSource(container);
         filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
@@ -233,6 +235,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     });
 
       uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
+        if (uploadPanel.getAlleleFileSelectionCB().isValid()) {
           Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
           List<Sample> allSamples =
                   openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
@@ -270,6 +273,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
           e.printStackTrace();
           reset();
+        } }else {
+          Utils.notification("Error", "Please choose an allele file from the database", "error");
         }
       });
   }
@@ -750,9 +755,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       } catch (IOException e) {
         MyPortletUI.logger.error("NeoOptiTope could not be found");
         loadingWindow.failure();
+        e.printStackTrace();
       } catch (InterruptedException e) {
         Utils.notification("Computation interrupted!", "", "error");
         MyPortletUI.logger.error("Computation interrupted");
+        e.printStackTrace();
       }
     });
 
