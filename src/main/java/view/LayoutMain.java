@@ -80,10 +80,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
   private BeanItemContainer<DatasetBean> container, alleleFileContainer;
 
-  //private String tmpPath = "/Users/spaethju/Desktop/";
-  private String tmpPath = "/tmp/";
-  //private String homePath = "/Users/spaethju/";
-  private String homePath = "/home/luser/";
+  private String tmpPath = "/Users/spaethju/Desktop/";
+  //private String tmpPath = "/tmp/";
+  private String homePath = "/Users/spaethju/";
+  //private String homePath = "/home/luser/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String outputPath = "";
   private String inputPath = "";
