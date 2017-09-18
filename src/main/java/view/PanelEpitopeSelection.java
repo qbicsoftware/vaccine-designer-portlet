@@ -265,17 +265,14 @@ public class PanelEpitopeSelection extends CustomComponent {
     TextField filter = new TextField();
     filter.addStyleName(ValoTheme.TEXTFIELD_TINY);
     filter.setImmediate(true);
-    filter.addTextChangeListener(new TextChangeListener() {
-      @Override
-      public void textChange(TextChangeEvent event) {
-        String newValue = event.getText();
-        // Remove the previous filter
-        container.removeContainerFilters(column.getPropertyId());
-        if (newValue != null && !newValue.isEmpty()) {
-          // Filter the information
-          container.addContainerFilter(
-              new SimpleStringFilter(column.getPropertyId(), newValue, true, true));
-        }
+    filter.addTextChangeListener((TextChangeListener) event -> {
+      String newValue = event.getText();
+      // Remove the previous filter
+      container.removeContainerFilters(column.getPropertyId());
+      if (newValue != null && !newValue.isEmpty()) {
+        // Filter the information
+        container.addContainerFilter(
+            new SimpleStringFilter(column.getPropertyId(), newValue, true, true));
       }
     });
     return filter;

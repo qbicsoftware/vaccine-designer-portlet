@@ -195,7 +195,7 @@ public class PanelParameters extends CustomComponent {
     // Specifies the distance-to-self threshold for all alleles
     VerticalLayout threshDistanceLayout = new VerticalLayout();
     threshDistanceTF = new TextField("Distance Threshold");
-    threshDistanceTF.setDescription("Specifies the distance-to-self threshold for all alleles");
+    threshDistanceTF.setDescription("Specifies the distance-to-self threshold for all alleles.");
     threshDistanceLayout.addComponent(threshDistanceTF);
     threshDistanceTF.setConverter(new StringToFloatConverter());
     threshDistanceTF
@@ -208,7 +208,7 @@ public class PanelParameters extends CustomComponent {
 
     VerticalLayout rankLayout = new VerticalLayout();
     rankCB = new CheckBox("Rank");
-    rankCB.setDescription("Compute selection on rank input");
+    rankCB.setDescription("Immunggenicity estimates are rank based.");
     rankLayout.addComponent(rankCB);
     rankCB.setValue(false);
     rankLayout.addStyleName("padded");

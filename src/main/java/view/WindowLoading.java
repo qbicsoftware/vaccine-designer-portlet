@@ -66,17 +66,13 @@ public class WindowLoading extends Window {
    */
   public void success() {
     loadingLayout.removeAllComponents();
-    Label successLabel = new Label("Computation finished successfully.");
+    Label successLabel = new Label("The selection of epitopes finished successfully.");
     successLabel.addStyleName(ValoTheme.LABEL_SUCCESS);
     Button closeBu = new Button("OK");
     closeBu.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-    closeBu.addClickListener(new ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        close();
-        UI.getCurrent().setScrollTop(100);
-      }
+    closeBu.addClickListener((ClickListener) event -> {
+      close();
+      UI.getCurrent().setScrollTop(100);
     });
     loadingLayout.addComponents(successLabel, closeBu);
     loadingLayout.setComponentAlignment(closeBu, Alignment.MIDDLE_CENTER);
@@ -93,13 +89,7 @@ public class WindowLoading extends Window {
     failureLabel.addStyleName(ValoTheme.LABEL_FAILURE);
     Button closeBu = new Button("Back");
     closeBu.setStyleName(ValoTheme.BUTTON_DANGER);
-    closeBu.addClickListener(new ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        close();
-      }
-    });
+    closeBu.addClickListener((ClickListener) event -> close());
     loadingLayout.addComponents(failureLabel, closeBu);
     loadingLayout.setComponentAlignment(closeBu, Alignment.MIDDLE_CENTER);
   }

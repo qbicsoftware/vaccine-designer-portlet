@@ -67,11 +67,11 @@ public class MyPortletUI extends UI {
             openbis = new OpenBisClient(config.getDataSourceUser(), config.getDataSourcePassword(),
                     config.getDataSourceUrl());
             openbis.login();
-            Utils.notification("Connected to database", "You can use the database function", "success");
         } catch (Exception e) {
             success = false;
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
+            Utils.notification("Error", "You can use the database function", "error");
         }
 
         if (success) {

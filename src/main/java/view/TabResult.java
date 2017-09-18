@@ -242,13 +242,10 @@ public class TabResult extends VerticalLayout {
     // ChartChromosome chromChart = new ChartChromosome(resultBean);
     // filterLayout.addComponent(chromChart);
 
-    typeChart.addPointClickListener(new PointClickListener() {
-      @Override
-      public void onClick(com.vaadin.addon.charts.PointClickEvent event) {
-        setFilter("type", typeChart.getDataSeriesObject(event));
-        // chromChart.unselect();
-        geneChart.unselect();
-      }
+    typeChart.addPointClickListener((PointClickListener) event -> {
+      setFilter("type", typeChart.getDataSeriesObject(event));
+      // chromChart.unselect();
+      geneChart.unselect();
     });
 
 
@@ -333,12 +330,12 @@ public class TabResult extends VerticalLayout {
    * joins the headers and takes the allele as title
    */
   public void joinHeader() {
-    String hlaA1 = new String(alleles[0]);
-    String hlaA2 = new String(alleles[3]);
-    String hlaB1 = new String(alleles[1]);
-    String hlaB2 = new String(alleles[4]);
-    String hlaC1 = new String(alleles[2]);
-    String hlaC2 = new String(alleles[5]);
+    String hlaA1 = alleles[0];
+    String hlaA2 = alleles[3];
+    String hlaB1 = alleles[1];
+    String hlaB2 = alleles[4];
+    String hlaC1 = alleles[2];
+    String hlaC2 = alleles[5];
     HeaderRow hlaHeader = resultGrid.prependHeaderRow();
     HeaderCell hlaA1Cell = hlaHeader.join("immA1", "distA1");
     hlaA1Cell.setText(hlaA1);

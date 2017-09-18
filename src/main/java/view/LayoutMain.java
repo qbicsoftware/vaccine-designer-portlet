@@ -1,7 +1,6 @@
 package view;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,18 +13,14 @@ import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.data.validator.BeanValidator;
-import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
@@ -70,7 +65,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private Process proc;
   private int maxLength;
   private DBFileHandler fileHandler;
-  private Boolean gridAcivated;
+  private Boolean gridActivated;
   private Filterable filterable;
   private static Boolean hasType;
   private static Boolean hasUnc;
@@ -168,7 +163,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   private void initDatabase() {
     uploadPanel.getDataSelectionDatabaseButton().setEnabled(true);
-    gridAcivated = false;
+    gridActivated = false;
     fileHandler = new DBFileHandler(openbis);
 
 
@@ -200,7 +195,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         filterable.removeAllContainerFilters();
         filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
         filter("fileName", ".tsv");
-        if (!gridAcivated) {
+        if (!gridActivated) {
           uploadPanel.getDatasetGrid().removeColumn("children");
           uploadPanel.getDatasetGrid().removeColumn("parents");
           uploadPanel.getDatasetGrid().removeColumn("sampleIdentifier");
@@ -214,7 +209,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           uploadPanel.getDatasetGrid().setHeightMode(HeightMode.ROW);
           uploadPanel.getDatasetGrid().setHeightByRows(5);
           uploadPanel.getDatasetGrid().setVisible(true);
-          gridAcivated = true;
+          gridActivated = true;
         }
       } else {
         uploadPanel.getDatasetGrid().setEnabled(false);
@@ -357,7 +352,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   private Button createRegisterButton() {
     registerButton = new Button("Register");
-    registerButton.setDescription("Register result in database.");
+    registerButton.setDescription("Register all results in database.");
     registerButton.setIcon(FontAwesome.UPLOAD);
     registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
     registerButton.addClickListener((ClickListener) event -> {
@@ -377,7 +372,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           Utils.notification("Error", "Please try again.", "error");
           e.printStackTrace();
         }
-      Utils.notification("Results registered", "SUCCESS", "success");
+      Utils.notification("Success", "SUCCESS", "success");
       MyPortletUI.logger.info("Result registered");
     });
     registerButton.setVisible(false);
@@ -392,7 +387,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   private Button createResetButton() {
     resetButton = new Button("Reset");
-    resetButton.setDescription("Reset all. Upload a new File.");
+    resetButton.setDescription("Reset all settings and upload new files.");
     resetButton.setIcon(FontAwesome.TIMES_CIRCLE_O);
     resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
     resetButton.addStyleName(ValoTheme.BUTTON_SMALL);
@@ -414,7 +409,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     runButton = new Button("Run");
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
-    runButton.setDescription("Computes the set of epitopes.");
+    runButton.setDescription("Runs the computation with the adjusted parameters.");
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
     runButton.addStyleName(ValoTheme.BUTTON_SMALL);
     runButton.addClickListener((ClickListener) (Button.ClickEvent event) -> {
@@ -757,7 +752,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         loadingWindow.failure();
         e.printStackTrace();
       } catch (InterruptedException e) {
-        Utils.notification("Computation interrupted!", "", "error");
+        Utils.notification("Error", "", "error");
         MyPortletUI.logger.error("Computation interrupted");
         e.printStackTrace();
       }

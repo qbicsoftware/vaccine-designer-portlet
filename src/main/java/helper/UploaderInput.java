@@ -39,7 +39,7 @@ public class UploaderInput
       tempFile = File.createTempFile("temp", ".txt");
       return new FileOutputStream(tempFile);
     } catch (IOException e) {
-      Utils.notification("Upload Error!", " An error occured while uploading the data. PLease try it again.", "error");
+      Utils.notification("Upload Error!", "An error occured while uploading the data. Please try it again.", "error");
       return null;
     }
    
