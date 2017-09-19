@@ -273,8 +273,6 @@ public class TabResult extends VerticalLayout {
      */
     public HorizontalLayout createResultGrid(ResultBean resultBean) {
         HorizontalLayout resultGridLayout = new HorizontalLayout();
-        resultGridLayout.setSpacing(true);
-        resultGridLayout.setMargin(true);
 
         // adjust grid
         resultGrid = new Grid();

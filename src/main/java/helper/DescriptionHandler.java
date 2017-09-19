@@ -24,7 +24,7 @@ public class DescriptionHandler {
     private String uploadData_columnTAA = "Column name specifying whether the peptide is a TAA or TSA (if not specified all peptides are assumed to be TSAs).";
 
     // PanelEpitopeSelection
-    private String epitopeSelection = "Select the <b>peptide sequences</b> you would like to <b>exclude</b> or <b>include</b> in your final solution. Double click on the corresponding peptide and check one of the boxes. Click next to continue with the parameter settings.";
+    private String epitopeSelection = "Select the <b>peptide sequences</b> you would like to <b><font color='#ed473b'>exclude</font></b> or <b><font color='#2c972'>include</font></b> in your final solution. Double click on the corresponding peptide and check one of the boxes. Click next to continue with the parameter settings.";
 
     // PanelParameters
     private String parameterSettings = "Set the parameter values to your wishes if you want change the default values.";

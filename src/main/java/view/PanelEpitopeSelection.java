@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 
+import static java.awt.Color.red;
+
 /**
  * The class {@link PanelEpitopeSelection} represents a component for showing the uploaded epitope
  * selection data.
@@ -150,9 +152,9 @@ public class PanelEpitopeSelection extends CustomComponent {
         dataGrid.getColumn("uncertaintyC1").setHeaderCaption("Uncertainty");
         dataGrid.getColumn("uncertaintyC2").setEditable(false);
         dataGrid.getColumn("uncertaintyC2").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("included").setHeaderCaption("In");
-        dataGrid.getColumn("excluded").setHeaderCaption("Out");
-
+        dataGrid.getDefaultHeaderRow().getCell("included").setHtml("<font color='#2c972'>" + FontAwesome.CHECK_CIRCLE.getHtml() + "</font>");
+        dataGrid.getDefaultHeaderRow().getCell("excluded").setHtml("<font color='#ed473b'>" +FontAwesome.TIMES_CIRCLE.getHtml()+ "</font>");
+        dataGrid.getDefaultHeaderRow().setStyleName(ValoTheme.LABEL_BOLD);
         dataGrid.setHeightMode(HeightMode.ROW);
         dataGrid.setHeightByRows(10);
         dataGrid.setVisible(true);
