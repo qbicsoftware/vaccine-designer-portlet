@@ -1,19 +1,7 @@
 package view;
 
-<<<<<<< HEAD
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-=======
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
->>>>>>> dcbcc432ce794f87cda444b740b3ad37318f6ca8
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
@@ -86,10 +74,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<DatasetBean>(DatasetBean.class);
     private DescriptionHandler dh = new DescriptionHandler();
 
-    private String tmpPath = "/Users/spaethju/Desktop/";
-    //private String tmpPath = "/tmp/";
-    private String homePath = "/Users/spaethju/";
-    //private String homePath = "/home/luser/";
+    //private String tmpPath = "/Users/spaethju/Desktop/";
+    private String tmpPath = "/tmp/";
+    //private String homePath = "/Users/spaethju/";
+    private String homePath = "/home/luser/";
     private String tmpPathRemote = "/home/jspaeth/";
     private String outputPath = "";
     private String inputPath = "";
@@ -173,21 +161,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             Files.deleteIfExists(Paths.get(tmpResultPath));
             Files.deleteIfExists(Paths.get(tmpAllelesPath));
         } catch (IOException e) {
-<<<<<<< HEAD
-          e.printStackTrace();
-          Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
-          reset();
-        } catch (Exception e) {
-          MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
-          Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
-          e.printStackTrace();
-          reset();
-        } }else {
-          Utils.notification("Error", "Please choose an allele file from the database", "error");
-=======
             MyPortletUI.logger.error("File System error: Old files could not be deleted");
             e.printStackTrace();
->>>>>>> dcbcc432ce794f87cda444b740b3ad37318f6ca8
         }
     }
 
