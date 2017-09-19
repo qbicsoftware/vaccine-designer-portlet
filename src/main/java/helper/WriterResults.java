@@ -17,9 +17,7 @@ import java.util.ArrayList;
  */
 public class WriterResults {
 
-  private int resultCounter;
-  private BufferedReader br;
-
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    * Constructor
@@ -34,13 +32,13 @@ public class WriterResults {
    * @param files files of all computed results
    */
   public void writeOutputData(ArrayList<File> files, String tmpResultPath) {
-    resultCounter = 1;
+    int resultCounter = 1;
 
     try {
       BufferedWriter writer =
           new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmpResultPath)));
       for (File file : files) {
-        br = new BufferedReader(new FileReader(file));
+        BufferedReader br = new BufferedReader(new FileReader(file));
         writer.write("Result " + resultCounter + "\n" + "\n");
         resultCounter++;
         String line;
@@ -55,8 +53,7 @@ public class WriterResults {
 
       writer.close();
     } catch (IOException ex) {
-      Utils.notification("Result Error",
-          "An problem occured while saving the results. Please try again", "error");
+      Utils.notification("Result Error", dh.getWriteResultOutputError(), "error");
       ex.printStackTrace();
     }
 

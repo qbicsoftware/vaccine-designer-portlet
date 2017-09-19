@@ -70,8 +70,7 @@ public class WriterScriptInput {
       excludeWriter.newLine();
     }
 
-    String allelesHeadline =
-        new String("A1\tA2\tB1\tB2\tC1\tC2\tA_expression\tB_expression\tC_expression");
+    String allelesHeadline = "A1\tA2\tB1\tB2\tC1\tC2\tA_expression\tB_expression\tC_expression";
     MyPortletUI.logger.info(allelesHeadline);
     MyPortletUI.logger.info(setAlleleRow(alleles, allele_expressions));
     allelesWriter.write(allelesHeadline);
@@ -93,7 +92,7 @@ public class WriterScriptInput {
   public void writeInputFile(BeanItemContainer<EpitopeSelectionBean> container) throws IOException {
 
     // initialize buffered writer
-    String header = new String("neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + imm + "\t" + "mutation");
+    String header = "neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + imm + "\t" + "mutation";
     if (!type.equals("") && LayoutMain.getHasType()){
       header += ("\t" + type);
     }
@@ -108,7 +107,7 @@ public class WriterScriptInput {
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
       for (String key : bean.getImm().keySet()) {
-        String peptide = new String(bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation());
+        String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
         if (!type.equals("") && LayoutMain.getHasType()){
           peptide += ("\t" + bean.getType());
         }
@@ -134,7 +133,7 @@ public class WriterScriptInput {
     ArrayList<String> included = new ArrayList<String>();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
-      if (bean.getIncluded() == true) {
+      if (bean.getIncluded()) {
         included.add(bean.getNeopeptide());
       }
     }
@@ -149,7 +148,7 @@ public class WriterScriptInput {
     ArrayList<String> excluded = new ArrayList<String>();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
-      if (bean.getExcluded() == true) {
+      if (bean.getExcluded()) {
         excluded.add(bean.getNeopeptide());
       }
     }

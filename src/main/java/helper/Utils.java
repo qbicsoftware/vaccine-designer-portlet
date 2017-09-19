@@ -43,7 +43,7 @@ public class Utils {
       notify.setIcon(FontAwesome.COMMENT);
       notify.setStyleName(ValoTheme.NOTIFICATION_TRAY + " " + ValoTheme.NOTIFICATION_CLOSABLE);
     }
-    notify.setPosition(Position.TOP_CENTER);
+    notify.setPosition(Position.MIDDLE_CENTER);
     notify.show(Page.getCurrent());
   }
 }

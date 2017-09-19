@@ -182,15 +182,6 @@ public class ParserInputAllelesAsColumns {
     immMap = new HashMap<>();
     otherMap = new HashMap<>();
 
-    MyPortletUI.logger.info("--------ALLELES-----------");
-    MyPortletUI.logger.info(hlaA1allele);
-    MyPortletUI.logger.info(hlaA2allele);
-    MyPortletUI.logger.info(hlaB1allele);
-    MyPortletUI.logger.info(hlaB2allele);
-    MyPortletUI.logger.info(hlaC1allele);
-    MyPortletUI.logger.info(hlaC2allele);
-    MyPortletUI.logger.info("--------------------------");
-
     // read all lines of the file
     while ((line = brReader.readLine()) != null) {
 

@@ -28,7 +28,7 @@ public class UploaderInput
 
   private ProgressBar progress = new ProgressBar(0.0f);
   private File tempFile;
-  public BeanItemContainer<EpitopeSelectionBean> beans;
+  private DescriptionHandler dh = new DescriptionHandler();
 
 
   /* (non-Javadoc)
@@ -39,7 +39,7 @@ public class UploaderInput
       tempFile = File.createTempFile("temp", ".txt");
       return new FileOutputStream(tempFile);
     } catch (IOException e) {
-      Utils.notification("Upload Error!", " An error occured while uploading the data. PLease try it again.", "error");
+      Utils.notification("Upload Failed!", dh.getUploadInputIOError(), "error");
       return null;
     }
    
@@ -58,7 +58,7 @@ public class UploaderInput
    */
   @Override
   public void uploadFailed(FailedEvent event) {
-    Utils.notification("Upload failed!", "An problem occured while uploading the file. Please try again or make sure your file is an acceptable TSV-file", "error");
+    Utils.notification("Upload failed!", dh.getUploadInputFailedError(), "error");
     progress.setVisible(false);
   }
 
