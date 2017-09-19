@@ -316,7 +316,7 @@ public class PanelEpitopeSelection extends CustomComponent {
   }
 
   public Label createDescriptionLabel(String info) {
-    Label descriptionLabel = new Label(FontAwesome.INFO.getHtml() + "    " + info, ContentMode.HTML);
+    Label descriptionLabel = new Label(FontAwesome.INFO_CIRCLE.getHtml() + "    " + info, ContentMode.HTML);
     descriptionLabel.addStyleName("description");
     return descriptionLabel;
   }
