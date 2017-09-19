@@ -2,61 +2,60 @@ package model;
 
 public class ProjectBean {
 
-  private String code, description, identifier, permId, spaceCode;
-  private long id;
- 
-  public ProjectBean() {
-    
-  }
+    private String code, description, identifier, permId, spaceCode;
+    private long id;
 
-  public String getDescription() {
-    return description;
-  }
+    public ProjectBean() {
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    }
 
-  public String getCode() {
-    return code;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setCode(String code) {
-    this.code = code;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public String getIdentifier() {
-    return identifier;
-  }
+    public String getCode() {
+        return code;
+    }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
-  }
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-  public String getPermId() {
-    return permId;
-  }
+    public String getIdentifier() {
+        return identifier;
+    }
 
-  public void setPermId(String permId) {
-    this.permId = permId;
-  }
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-  public String getSpaceCode() {
-    return spaceCode;
-  }
+    public String getPermId() {
+        return permId;
+    }
 
-  public void setSpaceCode(String spaceCode) {
-    this.spaceCode = spaceCode;
-  }
+    public void setPermId(String permId) {
+        this.permId = permId;
+    }
 
-  public long getId() {
-    return id;
-  }
+    public String getSpaceCode() {
+        return spaceCode;
+    }
 
-  public void setId(long id) {
-    this.id = id;
-  }
+    public void setSpaceCode(String spaceCode) {
+        this.spaceCode = spaceCode;
+    }
 
-  
-  
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+
 }

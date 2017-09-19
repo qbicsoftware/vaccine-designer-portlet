@@ -1,8 +1,5 @@
 package life.qbic;
 
-import javax.portlet.PortletContext;
-import javax.portlet.PortletSession;
-
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -16,6 +13,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import helper.DBConfig;
 import helper.DBManager;
+import helper.DescriptionHandler;
 import helper.Utils;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 import life.qbic.portal.liferayandvaadinhelpers.main.ConfigurationManager;
@@ -23,6 +21,8 @@ import life.qbic.portal.liferayandvaadinhelpers.main.ConfigurationManagerFactory
 import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 import view.LayoutMain;
 
+import javax.portlet.PortletContext;
+import javax.portlet.PortletSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +32,9 @@ import java.util.List;
 public class MyPortletUI extends UI {
 
     public static Log logger = LogFactoryUtil.getLog(MyPortletUI.class);
-    private LayoutMain mainLayout;
     private OpenBisClient openbis;
-    public static String tmpFolder;
-    ConfigurationManager config = new ConfigurationManagerFactory().getInstance();
-    public List<Project> projects;
+    private ConfigurationManager config = new ConfigurationManagerFactory().getInstance();
+    private DescriptionHandler dh = new DescriptionHandler();
 
     @Override
     protected void init(VaadinRequest request) {
@@ -50,10 +48,8 @@ public class MyPortletUI extends UI {
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
             userID = LiferayAndVaadinUtils.getUser().getScreenName();
         }
-        projects = new ArrayList<>();
         boolean success = true;
         config = ConfigurationManagerFactory.getInstance();
-        tmpFolder = config.getTmpFolder();
 
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
             logger.info("Vaccine Designer is running on Liferay and user is logged in.");
@@ -67,13 +63,14 @@ public class MyPortletUI extends UI {
             openbis = new OpenBisClient(config.getDataSourceUser(), config.getDataSourcePassword(),
                     config.getDataSourceUrl());
             openbis.login();
-            Utils.notification("Connected to database", "You can use the database function", "success");
         } catch (Exception e) {
             success = false;
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
+            Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
         }
 
+        LayoutMain mainLayout;
         if (success) {
             // stuff from openbis
             final List<String> spaces = openbis.getUserSpaces(userID);
@@ -86,9 +83,7 @@ public class MyPortletUI extends UI {
 
             List<Project> projects = new ArrayList<>();
             for (String space : spaces) {
-                for (Project project : openbis.getProjectsOfSpace(space)) {
-                    projects.add(project);
-                }
+                projects.addAll(openbis.getProjectsOfSpace(space));
             }
 
             // initialize the View with sample types, spaces and the dictionaries of tissues and species
