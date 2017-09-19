@@ -1,8 +1,5 @@
 package life.qbic;
 
-import javax.portlet.PortletContext;
-import javax.portlet.PortletSession;
-
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -24,6 +21,8 @@ import life.qbic.portal.liferayandvaadinhelpers.main.ConfigurationManagerFactory
 import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 import view.LayoutMain;
 
+import javax.portlet.PortletContext;
+import javax.portlet.PortletSession;
 import java.util.ArrayList;
 import java.util.List;
 
