@@ -3,14 +3,14 @@ package view;
 import java.util.ArrayList;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import helper.DescriptionHandler;
 import model.ResultBean;
 
 /**
@@ -29,6 +29,7 @@ public class PanelResults extends CustomComponent {
   private TabSheet resultsTab;
   private ArrayList<TabResult> tabs;
   private int resultCounter;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    * Constructor
@@ -49,6 +50,7 @@ public class PanelResults extends CustomComponent {
    */
   public Panel createPanel() {
     panel.setContent(panelContent);
+    panelContent.addComponent(createInfo());
     panelContent.addComponent(resultsTab);
 
     panelContent.setMargin(true);
@@ -72,24 +74,31 @@ public class PanelResults extends CustomComponent {
     resultsTab.setSelectedTab(resultCounter - 1);
     resultCounter++;
     tabs.add(tabResult);
-    resultsTab.addSelectedTabChangeListener(new SelectedTabChangeListener() {
-
-      @Override
-      public void selectedTabChange(SelectedTabChangeEvent event) {
-        for (TabResult tr : tabs) {
-          tr.getFilterable().removeAllContainerFilters();
-        }
+    resultsTab.addSelectedTabChangeListener((SelectedTabChangeListener) event -> {
+      for (TabResult tr : tabs) {
+        tr.getFilterable().removeAllContainerFilters();
       }
     });
-    tabResult.getOptionTab().addSelectedTabChangeListener(new SelectedTabChangeListener() {
-
-      @Override
-      public void selectedTabChange(SelectedTabChangeEvent event) {
-        for (TabResult tr : tabs) {
-          tr.getFilterable().removeAllContainerFilters();
-        }
+    tabResult.getOptionTab().addSelectedTabChangeListener((SelectedTabChangeListener) event -> {
+      for (TabResult tr : tabs) {
+        tr.getFilterable().removeAllContainerFilters();
       }
     });
+  }
+
+
+  public VerticalLayout createInfo() {
+    VerticalLayout infoLayout = new VerticalLayout();
+    Label infoLa = createDescriptionLabel(dh.getResults());
+    infoLayout.addComponents(infoLa);
+
+    return infoLayout;
+  }
+
+  public Label createDescriptionLabel(String info) {
+    Label descriptionLabel = new Label(FontAwesome.INFO_CIRCLE.getHtml() + "    " + info, ContentMode.HTML);
+    descriptionLabel.addStyleName("description");
+    return descriptionLabel;
   }
 
   /**

@@ -11,7 +11,9 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.grid.HeightMode;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -27,6 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
+import helper.DescriptionHandler;
 import model.EpitopeSelectionBean;
 
 /**
@@ -50,6 +53,7 @@ public class PanelEpitopeSelection extends CustomComponent {
   private Filterable filterable;
   private NativeSelect methodSelect;
   private String methodColumn;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   /**
    * Constructor
@@ -88,12 +92,12 @@ public class PanelEpitopeSelection extends CustomComponent {
     // Set Allele Names for Headers
     String[] alleleNames =
         container.getItem(container.firstItemId()).getBean().prepareAlleleNames();
-    hlaA1 = new String(alleleNames[0]);
-    hlaA2 = new String(alleleNames[1]);
-    hlaB1 = new String(alleleNames[2]);
-    hlaB2 = new String(alleleNames[3]);
-    hlaC1 = new String(alleleNames[4]);
-    hlaC2 = new String(alleleNames[5]);
+    hlaA1 = alleleNames[0];
+    hlaA2 = alleleNames[1];
+    hlaB1 = alleleNames[2];
+    hlaB2 = alleleNames[3];
+    hlaC1 = alleleNames[4];
+    hlaC2 = alleleNames[5];
 
 
     // set epitope selection bean item container as container data source
@@ -265,17 +269,14 @@ public class PanelEpitopeSelection extends CustomComponent {
     TextField filter = new TextField();
     filter.addStyleName(ValoTheme.TEXTFIELD_TINY);
     filter.setImmediate(true);
-    filter.addTextChangeListener(new TextChangeListener() {
-      @Override
-      public void textChange(TextChangeEvent event) {
-        String newValue = event.getText();
-        // Remove the previous filter
-        container.removeContainerFilters(column.getPropertyId());
-        if (newValue != null && !newValue.isEmpty()) {
-          // Filter the information
-          container.addContainerFilter(
-              new SimpleStringFilter(column.getPropertyId(), newValue, true, true));
-        }
+    filter.addTextChangeListener((TextChangeListener) event -> {
+      String newValue = event.getText();
+      // Remove the previous filter
+      container.removeContainerFilters(column.getPropertyId());
+      if (newValue != null && !newValue.isEmpty()) {
+        // Filter the information
+        container.addContainerFilter(
+            new SimpleStringFilter(column.getPropertyId(), newValue, true, true));
       }
     });
     return filter;
@@ -307,18 +308,17 @@ public class PanelEpitopeSelection extends CustomComponent {
   public VerticalLayout createInfo() {
     infoLayout = new VerticalLayout();
 
-    Label infoLa = new Label("Select your epitopes:");
+    Label infoLa = createDescriptionLabel(dh.getEpitopeSelection());
 
-    Label outLa = new Label("'Out' labeled epitopes will be excluded from the set of epitopes.");
-    outLa.addStyleName("out");
-    Label inLa =
-        new Label("'In' labeled epitopes will be definitely included in the set of epitopes.");
-    inLa.addStyleName("in");
-    infoLa.addStyleName(ValoTheme.LABEL_BOLD);
-
-    infoLayout.addComponents(infoLa, inLa, outLa);
+    infoLayout.addComponent(infoLa);
 
     return infoLayout;
+  }
+
+  public Label createDescriptionLabel(String info) {
+    Label descriptionLabel = new Label(FontAwesome.INFO_CIRCLE.getHtml() + "    " + info, ContentMode.HTML);
+    descriptionLabel.addStyleName("description");
+    return descriptionLabel;
   }
   
   public HorizontalLayout createMethodSelection() {
@@ -397,7 +397,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     ArrayList<String> included = new ArrayList<>();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
-      if (bean.getIncluded() == true) {
+      if (bean.getIncluded()) {
         included.add(bean.getNeopeptide());
       }
     }
@@ -414,7 +414,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     ArrayList<String> excluded = new ArrayList<>();
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext();) {
       EpitopeSelectionBean bean = i.next();
-      if (bean.getIncluded() == true) {
+      if (bean.getIncluded()) {
         excluded.add(bean.getNeopeptide());
       }
     }

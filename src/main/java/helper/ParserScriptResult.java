@@ -71,8 +71,6 @@ public class ParserScriptResult {
         line = br.readLine();
       }
 
-    } catch (FileNotFoundException e) {
-      Utils.notification("ERROR", "No results found, please try again.", "error");
     } catch (IOException e) {
       Utils.notification("ERROR", "No results found, please try again.", "error");
     }
