@@ -57,16 +57,14 @@ public class PanelParameters extends CustomComponent {
     kLabel = new Label("10");
     kLabel.setImmediate(true);
     kLabel.setStyleName("parameter");
-    kSlider.addValueChangeListener(new Property.ValueChangeListener() {
-      public void valueChange(ValueChangeEvent event) {
-        int value = kSlider.getValue().intValue();
-        // Use the value
-        kLabel.setValue(String.valueOf(value));
-        //change ktaa
-        ktaaSlider.setMax(value);
-        if (ktaaSlider.getValue().intValue() > value) {
-          ktaaSlider.setValue((double) value);
-        }
+    kSlider.addValueChangeListener((Property.ValueChangeListener) event -> {
+      int value = kSlider.getValue().intValue();
+      // Use the value
+      kLabel.setValue(String.valueOf(value));
+      //change ktaa
+      ktaaSlider.setMax(value);
+      if (ktaaSlider.getValue().intValue() > value) {
+        ktaaSlider.setValue((double) value);
       }
     });
     kLayout.addComponents(kSlider, kLabel);

@@ -1,7 +1,6 @@
 package view;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,18 +13,14 @@ import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.data.validator.BeanValidator;
-import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
@@ -267,6 +262,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           Files.delete(destination);
         } catch (IOException e) {
           e.printStackTrace();
+          Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
           reset();
         } catch (Exception e) {
           MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
