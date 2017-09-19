@@ -49,7 +49,7 @@ public class DescriptionHandler {
     private String uploadInputFailedError = "The upload of your epitope prediction data failed. Please try again.";
 
     // WriterResults
-    private  String writeResultOutputError = "Writing or Saving your results failed. Please try again.";
+    private String writeResultOutputError = "Writing or Saving your results failed. Please try again.";
 
     // MyPortletUI
     private String databaseConnectionError = "The connection to the database could not have been established. Please log in or make sure you are allowed to use this portlet.";
