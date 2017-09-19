@@ -209,6 +209,8 @@ public class PanelParameters extends CustomComponent {
 
         parameterLayout.addComponents(kLayout, ktaaLayout, consAlleleLayout, consAntigenLayout,
                 consOverlapLayout, threshEpitopeLayout, threshDistanceLayout, rankLayout);
+
+        parameterLayout.setComponentAlignment(rankLayout, Alignment.BOTTOM_CENTER);
         panelContent.setMargin(true);
         panelContent.setSpacing(true);
 
