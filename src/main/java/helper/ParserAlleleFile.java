@@ -34,36 +34,28 @@ public class ParserAlleleFile {
       if (h.equalsIgnoreCase("a1")) {
         a1 = counter;
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       } else if (h.equalsIgnoreCase("a2")) {
         a2 = counter;
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       } else if (h.equalsIgnoreCase("b1")) {
         b1 = counter;
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       } else if (h.equalsIgnoreCase("b2")) {
         b2 = counter;
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       } else if (h.equalsIgnoreCase("c1")) {
         c1 = counter;
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       } else if (h.equalsIgnoreCase("c2")) {
         c2 = counter;
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       } else {
         counter = counter + 1;
-        MyPortletUI.logger.info(h);
       }
     }
 
     line = brReader.readLine();
     String[] columns = line.split("\t");
-    MyPortletUI.logger.info(columns);
     alleles.put("A1", columns[a1].trim());
     alleles.put("A2", columns[a2].trim());
     alleles.put("B1", columns[b1].trim());

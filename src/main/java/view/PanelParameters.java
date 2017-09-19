@@ -5,6 +5,8 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.converter.StringToFloatConverter;
 import com.vaadin.data.validator.DoubleRangeValidator;
 import com.vaadin.data.validator.FloatRangeValidator;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import helper.DescriptionHandler;
@@ -21,7 +23,7 @@ import helper.DescriptionHandler;
 public class PanelParameters extends CustomComponent {
 
   private Panel panel;
-  private HorizontalLayout panelContent;
+  private VerticalLayout panelContent;
   private Slider kSlider, consAlleleSlider, consAntigenSlider, consOverlapSlider, ktaaSlider;
   private TextField threshEpitopeTF, threshDistanceTF;
   private Label kLabel, consAlleleLabel, consAntigenLabel, consOverlapLabel, ktaaLabel;
@@ -42,8 +44,9 @@ public class PanelParameters extends CustomComponent {
    */
   public Panel createPanel() {
 
-    panelContent = new HorizontalLayout();
-    panelContent.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+    panelContent = new VerticalLayout();
+    HorizontalLayout parameterLayout = new HorizontalLayout();
+    parameterLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
     panel.setContent(panelContent);
 
     // The number of epitopes
@@ -206,10 +209,12 @@ public class PanelParameters extends CustomComponent {
     rankLayout.addStyleName("padded");
 
 
-    panelContent.addComponents(kLayout, ktaaLayout, consAlleleLayout, consAntigenLayout,
+    parameterLayout.addComponents(kLayout, ktaaLayout, consAlleleLayout, consAntigenLayout,
         consOverlapLayout, threshEpitopeLayout, threshDistanceLayout, rankLayout);
     panelContent.setMargin(true);
     panelContent.setSpacing(true);
+
+    panelContent.addComponents(createInfo(), parameterLayout);
 
 
     return panel;
@@ -223,11 +228,17 @@ public class PanelParameters extends CustomComponent {
   public VerticalLayout createInfo() {
     VerticalLayout infoLayout = new VerticalLayout();
 
-    Label infoLa = new Label(dh.getParameterSettings());
+    Label infoLa = createDescriptionLabel(dh.getParameterSettings());
 
     infoLayout.addComponents(infoLa);
 
     return infoLayout;
+  }
+
+  public Label createDescriptionLabel(String info) {
+    Label descriptionLabel = new Label(FontAwesome.INFO.getHtml() + "    " + info, ContentMode.HTML);
+    descriptionLabel.addStyleName("description");
+    return descriptionLabel;
   }
   
   public void update() {

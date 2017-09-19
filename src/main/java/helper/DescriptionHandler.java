@@ -3,28 +3,28 @@ package helper;
 public class DescriptionHandler {
 
     // PanelUpload
-    private String uploadData_selectUpload = "Welcome to the Interactive Vaccine Designer. The functionality is based on EpitopeSelector, a software package for RNA-Seq based neo-epitope selection (https://github.com/APERIM-EU/WP3-EpitopeSelector). \n" +
+    private String uploadData_selectUpload = "Welcome to the <b>Interactive Vaccine Designer</b>. The functionality is based on  <a href=\"https://github.com/APERIM-EU/WP3-EpitopeSelector\"target=\"_blank\">EpitopeSelector</a>, a software package for RNA-Seq based neo-epitope selection. \n" +
             "\n" +
-            "You can either upload your epitope prediction results from your computer or select one from our database.";
-    private String uploadData_selectAlleleUpload = "You can now decide wether you want to upload an allele file or choose one from our database. The allele file has to contain the alleles for which the epitope prediction has been performed.";
-    private String uploadData_selectStructure = "Your epitope prediction file has to be in one of the following structures. Choose the fitting structure.";
-    private String uploadData_specifyColumns = "Specify the column names of your epitope prediction file. If the columns do not exist leave them empty.";
-    private String uploadData_specifyAlleleExpression = "Specify allele expression as FPKM values.";
-    private String uploadData_specifyAlleles = "Specify the corresponding HLA alleles and the allele expression as FPKM values.";
-    private String uploadData_databaseUploadAndAllele = "Choose the project containing your epitope prediction file and select the file. Finally choose the corresponding allele file and press 'Upload'.";
-    private String uploadData_databaseUpload = "Choose the project containing your epitope prediction file, select the file and finally press 'Upload'.";
-    private String uploadData_upload = "Choose your epitope prediction file from your computer's directory and press 'Upload'.";
+            "You can either <b>upload</b> your epitope prediction results from your computer or select one from our <b>database</b>.";
+    private String uploadData_selectAlleleUpload = "You can now decide wether you want to <b>upload</b> an allele file or choose one from our <b>database</b>. The allele file has to contain the alleles for which the epitope prediction has been performed.";
+    private String uploadData_selectStructure = "Your epitope prediction file has to be in one of the <b>following structures</b>. Choose the fitting structure.";
+    private String uploadData_specifyColumns = "Specify the <b>column names</b> of your epitope prediction file. If the columns do not exist leave them empty.";
+    private String uploadData_specifyAlleleExpression = "Specify the <b>allele expressions</b> as FPKM values.";
+    private String uploadData_specifyAlleles = "Specify the corresponding <b>HLA alleles</b> and the <b>allele expressions</b> as FPKM values.";
+    private String uploadData_databaseUploadAndAllele = "Choose the project containing your epitope prediction file and select the file. Finally choose the corresponding allele file and press <b>Upload</b>.";
+    private String uploadData_databaseUpload = "Choose the project containing your epitope prediction file, select the file and finally press <b>Upload</b>.";
+    private String uploadData_upload = "Choose your epitope prediction file from your computer's directory and press <b>Upload</b>.";
     private String uploadData_immValidatorDescription = "Please enter the column name of the immunogenicity to continue.";
     private String uploadData_hlaValidatorDescription = "Please enter valid HLA alleles.";
     private String uploadData_hlaExprValidatorDescription = "Please enter valid HLA expression values.";
     private String uploadData_columnMethod = "Column name of the prediction method.";
     private String uploadData_columnImm = "Column name of peptide immunogenicity.";
-    private String uploadData_columnUncertainty = "Column name of prediction uncertainty";
-    private String uploadData_columnDistance = "Column name of distance-to-self calculation";
+    private String uploadData_columnUncertainty = "Column name of prediction uncertainty.";
+    private String uploadData_columnDistance = "Column name of distance-to-self calculation.";
     private String uploadData_columnTAA = "Column name specifying whether the peptide is a TAA or TSA (if not specified all peptides are assumed to be TSAs).";
 
     // PanelEpitopeSelection
-    private String epitopeSelection = "Select the peptide sequences you would like to exclude or include in your final solution. Double click on the corresponding peptide and check one of the boxes. Click next to continue with the parameter settings.";
+    private String epitopeSelection = "Select the <b>peptide sequences</b> you would like to <b>exclude</b> or <b>include</b> in your final solution. Double click on the corresponding peptide and check one of the boxes. Click next to continue with the parameter settings.";
 
     // PanelParameters
     private String parameterSettings = "Set the parameter values to your wishes if you want change the default values.";
@@ -38,8 +38,8 @@ public class DescriptionHandler {
     private String parameter_rank = "Activates rank based estimation of immunogenicity .";
 
     // PanelResults
-    private String results = "Here are the results of your current session. You have now the following options (see below): \n" +
-            "Reset all settings and upload new files, Save the current results locally on your computer, Register the current results in our database or change parameters and rerun the computation which will be added as another tab to your results.";
+    private String results = "Here are the <b>results</b> of your current session. You have now the following options: \n" +
+            "<ul><li><b>Reset</b> all settings and upload new files</li> <li><b>Save</b> the current results locally on your computer</li> <li><b>Register</b> the current results in our database</li> <li><b>Change parameters</b> and <b>re-run</b> the epitope selection (adds another tab to your results) </li></ul>";
 
     // ParserScriptResults
     private String parseScriptResultError = "It was not possible to parse the result file. Please try again.";
@@ -66,12 +66,15 @@ public class DescriptionHandler {
     private String registerButtonDescription = "Register all results of the current session in the database.";
     private String registerError = "It was not possible to register your epitope selection result file in the database. Please try again later.";
     private String registerSuccess = "Your file was registered successfully in the database.";
+    private String runButtonDescription = "Run epitope selection.";
+    private String rerunButtonDescription = "Re-run epitope selection.";
     private String resetButtonDescription = "Reset all settings and upload new files.";
-    private String resetButtonSuccess = "Reset comlete. You can start from the beginning now";
+    private String resetButtonSuccess = "Reset successful. You can start from the beginning now.";
     private String writeInputError = "It was not possible to prepare the obligatory input files. Please try again.";
     private String processingDataError = "It was not possible to process your input or allele file. Please try again and make sure all your columns and your allele file are specified correctly.";
     private String uploadSuccess = "Your epitope prediction file was uploaded successfully.";
     private String computationError = "The epitope selection on our server was interrupted. Please try again.";
+    private String saveButtonDescription = "Save result file on your computer";
 
     public DescriptionHandler() {
 
@@ -267,5 +270,17 @@ public class DescriptionHandler {
 
     public String getUploadData_columnTAA() {
         return uploadData_columnTAA;
+    }
+
+    public String getRunButtonDescription() {
+        return runButtonDescription;
+    }
+
+    public String getRerunButtonDescription() {
+        return rerunButtonDescription;
+    }
+
+    public String getSaveButtonDescription() {
+        return saveButtonDescription;
     }
 }

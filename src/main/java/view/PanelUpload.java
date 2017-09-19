@@ -10,9 +10,15 @@ import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Grid.SingleSelectionModel;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 import helper.DescriptionHandler;
@@ -20,8 +26,8 @@ import helper.UploaderInput;
 import helper.Utils;
 import model.DatasetBean;
 
+import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -51,6 +57,7 @@ public class PanelUpload extends CustomComponent {
   private Boolean alleleFileUpload;
   private HashMap<String, String> alleles, allele_expressions;
   private DescriptionHandler dh = new DescriptionHandler();
+  private Label hlaDescription, databaseUploadDescription;
 
   /**
    * Constructor
@@ -109,7 +116,7 @@ public class PanelUpload extends CustomComponent {
     uploadButton.setEnabled(false);
 
     VerticalLayout allUploadLayout = new VerticalLayout();
-    Label description = createDescriptionLabel(dh.getUploadData_selectUpload());
+    Label description = createDescriptionLabel(dh.getUploadData_upload());
 
     HorizontalLayout uploadLayout = new HorizontalLayout();
     uploadLayout.setMargin(true);
@@ -125,7 +132,6 @@ public class PanelUpload extends CustomComponent {
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     buttonsLayout.setSizeFull();
     buttonsLayout.setSpacing(true);
-    buttonsLayout.setMargin(new MarginInfo(false, false, true, false));
     Button backButton = new Button("Back");
     backButton.setIcon(FontAwesome.ARROW_CIRCLE_O_LEFT);
     backButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
@@ -185,8 +191,10 @@ public class PanelUpload extends CustomComponent {
           hlaExpressionLayout.setVisible(true);
           if (alleleFileUpload) {
             alleleTFLayout.setVisible(false);
+            hlaDescription = createDescriptionLabel(dh.getUploadData_specifyAlleleExpression());
           } else {
             alleleTFLayout.setVisible(true);
+            hlaDescription = createDescriptionLabel(dh.getUploadData_specifyAlleles());
           }
         } else {
           Utils.notification("Error", dh.getUploadData_immValidatorDescription(), "error");
@@ -212,6 +220,11 @@ public class PanelUpload extends CustomComponent {
           nextButton.setVisible(false);
         if (useDatabase) {
           databaseLayout.setVisible(true);
+          if (alleleFileUpload) {
+            databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUploadAndAllele());
+          } else {
+            databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUpload());
+          }
         } else if (!useDatabase) {
           uploadLayout.setVisible(true);
         }
@@ -279,7 +292,7 @@ public class PanelUpload extends CustomComponent {
 
   public VerticalLayout createHlaExpressionTextFields() {
     VerticalLayout allAlleleLayout = new VerticalLayout();
-    Label description = createDescriptionLabel(dh.getUploadData_specifyAlleleExpression());
+    hlaDescription = createDescriptionLabel(dh.getUploadData_specifyAlleles());
     alleleTFLayout = new HorizontalLayout();
     HorizontalLayout alleleEVTFLayout = new HorizontalLayout();
     alleleEVTFLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
@@ -390,7 +403,7 @@ public class PanelUpload extends CustomComponent {
     alleleEVTFLayout.setMargin(new MarginInfo(false, true, false, true));
     alleleEVTFLayout.setSizeFull();
 
-    allAlleleLayout.addComponents(description, alleleTFLayout, alleleEVTFLayout);
+    allAlleleLayout.addComponents(hlaDescription, alleleTFLayout, alleleEVTFLayout);
 
     return allAlleleLayout;
   }
@@ -398,7 +411,7 @@ public class PanelUpload extends CustomComponent {
   public VerticalLayout createDataSelection() {
 
     VerticalLayout allDataSelectionLayout = new VerticalLayout();
-    Label description = createDescriptionLabel(dh.getUploadData_upload());
+    Label description = createDescriptionLabel(dh.getUploadData_selectUpload());
     
     HorizontalLayout dataSelectionLayout = new HorizontalLayout();
     dataSelectionLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
@@ -442,7 +455,7 @@ public class PanelUpload extends CustomComponent {
   }
 
   public VerticalLayout createDatabaseSelection() {
-    Label description = createDescriptionLabel(dh.getUploadData_databaseUpload());
+    databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUpload());
 
     projectSelectionCB = new ComboBox("Choose Project");
     projectSelectionCB.setRequired(true);
@@ -484,7 +497,7 @@ public class PanelUpload extends CustomComponent {
        });
     
     
-    databaseLayout.addComponents(description, dataBaseSelection, datasetGrid);
+    databaseLayout.addComponents(databaseUploadDescription, dataBaseSelection, datasetGrid);
     
     return databaseLayout;
   }
@@ -579,11 +592,8 @@ public class PanelUpload extends CustomComponent {
   }
 
   public Label createDescriptionLabel(String info) {
-    Label descriptionLabel = new Label(info);
-    descriptionLabel.addStyleName(ValoTheme.LABEL_LARGE);
-    descriptionLabel.addStyleName(ValoTheme.LABEL_BOLD);
-    descriptionLabel.addStyleName("padded");
-
+    Label descriptionLabel = new Label(FontAwesome.INFO.getHtml() + "    " + info, ContentMode.HTML);
+    descriptionLabel.addStyleName("description");
     return descriptionLabel;
   }
 

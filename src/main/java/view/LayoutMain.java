@@ -79,6 +79,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String sampleCode;
   private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
   private BeanItemContainer<DatasetBean> container, alleleFileContainer;
+  private DescriptionHandler dh = new DescriptionHandler();
 
   private String tmpPath = "/Users/spaethju/Desktop/";
   //private String tmpPath = "/tmp/";
@@ -172,7 +173,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     }
 
     uploadPanel.getProjectSelectionCB().addValueChangeListener((ValueChangeListener) event -> {
-      List<DataSet> dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+      List<DataSet> dataSets = new ArrayList<>();
+      try {
+        dataSets = openbis.getDataSetsOfProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+      } catch (NullPointerException e) {
+        Utils.notification("Error", "Dataset could not be found in openbis", "error");
+      }
       container = fileHandler.fillTable(dataSets);
       alleleFileContainer = fileHandler.fillTable(dataSets);
       if (container.size() > 0) {
@@ -265,11 +271,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           reset();
         } catch (Exception e) {
           MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
-          Utils.notification("Upload failed", "Something went wrong while uploading/parsing the file", "error");
+          Utils.notification("Upload failed", dh.getUploadInputFailedError(), "error");
           e.printStackTrace();
           reset();
         } }else {
-          Utils.notification("Error", "Please choose an allele file from the database", "error");
+          Utils.notification("Error", dh.getNoAlleleFileSelected(), "error");
         }
       });
   }
@@ -296,16 +302,16 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     contentAccordion = new Accordion();
     contentAccordion.setImmediate(true);
     contentAccordion.setSizeFull();
-    contentAccordion.addTab(uploadPanel, "Upload Data");
+    contentAccordion.addTab(uploadPanel, "Data Preperation");
     contentAccordion.getTab(uploadPanel).setIcon(FontAwesome.UPLOAD);
     contentAccordion.getTab(uploadPanel).setEnabled(true);
-    contentAccordion.addTab(epitopeSelectionPanel, "Epitope Selection");
+    contentAccordion.addTab(epitopeSelectionPanel, "Epitope Pre-Selection");
     contentAccordion.getTab(epitopeSelectionPanel).setIcon(FontAwesome.MOUSE_POINTER);
     contentAccordion.getTab(epitopeSelectionPanel).setEnabled(false);
-    contentAccordion.addTab(parameterPanel, "Parameter Settings");
+    contentAccordion.addTab(parameterPanel, "Parameter Optimization");
     contentAccordion.getTab(parameterPanel).setIcon(FontAwesome.SLIDERS);
     contentAccordion.getTab(parameterPanel).setEnabled(false);
-    contentAccordion.addTab(resultsPanel, "Results");
+    contentAccordion.addTab(resultsPanel, "Results Overview");
     contentAccordion.getTab(resultsPanel).setIcon(FontAwesome.PIE_CHART);
     contentAccordion.getTab(resultsPanel).setEnabled(false);
     contentAccordion.setStyleName("accordion-color");
@@ -325,7 +331,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     nextButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
     nextButton.addStyleName(ValoTheme.BUTTON_SMALL);
     nextButton.setIcon(FontAwesome.ARROW_CIRCLE_O_RIGHT);
-    nextButton.setDescription("Go on with the next step.");
+    nextButton.setDescription(dh.getNextButtonDescription());
     nextButton.addClickListener((ClickListener) event -> {
       epitopeSelectionPanel.getContainer().removeAllContainerFilters();
       if (!uploadPanel.getMethodColTf().getValue().equals("")) {
@@ -352,7 +358,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   private Button createRegisterButton() {
     registerButton = new Button("Register");
-    registerButton.setDescription("Register all results in database.");
+    registerButton.setDescription(dh.getRegisterButtonDescription());
     registerButton.setIcon(FontAwesome.UPLOAD);
     registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
     registerButton.addClickListener((ClickListener) event -> {
@@ -369,10 +375,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
         } catch (IOException | InterruptedException e) {
           MyPortletUI.logger.error("Could not write the folder on the file system");
-          Utils.notification("Error", "Please try again.", "error");
+          Utils.notification("Error", dh.getRegisterError(), "error");
           e.printStackTrace();
         }
-      Utils.notification("Success", "SUCCESS", "success");
+      Utils.notification("Success", dh.getRegisterSuccess(), "success");
       MyPortletUI.logger.info("Result registered");
     });
     registerButton.setVisible(false);
@@ -387,13 +393,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    */
   private Button createResetButton() {
     resetButton = new Button("Reset");
-    resetButton.setDescription("Reset all settings and upload new files.");
+    resetButton.setDescription(dh.getResetButtonDescription());
     resetButton.setIcon(FontAwesome.TIMES_CIRCLE_O);
     resetButton.setStyleName(ValoTheme.BUTTON_DANGER);
     resetButton.addStyleName(ValoTheme.BUTTON_SMALL);
     resetButton.addClickListener((ClickListener) event -> {
       reset();
-      Utils.notification("Reset", "You can now upload new data.", "success");
+      Utils.notification("Reset", dh.getResetButtonSuccess(), "success");
     });
     return resetButton;
   }
@@ -409,7 +415,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     runButton = new Button("Run");
     runButton.setIcon(FontAwesome.PLAY_CIRCLE_O);
-    runButton.setDescription("Runs the computation with the adjusted parameters.");
+    runButton.setDescription(dh.getRunButtonDescription());
     runButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
     runButton.addStyleName(ValoTheme.BUTTON_SMALL);
     runButton.addClickListener((ClickListener) (Button.ClickEvent event) -> {
@@ -443,6 +449,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
       if (valuesCorrect) {
         runButton.setCaption("Re-Run");
+        runButton.setDescription(dh.getRerunButtonDescription());
         try {
           Process mkdir = Runtime.getRuntime().exec("ssh -i "+ homePath +".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir "  + tmpPathRemote+random);
           mkdir.waitFor();
@@ -532,8 +539,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         try {
           inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(), uploadPanel.getAllele_expressions(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
         } catch (IOException e) {
-          Utils.notification("Problem!",
-                  "There was a problem writing the input files. Please try again", "error");
+          Utils.notification("Error!",
+                  dh.getWriteInputError(), "error");
           MyPortletUI.logger.error("Error while writing the input data");
           e.printStackTrace();
         }
@@ -555,7 +562,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private Button createDownloadButton() {
     downloadButton = new Button("Save");
     downloadButton.setIcon(FontAwesome.DOWNLOAD);
-    downloadButton.setDescription("Save your results");
+    downloadButton.setDescription(dh.getSaveButtonDescription());
     downloadButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
     downloadButton.addStyleName(ValoTheme.BUTTON_SMALL);
     downloadButton.setVisible(false);
@@ -594,7 +601,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     try {
       processingData(uploader.getTempFile());
     } catch (Exception e){
-      Utils.notification("Upload failed", "Something went wrong. Make sure you have selected an appropriate file and described its parameters correctly ", "error");
+      Utils.notification("Upload failed", dh.getProcessingDataError(), "error");
       e.printStackTrace();
       reset();
     }
@@ -691,7 +698,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         nextButton.setEnabled(true);
       });
     }
-    Utils.notification("Upload completed!", "Your upload completed successfully.", "success");
+    Utils.notification("Upload completed!", dh.getUploadSuccess(), "success");
     life.qbic.MyPortletUI.logger.info("Upload successful");
     resetButton.setEnabled(true);
   }
@@ -749,10 +756,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
       } catch (IOException e) {
         MyPortletUI.logger.error("NeoOptiTope could not be found");
+        Utils.notification("Error", dh.getComputationError(), "error");
         loadingWindow.failure();
         e.printStackTrace();
       } catch (InterruptedException e) {
-        Utils.notification("Error", "", "error");
+        Utils.notification("Error", dh.getComputationError(), "error");
         MyPortletUI.logger.error("Computation interrupted");
         e.printStackTrace();
       }

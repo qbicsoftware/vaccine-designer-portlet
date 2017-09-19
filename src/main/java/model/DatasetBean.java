@@ -94,4 +94,27 @@ public class DatasetBean {
     return sampleIdentifier;
   }
 
+  public ProjectBean getProjectBean() {
+    return projectBean;
+  }
+
+  public String getDataSetTypeCode() {
+    return dataSetTypeCode;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  public Date getRegistrationDate() {
+    return registrationDate;
+  }
+
+  public List<String> getParents() {
+    return parents;
+  }
 }

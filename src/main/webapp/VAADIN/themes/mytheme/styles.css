@@ -13056,3 +13056,16 @@ div.v-layout.v-horizontal.v-widget {
 .mytheme .button_huge {
 	font-size: 3.5em;
 }
+
+.mytheme .v-label.description {
+	border-left: 6px solid #197de1;
+	background-color: #e6f0ff;
+	padding-top: 6px;
+	padding-right: 6px;
+	padding-left: 6px;
+	padding-bottom: 6px;
+	margin-top: 5px;
+	margin-right: 10px;
+	margin-left: 5px;
+	margin-bottom: 10px;
+}

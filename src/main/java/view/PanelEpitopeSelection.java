@@ -11,7 +11,9 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.grid.HeightMode;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -306,11 +308,17 @@ public class PanelEpitopeSelection extends CustomComponent {
   public VerticalLayout createInfo() {
     infoLayout = new VerticalLayout();
 
-    Label infoLa = new Label(dh.getEpitopeSelection());
+    Label infoLa = createDescriptionLabel(dh.getEpitopeSelection());
 
     infoLayout.addComponent(infoLa);
 
     return infoLayout;
+  }
+
+  public Label createDescriptionLabel(String info) {
+    Label descriptionLabel = new Label(FontAwesome.INFO.getHtml() + "    " + info, ContentMode.HTML);
+    descriptionLabel.addStyleName("description");
+    return descriptionLabel;
   }
   
   public HorizontalLayout createMethodSelection() {
