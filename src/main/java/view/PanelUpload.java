@@ -1,7 +1,5 @@
 package view;
 
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
 import com.vaadin.data.validator.*;
@@ -20,13 +18,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
-
 import helper.DescriptionHandler;
 import helper.UploaderInput;
 import helper.Utils;
 import model.DatasetBean;
-
-import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 
@@ -224,6 +219,7 @@ public class PanelUpload extends CustomComponent {
             databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUploadAndAllele());
           } else {
             databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUpload());
+            alleleFileSelectionCB.setVisible(false);
           }
         } else if (!useDatabase) {
           uploadLayout.setVisible(true);

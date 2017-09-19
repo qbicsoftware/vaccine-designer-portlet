@@ -78,7 +78,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String sampleBarcode;
   private String sampleCode;
   private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
-  private BeanItemContainer<DatasetBean> container, alleleFileContainer;
+  private BeanItemContainer<DatasetBean> container;
+  private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<DatasetBean>(DatasetBean.class);
   private DescriptionHandler dh = new DescriptionHandler();
 
   private String tmpPath = "/Users/spaethju/Desktop/";
@@ -180,8 +181,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         Utils.notification("Error", "Dataset could not be found in openbis", "error");
       }
       container = fileHandler.fillTable(dataSets);
+      alleleFileContainer.removeAllItems();
       alleleFileContainer = fileHandler.fillTable(dataSets);
-      if (container.size() > 0) {
+      uploadPanel.getAlleleFileSelectionCB().removeAllItems();
+      uploadPanel.getDatasetGrid().setContainerDataSource(container);
+      if (uploadPanel.getDatasetGrid().getContainerDataSource().size() > 0) {
         uploadPanel.getDatasetGrid().setEnabled(true);
         if (uploadPanel.getAlleleFileUpload()) {
           uploadPanel.getAlleleFileSelectionCB().setVisible(true);
@@ -190,20 +194,18 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           for (Object itemId : alleleFileContainer.getItemIds()) {
             Item item = alleleFileContainer.getItem(itemId);
             String type = item.getItemProperty("type").toString();
-            String filename = item.getItemProperty("fileName").toString();
+            String filename = item.getItemProperty("name").toString();
             if (type.equalsIgnoreCase("Q_WF_NGS_HLATYPING_RESULTS") && (filename.contains(".txt") || filename.contains(".tsv")) ) {
-              uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("fileName"));
+              uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("name"));
             }
           }
         }
-        uploadPanel.getDatasetGrid().setContainerDataSource(container);
         filterable = (Filterable) uploadPanel.getDatasetGrid().getContainerDataSource();
         filterable.removeAllContainerFilters();
         filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
-        filter("fileName", ".tsv");
+        filter("name", ".tsv");
         if (!gridActivated) {
           uploadPanel.getDatasetGrid().removeColumn("children");
-          uploadPanel.getDatasetGrid().removeColumn("parents");
           uploadPanel.getDatasetGrid().removeColumn("sampleIdentifier");
           uploadPanel.getDatasetGrid().removeColumn("type");
           uploadPanel.getDatasetGrid().removeColumn("properties");
@@ -226,9 +228,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     uploadPanel.getAlleleFileSelectionCB().addValueChangeListener((ValueChangeListener) event -> {
       for (Object itemId : alleleFileContainer.getItemIds()) {
         Item item = alleleFileContainer.getItem(itemId);
-        String filename = item.getItemProperty("fileName").toString();
+        String filename = item.getItemProperty("name").toString();
         if (filename.equalsIgnoreCase(uploadPanel.getAlleleFileSelectionCB().getValue().toString())) {
-          alleleFileName = item.getItemProperty("fileName").toString();
+          alleleFileName = item.getItemProperty("name").toString();
           alleleFileCode = item.getItemProperty("code").toString();
           alleleDssPath = item.getItemProperty("dssPath").toString();
         }
@@ -245,7 +247,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                   sampleBarcode = sample.getCode();
               }
           }
-        String filename = uploadPanel.getSelected().getBean().getFileName();
+        String filename = uploadPanel.getSelected().getBean().getName();
         code = uploadPanel.getSelected().getBean().getCode();
         path = uploadPanel.getSelected().getBean().getDssPath();
         folder = path.replace("original/","").replace(filename,"");

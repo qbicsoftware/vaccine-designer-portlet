@@ -7,8 +7,8 @@ import java.util.Map;
 public class DatasetBean {
 
   private ProjectBean projectBean;
-  private String code, dataSetTypeCode, type, dssPath, name, sampleIdentifier;
-  private long id, fileSize;
+  private String code, dataSetTypeCode, type, name, dssPath, sampleIdentifier;
+  private long id, size;
   private List<DatasetBean> children;
   private Map<String, String> properties;
   private Date registrationDate;
@@ -42,14 +42,6 @@ public class DatasetBean {
     return children != null && children.size() > 0;
   }
 
-  public long getFileSize() {
-    return fileSize;
-  }
-
-  public void setFileSize(long fileSize) {
-    this.fileSize = fileSize;
-  }
-
   public void setChildren(List<DatasetBean> children) {
     this.children = children;
   }
@@ -73,14 +65,6 @@ public class DatasetBean {
   public void setDssPath(String dssPath) {
     this.dssPath = dssPath;
   }
-  
-  public String getFileName() {
-    return name;
-  }
-
-  public void setFileName(String fileName) {
-    this.name = fileName;
-  }
 
   public void setRegistrationDate(Date registrationDate) {
     this.registrationDate = registrationDate;
@@ -102,10 +86,6 @@ public class DatasetBean {
     return dataSetTypeCode;
   }
 
-  public String getName() {
-    return name;
-  }
-
   public Map<String, String> getProperties() {
     return properties;
   }
@@ -114,7 +94,28 @@ public class DatasetBean {
     return registrationDate;
   }
 
-  public List<String> getParents() {
-    return parents;
+  public void setProjectBean(ProjectBean projectBean) {
+    this.projectBean = projectBean;
+  }
+
+  public void setDataSetTypeCode(String dataSetTypeCode) {
+    this.dataSetTypeCode = dataSetTypeCode;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
+  public void setSize(long size) {
+    this.size = size;
+  }
+
+  public String getName() {
+    return name;
+
   }
 }

@@ -43,7 +43,7 @@ public class DBFileHandler {
     List<String> fileNames = new ArrayList<>();
 
     for (model.DatasetBean bean : datasetBeans) {
-      fileNames.add(bean.getFileName());
+      fileNames.add(bean.getName());
 
       if (dataMap.get(bean.getCode()).getProperties() != null) {
         bean.setProperties(dataMap.get(bean.getCode()).getProperties());
@@ -94,10 +94,10 @@ public class DBFileHandler {
       String fileName = (String) ss[2];
       b.setCode(code);
       b.setType(types.get(code));
-      b.setFileName(fileName);
+      b.setName(fileName);
       b.setDssPath((String) ss[1]);
       long size = (Long) ss[3];
-      b.setFileSize(size);
+      b.setSize(size);
       b.setRegistrationDate(parseDate((String) ss[5]));
       b.setProperties(props.get(code));
       b.setSampleIdentifier(samples.get(code));
@@ -136,7 +136,7 @@ public class DBFileHandler {
         if (b.hasChildren()) {
           collect.addAll(b.getChildren());
         } else {
-          if (b.getFileSize() == 0) {
+          if (b.getSize() == 0) {
             toRemove.add(b);
           }
         }
