@@ -3,6 +3,7 @@ package view;
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
+import com.sun.org.apache.xml.internal.utils.WrongParserException;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Item;
@@ -208,6 +209,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 filter("type", "Q_WF_NGS_EPITOPE_PREDICTION_RESULTS");
                 filter("name", ".tsv");
                 if (!gridActivated) {
+                    uploadPanel.getDatasetGrid().getColumn("size").setHeaderCaption("Size (KB)");
                     uploadPanel.getDatasetGrid().removeColumn("children");
                     uploadPanel.getDatasetGrid().removeColumn("sampleIdentifier");
                     uploadPanel.getDatasetGrid().removeColumn("type");
@@ -241,7 +243,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         });
 
         uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
-            if (uploadPanel.getAlleleFileSelectionCB().isValid()) {
+            if (uploadPanel.getAlleleFileSelectionCB().isValid() || !uploadPanel.getAlleleFileUpload()) {
                 Project project = openbis.getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
                 List<Sample> allSamples =
                         openbis.getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
@@ -271,8 +273,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                     }
                     processingData(file);
                     Files.delete(destination);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (NumberFormatException e) {
+                    Utils.notification("Error", "Your alleles did not fit to your epitope prediction file. Please try again.", "error");
+                    MyPortletUI.logger.error("Alleles do not fit to the epitope prediction file");
                     reset();
                 } catch (Exception e) {
                     MyPortletUI.logger.error("Something went wrong while uploading/Parsing the file");
@@ -313,7 +316,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         contentAccordion.addTab(epitopeSelectionPanel, "Epitope Pre-Selection");
         contentAccordion.getTab(epitopeSelectionPanel).setIcon(FontAwesome.MOUSE_POINTER);
         contentAccordion.getTab(epitopeSelectionPanel).setEnabled(false);
-        contentAccordion.addTab(parameterPanel, "Parameter Optimization");
+        contentAccordion.addTab(parameterPanel, "Parameter Adjustment");
         contentAccordion.getTab(parameterPanel).setIcon(FontAwesome.SLIDERS);
         contentAccordion.getTab(parameterPanel).setEnabled(false);
         contentAccordion.addTab(resultsPanel, "Results Overview");
@@ -366,6 +369,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         registerButton.setDescription(dh.getRegisterButtonDescription());
         registerButton.setIcon(FontAwesome.UPLOAD);
         registerButton.setStyleName(ValoTheme.BUTTON_SMALL);
+        registerButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         registerButton.addClickListener((ClickListener) event -> {
             try {
                 String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
@@ -622,6 +626,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                     uploadPanel.getUncertaintyColTf().getValue(),
                     uploadPanel.getDistanceColTf().getValue(),
                     uploadPanel.getTaaColTf().getValue());
+            if (!parser.checkAlleles(uploadPanel.getAlleles())){
+                throw new NumberFormatException();
+            }
             hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
             hasDist = parser.getHasDist();
@@ -638,6 +645,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             ParserInputAllelesAsColumns parser = new ParserInputAllelesAsColumns();
             parser.parse(file, uploadPanel.getMethodColTf().getValue(),
                     uploadPanel.getTaaColTf().getValue());
+            if (!parser.checkAlleles(uploadPanel.getAlleles())){
+                throw new NumberFormatException();
+            }
             hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
             epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
@@ -907,6 +917,5 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         } else {
             filterable.removeContainerFilter(tmpFilter);
         }
-
     }
 }

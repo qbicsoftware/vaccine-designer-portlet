@@ -1,6 +1,7 @@
 package helper;
 
 import com.vaadin.data.util.BeanItemContainer;
+import life.qbic.MyPortletUI;
 import model.EpitopeSelectionBean;
 
 import java.io.BufferedReader;
@@ -23,9 +24,11 @@ public class ParserInputAllelesAsRows {
             hla1BindingPrediction, uncertainty, distance, type, maxLength;
     private String methodCol, immCol, uncertaintyCol, distanceCol, typeCol;
     private HashMap<String, HashMap<String, String>> immMap, uncMap, distMap, otherMap;
+    private HashMap<String, String> alleleImmMap;
     private BufferedReader brReader;
     private File file;
     private Boolean hasType, hasDist, hasImm, hasUnc, hasMethod, hasTranscriptExpression;
+    private String[] alleleNames;
 
     public ParserInputAllelesAsRows() {
         hasTranscriptExpression = false;
@@ -176,7 +179,7 @@ public class ParserInputAllelesAsRows {
             String[] columns = line.split("\t");
 
             // initialize allele map
-            HashMap<String, String> alleleImmMap = new HashMap<>();
+            alleleImmMap = new HashMap<>();
             HashMap<String, String> alleleUncMap = new HashMap<>();
             HashMap<String, String> alleleDistMap = new HashMap<>();
 
@@ -273,7 +276,7 @@ public class ParserInputAllelesAsRows {
             newBean.setExcluded(false);
             newBean.setNeopeptide(key);
             newBean.setImm(immMap.get(key));
-            String[] alleleNames = newBean.prepareAlleleNames();
+            alleleNames = newBean.prepareAlleleNames();
             newBean.prepareImm(alleleNames);
             if (!methodCol.equals("") && hasMethod) {
                 newBean.setMethod(otherMap.get(key).get("method"));
@@ -306,6 +309,16 @@ public class ParserInputAllelesAsRows {
             epitopes.addBean(newBean);
 
         }
+    }
+
+    public Boolean checkAlleles(HashMap<String, String> alleles) {
+        Boolean allelesCorrect = true;
+        for (String allele : alleleNames) {
+            if (!alleles.containsValue(allele))  {
+                allelesCorrect = false;
+            }
+        }
+        return allelesCorrect;
     }
 
     /**
