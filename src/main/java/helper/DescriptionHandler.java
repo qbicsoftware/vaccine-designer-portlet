@@ -46,7 +46,7 @@ public class DescriptionHandler {
 
     // UploaderInput
     private String uploadInputIOError = "It was not possible to upload your data. Please try again.";
-    private String uploadInputFailedError = "The upload of your epitope prediction data failed. Please try again.";
+    private String uploadInputFailedError = "The upload of your epitope prediction data failed. Usually this is the case, if your epitope prediction file was not described correctly in the previous steps.";
 
     // WriterResults
     private String writeResultOutputError = "Writing or Saving your results failed. Please try again.";

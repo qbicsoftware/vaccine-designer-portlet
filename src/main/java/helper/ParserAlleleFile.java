@@ -1,5 +1,7 @@
 package helper;
 
+import life.qbic.MyPortletUI;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -60,7 +62,6 @@ public class ParserAlleleFile {
         alleles.put("B2", columns[b2].trim());
         alleles.put("C1", columns[c1].trim());
         alleles.put("C2", columns[c2].trim());
-
         brReader.close();
 
         return alleles;
