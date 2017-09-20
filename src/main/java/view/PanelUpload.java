@@ -51,6 +51,7 @@ public class PanelUpload extends CustomComponent {
     private HashMap<String, String> alleles, allele_expressions;
     private DescriptionHandler dh = new DescriptionHandler();
     private Label hlaDescription, databaseUploadDescription;
+    private NullValidator nv = new NullValidator("Please choose an allele file from the database", false);
 
     /**
      * Constructor
@@ -197,12 +198,13 @@ public class PanelUpload extends CustomComponent {
                 if (isHlaExpressionlValid()) {
                     if (!alleleFileUpload) {
                         if (isHlalValid()) {
-                            alleles.put("A1", hlaA1TF.getValue());
-                            alleles.put("A2", hlaA2TF.getValue());
-                            alleles.put("B1", hlaB1TF.getValue());
-                            alleles.put("B2", hlaB2TF.getValue());
-                            alleles.put("C1", hlaA1TF.getValue());
-                            alleles.put("C2", hlaA1TF.getValue());
+                            alleles.clear();
+                            alleles.put("A1", hlaA1TF.getValue().replace("HLA-", ""));
+                            alleles.put("A2", hlaA2TF.getValue().replace("HLA-", ""));
+                            alleles.put("B1", hlaB1TF.getValue().replace("HLA-", ""));
+                            alleles.put("B2", hlaB2TF.getValue().replace("HLA-", ""));
+                            alleles.put("C1", hlaC1TF.getValue().replace("HLA-", ""));
+                            alleles.put("C2", hlaC2TF.getValue().replace("HLA-", ""));
                         } else {
                             Utils.notification("Error", dh.getUploadData_hlaValidatorDescription(), "error");
                         }
@@ -216,9 +218,11 @@ public class PanelUpload extends CustomComponent {
                         databaseLayout.setVisible(true);
                         if (alleleFileUpload) {
                             databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUploadAndAllele());
+                            alleleFileSelectionCB.addValidator(nv);
                         } else {
                             databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUpload());
                             alleleFileSelectionCB.setVisible(false);
+                            alleleFileSelectionCB.removeValidator(nv);
                         }
                     } else if (!useDatabase) {
                         uploadLayout.setVisible(true);
@@ -245,21 +249,21 @@ public class PanelUpload extends CustomComponent {
 
         // method column
         methodColTf = new TextField("Method Column");
-        methodColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
+        methodColTf.setStyleName("padded");
         methodColTf.setImmediate(true);
         methodColTf.setValue("");
         methodColTf.setDescription(dh.getUploadData_columnMethod());
 
         // taa column
         taaColTf = new TextField("TAA Column");
-        taaColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
+        taaColTf.setStyleName("padded");
         taaColTf.setImmediate(true);
         taaColTf.setValue("");
         taaColTf.setDescription(dh.getUploadData_columnTAA());
 
         // immunogenicity column
         immColTf = new TextField("Immunogenicity Column");
-        immColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
+        immColTf.setStyleName("padded");
         immColTf.setImmediate(true);
         immColTf.setValue("SCORE");
         immColTf.setDescription(dh.getUploadData_columnImm());
@@ -268,14 +272,14 @@ public class PanelUpload extends CustomComponent {
 
         // distance column
         distanceColTf = new TextField("Distance Column");
-        distanceColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
+        distanceColTf.setStyleName("padded");
         distanceColTf.setImmediate(true);
         distanceColTf.setValue("");
         distanceColTf.setDescription(dh.getUploadData_columnDistance());
 
         // uncertainty column
         uncertaintyColTf = new TextField("Uncertainty Column");
-        uncertaintyColTf.setStyleName(ValoTheme.TEXTFIELD_HUGE);
+        uncertaintyColTf.setStyleName("padded");
         uncertaintyColTf.setImmediate(true);
         uncertaintyColTf.setValue("");
         uncertaintyColTf.setDescription(dh.getUploadData_columnUncertainty());
@@ -306,21 +310,21 @@ public class PanelUpload extends CustomComponent {
         hlaValidator.setMinLength(11);
         hlaValidator.setMaxLength(11);
         hlaA1TF = new TextField();
-        hlaA1TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaA1TF.setStyleName("padded");
         hlaA1TF.setImmediate(true);
         hlaA1TF.setValue("HLA-A*24:02");
         hlaA1TF.setRequired(true);
         hlaA1TF.addValidator(hlaValidator);
         hlaA1TF.setDescription("HLA-A Allele");
         hlaA2TF = new TextField();
-        hlaA2TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaA2TF.setStyleName("padded");
         hlaA2TF.setImmediate(true);
         hlaA2TF.setValue("HLA-A*29:02");
         hlaA2TF.setDescription("HLA-A Allele");
         hlaA2TF.setRequired(true);
         hlaA2TF.addValidator(hlaValidator);
         hlaAEVTF = new TextField("HLA-A expression");
-        hlaAEVTF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaAEVTF.setStyleName("padded");
         hlaAEVTF.setImmediate(true);
         hlaAEVTF.setDescription("HLA-A expression");
         hlaAEVTF.setRequired(true);
@@ -338,21 +342,21 @@ public class PanelUpload extends CustomComponent {
         hlaBLabel.addStyleName(ValoTheme.LABEL_COLORED);
         hlaBLabel.addStyleName(ValoTheme.LABEL_BOLD);
         hlaB1TF = new TextField();
-        hlaB1TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaB1TF.setStyleName("padded");
         hlaB1TF.setImmediate(true);
         hlaB1TF.setValue("HLA-B*37:01");
         hlaB1TF.setDescription("HLA-B Allele");
         hlaB1TF.setRequired(true);
         hlaB1TF.addValidator(hlaValidator);
         hlaB2TF = new TextField();
-        hlaB2TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaB2TF.setStyleName("padded");
         hlaB2TF.setImmediate(true);
         hlaB2TF.setValue("HLA-B*44:03");
         hlaB2TF.setDescription("HLA-B Allele");
         hlaB2TF.setRequired(true);
         hlaB2TF.addValidator(hlaValidator);
         hlaBEVTF = new TextField("HLA-B expression");
-        hlaBEVTF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaBEVTF.setStyleName("padded");
         hlaBEVTF.setImmediate(true);
         hlaBEVTF.setDescription("HLA-B expression");
         hlaBEVTF.setRequired(true);
@@ -370,21 +374,21 @@ public class PanelUpload extends CustomComponent {
         hlaCLabel.addStyleName(ValoTheme.LABEL_COLORED);
         hlaCLabel.addStyleName(ValoTheme.LABEL_BOLD);
         hlaC1TF = new TextField();
-        hlaC1TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaC1TF.setStyleName("padded");
         hlaC1TF.setImmediate(true);
         hlaC1TF.setValue("HLA-C*16:01");
         hlaC1TF.setDescription("HLA-C Allele");
         hlaC1TF.setRequired(true);
         hlaC1TF.addValidator(hlaValidator);
         hlaC2TF = new TextField();
-        hlaC2TF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaC2TF.setStyleName("padded");
         hlaC2TF.setImmediate(true);
         hlaC2TF.setValue("HLA-C*06:02");
         hlaC2TF.setDescription("HLA-C Allele");
         hlaC2TF.setRequired(true);
         hlaC2TF.addValidator(hlaValidator);
         hlaCEVTF = new TextField("HLA-C expression");
-        hlaCEVTF.setStyleName(ValoTheme.TEXTFIELD_LARGE);
+        hlaCEVTF.setStyleName("padded");
         hlaCEVTF.setImmediate(true);
         hlaCEVTF.setDescription("HLA-C expression");
         hlaCEVTF.setRequired(true);
@@ -396,9 +400,9 @@ public class PanelUpload extends CustomComponent {
 
         alleleTFLayout.addComponents(hlaALayout, hlaBLayout, hlaCLayout);
         alleleEVTFLayout.addComponents(hlaAEVTF, hlaBEVTF, hlaCEVTF);
+        alleleEVTFLayout.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
         alleleEVTFLayout.setSpacing(true);
         alleleEVTFLayout.setMargin(new MarginInfo(false, true, false, true));
-        alleleEVTFLayout.setSizeFull();
 
         allAlleleLayout.addComponents(hlaDescription, alleleTFLayout, alleleEVTFLayout);
 
@@ -463,8 +467,6 @@ public class PanelUpload extends CustomComponent {
         alleleFileSelectionCB.setVisible(false);
         alleleFileSelectionCB.setRequired(true);
         alleleFileSelectionCB.setFilteringMode(FilteringMode.CONTAINS);
-        NullValidator nv = new NullValidator("Please choose an allele file from the database", false);
-        alleleFileSelectionCB.addValidator(nv);
 
         VerticalLayout databaseLayout = new VerticalLayout();
 

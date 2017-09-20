@@ -25,6 +25,7 @@ public class ParserInputAllelesAsColumns {
     private String methodCol, typeCol, hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele;
     private HashMap<String, HashMap<String, String>> immMap, otherMap;
     private HashMap<String, String> alleleImmMap;
+    private String[] alleleNames;
     private BufferedReader brReader;
     private File file;
     private Boolean hasType, hasMethod, hasTranscriptExpression;
@@ -265,7 +266,7 @@ public class ParserInputAllelesAsColumns {
             newBean.setExcluded(false);
             newBean.setNeopeptide(key);
             newBean.setImm(immMap.get(key));
-            String[] alleleNames = newBean.prepareAlleleNames();
+            alleleNames = newBean.prepareAlleleNames();
             newBean.prepareImm(alleleNames);
             if (!(methodCol.equals("")) && hasMethod) {
                 newBean.setMethod(otherMap.get(key).get("method"));
@@ -321,6 +322,16 @@ public class ParserInputAllelesAsColumns {
 
     public void setHasMethod(Boolean hasMethod) {
         this.hasMethod = hasMethod;
+    }
+
+    public Boolean checkAlleles(HashMap<String, String> alleles) {
+        Boolean allelesCorrect = true;
+        for (String allele : alleleNames) {
+            if (!alleles.containsValue(allele))  {
+                allelesCorrect = false;
+            }
+        }
+        return allelesCorrect;
     }
 
 
