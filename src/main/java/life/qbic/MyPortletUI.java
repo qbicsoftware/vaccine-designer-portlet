@@ -38,16 +38,15 @@ public class MyPortletUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
-        final String portletContextName = getPortletContextName(request);
-        final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
+        if (LiferayAndVaadinUtils.isLiferayPortlet()) {
+            final String portletContextName = getPortletContextName(request);
+            final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
+        }
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
         setContent(layout);
 
-        String userID = "MISSING SCREENNAME";
-        if (LiferayAndVaadinUtils.isLiferayPortlet()) {
-            userID = LiferayAndVaadinUtils.getUser().getScreenName();
-        }
+        String userID = "zxmqw74";
         boolean success = true;
         config = ConfigurationManagerFactory.getInstance();
 
@@ -68,6 +67,7 @@ public class MyPortletUI extends UI {
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
             Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
+            e.printStackTrace();
         }
 
         LayoutMain mainLayout;

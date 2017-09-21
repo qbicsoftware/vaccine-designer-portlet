@@ -295,45 +295,15 @@ public class EpitopeSelectionBean {
         this.dist = dist;
     }
 
-    public String[] prepareAlleleNames() {
+    public String[] prepareAlleleNames(String[] alleles) {
         String[] alleleNames = new String[6];
-        ArrayList<String> hlaA = new ArrayList<>();
-        ArrayList<String> hlaB = new ArrayList<>();
-        ArrayList<String> hlaC = new ArrayList<>();
-        int aCounter = 0;
-        int bCounter = 0;
-        int cCounter = 0;
 
-        for (String key : imm.keySet()) {
-            if (key.contains("A*") && aCounter == 1) {
-                hlaA.add(key);
-            }
-            if (key.contains("A*") && aCounter == 0) {
-                hlaA.add(key);
-                aCounter++;
-            }
-            if (key.contains("B*") && bCounter == 1) {
-                hlaB.add(key);
-            }
-            if (key.contains("B*") && bCounter == 0) {
-                hlaB.add(key);
-                bCounter++;
-            }
-            if (key.contains("C*") && cCounter == 1) {
-                hlaC.add(key);
-            }
-            if (key.contains("C*") && cCounter == 0) {
-                hlaC.add(key);
-                cCounter++;
-            }
-        }
-
-        alleleNames[0] = hlaA.get(0);
-        alleleNames[1] = hlaA.get(1);
-        alleleNames[2] = hlaB.get(0);
-        alleleNames[3] = hlaB.get(1);
-        alleleNames[4] = hlaC.get(0);
-        alleleNames[5] = hlaC.get(1);
+        alleleNames[0] = alleles[0];
+        alleleNames[1] = alleles[1];
+        alleleNames[2] = alleles[2];
+        alleleNames[3] = alleles[3];
+        alleleNames[4] = alleles[4];
+        alleleNames[5] = alleles[5];
         return alleleNames;
     }
 

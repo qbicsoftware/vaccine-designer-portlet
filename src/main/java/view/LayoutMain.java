@@ -135,23 +135,28 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
         generator = new RandomCharGenerator();
         random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
-        File f = new File(tmpPath + LiferayAndVaadinUtils.getUser().getScreenName());
+
+        String username = "zxmqw74";
+        if (LiferayAndVaadinUtils.isLiferayPortlet()) {
+            username = LiferayAndVaadinUtils.getUser().getScreenName();
+        }
+        File f = new File(tmpPath + username);
         if (!(f.exists() && f.isDirectory())) {
             try {
-                Runtime.getRuntime().exec("mkdir " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName());
+                Runtime.getRuntime().exec("mkdir " + tmpPath + username);
             } catch (IOException e) {
                 MyPortletUI.logger.error("Could not write the folder on the file system");
                 e.printStackTrace();
             }
         }
-        outputPath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/output.txt";
-        inputPath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/input.txt";
-        allelePath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/alleles.txt";
-        includePath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/include.txt";
-        excludePath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/exclude.txt";
-        tmpResultPath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/tmp_result.txt";
-        tmpDownloadPath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/tmp_download.txt";
-        tmpAllelesPath = tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/tmp_alleles.txt";
+        outputPath = tmpPath + username + "/output.txt";
+        inputPath = tmpPath + username + "/input.txt";
+        allelePath = tmpPath + username + "/alleles.txt";
+        includePath = tmpPath + username + "/include.txt";
+        excludePath = tmpPath + username + "/exclude.txt";
+        tmpResultPath = tmpPath + username + "/tmp_result.txt";
+        tmpDownloadPath = tmpPath + username + "/tmp_download.txt";
+        tmpAllelesPath = tmpPath + username + "/tmp_alleles.txt";
         try {
             Files.deleteIfExists(Paths.get(allelePath));
             Files.deleteIfExists(Paths.get(excludePath));
@@ -273,7 +278,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                     }
                     processingData(file);
                     Files.delete(destination);
-                } catch (NumberFormatException e) {
+                } catch (AllelesException e) {
                     Utils.notification("Error", "Your alleles did not fit to your epitope prediction file. Please try again.", "error");
                     MyPortletUI.logger.error("Alleles do not fit to the epitope prediction file");
                     reset();
@@ -627,14 +632,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                     uploadPanel.getDistanceColTf().getValue(),
                     uploadPanel.getTaaColTf().getValue());
             if (!parser.checkAlleles(uploadPanel.getAlleles())){
-                throw new NumberFormatException();
+                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
             }
             hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
             hasDist = parser.getHasDist();
             hasUnc = parser.getHasUnc();
             epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-                    uploadPanel.getMethodColTf().getValue());
+                    uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles());
             maxLength = parser.getMaxLength();
             if (uploadPanel.getTaaColTf().getValue().equals("")) {
                 epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -646,12 +651,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             parser.parse(file, uploadPanel.getMethodColTf().getValue(),
                     uploadPanel.getTaaColTf().getValue());
             if (!parser.checkAlleles(uploadPanel.getAlleles())){
-                throw new NumberFormatException();
+                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
             }
             hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
             epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-                    uploadPanel.getMethodColTf().getValue().trim());
+                    uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles());
             maxLength = parser.getMaxLength();
             if (uploadPanel.getTaaColTf().getValue().equals("")) {
                 epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -916,6 +921,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             filterable.addContainerFilter(tmpFilter);
         } else {
             filterable.removeContainerFilter(tmpFilter);
+        }
+    }
+
+    public class AllelesException extends Exception {
+
+        public AllelesException(String message) {
+            super(message);
         }
     }
 }

@@ -28,7 +28,7 @@ public class ParserInputAllelesAsRows {
     private BufferedReader brReader;
     private File file;
     private Boolean hasType, hasDist, hasImm, hasUnc, hasMethod, hasTranscriptExpression;
-    private String[] alleleNames;
+    private String[] alleleNames, alleles;
 
     public ParserInputAllelesAsRows() {
         hasTranscriptExpression = false;
@@ -276,7 +276,8 @@ public class ParserInputAllelesAsRows {
             newBean.setExcluded(false);
             newBean.setNeopeptide(key);
             newBean.setImm(immMap.get(key));
-            alleleNames = newBean.prepareAlleleNames();
+            String[] alleles = new String[5];
+            alleleNames = newBean.prepareAlleleNames(alleles);
             newBean.prepareImm(alleleNames);
             if (!methodCol.equals("") && hasMethod) {
                 newBean.setMethod(otherMap.get(key).get("method"));
@@ -385,5 +386,7 @@ public class ParserInputAllelesAsRows {
         this.hasMethod = hasMethod;
     }
 
-
+    public String[] getAlleles() {
+        return alleles;
+    }
 }

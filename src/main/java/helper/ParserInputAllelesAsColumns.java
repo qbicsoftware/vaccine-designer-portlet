@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -23,12 +24,12 @@ public class ParserInputAllelesAsColumns {
     private int method, mutation, gene, transcript, transcriptExpression, neopeptide, hlaA1, hlaA2, hlaB1,
             hlaB2, hlaC1, hlaC2, type, maxLength;
     private String methodCol, typeCol, hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele;
-    private HashMap<String, HashMap<String, String>> immMap, otherMap;
-    private HashMap<String, String> alleleImmMap;
+    private HashMap<String, HashMap<String, HashMap<String, String>>> peptides;
     private String[] alleleNames;
     private BufferedReader brReader;
     private File file;
     private Boolean hasType, hasMethod, hasTranscriptExpression;
+    private String[] alleles;
 
 
     public ParserInputAllelesAsColumns() {
@@ -78,13 +79,9 @@ public class ParserInputAllelesAsColumns {
         for (String h : headers) {
             if (!(typeCol.equals("")) && h.equals(typeCol)) {
                 hasType = true;
-            } else if (!(typeCol.equals("")) && !(hasMethod.equals(typeCol))) {
-                life.qbic.MyPortletUI.logger.error("Type column was not found in the uploaded file and ignored");
             }
             if (!(methodCol.equals("")) && h.equals(methodCol)) {
                 hasMethod = true;
-            } else if (!(methodCol.equals("")) && !(h.equals(methodCol))) {
-                life.qbic.MyPortletUI.logger.error("Method column was not found in the uploaded file and ignored");
             }
         }
 
@@ -106,7 +103,6 @@ public class ParserInputAllelesAsColumns {
 
         // for each tab separated header set the corresponding field to the counters value and set
         // counter + 1
-        MyPortletUI.logger.info("Found " + headers.length + " header entries to parse.");
         for (String h : headers) {
             h.trim();
             h.replace("HLA-", "");
@@ -177,77 +173,21 @@ public class ParserInputAllelesAsColumns {
     public void readInput() throws IOException {
 
         // initialize maps
-        immMap = new HashMap<>();
-        otherMap = new HashMap<>();
+        peptides = new HashMap<>();
 
         // read all lines of the file
         while ((line = brReader.readLine()) != null) {
-
             // get all columns
             String[] columns = line.split("\t");
 
-            // initialize allele map
-            HashMap<String, String> alleleImmMap = new HashMap<>();
-
             // if neopeptide not yet readed
-            if (!(immMap.containsKey(columns[neopeptide]))) {
-
+            if (!(peptides.containsKey(columns[neopeptide]))) {
                 // initialize others map
-                HashMap<String, String> others = new HashMap<>();
-
-                // save mutation, gene, transcript, transcriptExpression
-                others.put("mutation", columns[mutation]);
-                others.put("gene", columns[gene]);
-                others.put("transcript", columns[transcript]);
-                others.put("transcriptExpression", columns[transcriptExpression]);
-                if (!(methodCol.equals("")) && hasMethod) {
-                    others.put("method", columns[method]);
-                }
-                // if type column exists also read type
-                if (!(typeCol.equals("")) && hasType) {
-                    others.put("type", columns[type]);
-                }
-
-                // save all in a map with its neopeptide as key
-                otherMap.put(columns[neopeptide], others);
-
-                // save allele and its immunogenicity, uncertainty and distance in a map each and together
-                // with
-                // map this map with its neopeptide
-                alleleImmMap.put(hlaA1allele, columns[hlaA1]);
-                alleleImmMap.put(hlaA2allele, columns[hlaA2]);
-                alleleImmMap.put(hlaB1allele, columns[hlaB1]);
-                alleleImmMap.put(hlaB2allele, columns[hlaB2]);
-                alleleImmMap.put(hlaC1allele, columns[hlaC1]);
-                alleleImmMap.put(hlaC2allele, columns[hlaC2]);
-                immMap.put(columns[neopeptide], alleleImmMap);
-
-                // if neopeptide already exists in the map
+                addCompletePeptide(columns);
             } else {
-
-                // if different mutation, concat that mutation
-                if (!(otherMap.get(columns[neopeptide]).get("mutation").contains(columns[mutation]))) {
-                    otherMap.get(columns[neopeptide]).put("mutation",
-                            otherMap.get(columns[neopeptide]).get("mutation").concat(", " + columns[mutation]));
-                }
-                // if different gene, concat that gene
-                if (!(otherMap.get(columns[neopeptide]).get("gene").contains(columns[gene]))) {
-                    otherMap.get(columns[neopeptide]).put("gene",
-                            otherMap.get(columns[neopeptide]).get("gene").concat(", " + columns[gene]));
-                }
-                // if different transcript, concat that transcript
-                if (!(otherMap.get(columns[neopeptide]).get("transcript").contains(columns[transcript]))) {
-                    otherMap.get(columns[neopeptide]).put("transcript", otherMap.get(columns[neopeptide])
-                            .get("transcript").concat(", " + columns[transcript]));
-                }
-                // if different transcript expression, add that transcript expression
-                if (!(otherMap.get(columns[neopeptide]).get("transcriptExpression")
-                        .contains(columns[transcriptExpression]))) {
-                    otherMap.get(columns[neopeptide]).put("transcriptExpression",
-                            otherMap.get(columns[neopeptide]).get("transcriptExpression")
-                                    .concat(", " + columns[transcriptExpression]));
-                }
+                peptides.get(columns[neopeptide]).put(columns[method], addValues(columns));
             }
+
         }
         brReader.close();
     }
@@ -256,39 +196,49 @@ public class ParserInputAllelesAsColumns {
      * Sets the bean with its parameters and adds it to a bean item container.
      */
     public void setBean() {
-        for (String key : immMap.keySet()) {
+        MyPortletUI.logger.info(peptides.size() + " to parse...");
+        for (String peptide : peptides.keySet()) {
+            for (String method : peptides.get(peptide).keySet()) {
+                EpitopeSelectionBean newBean = new EpitopeSelectionBean();
+                // set parameters with key and values from the map
+                newBean.setIncluded(false);
+                newBean.setExcluded(false);
+                newBean.setNeopeptide(peptide);
+                try {
+                    newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
+                    newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
+                    newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
+                    newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
+                    newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
+                    newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
+                } catch (NumberFormatException e) {
+                    MyPortletUI.logger.error("Some of the peptides do not have valid entries");
+                }
+                alleles = new String[]{hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele};
+                alleleNames = newBean.prepareAlleleNames(alleles);
+                //newBean.prepareImm(alleleNames);
+                if (!(methodCol.equals("")) && hasMethod) {
+                    newBean.setMethod(method);
+                }
+                newBean.setLength(peptide.length());
+                if (peptide.length() > maxLength) {
+                    maxLength = peptide.length();
+                }
+                newBean.setMutation(peptides.get(peptide).get(method).get("mutation"));
+                newBean.setGene(peptides.get(peptide).get(method).get("gene"));
+                newBean.setTranscript(peptides.get(peptide).get(method).get("transcript"));
+                if (hasTranscriptExpression) {
+                    newBean.setTranscriptExpression(Float.parseFloat(peptides.get(peptide).get(method).get("transcriptExpression")));
+                } else {
+                    newBean.setTranscriptExpression(1f);
+                }
+                if (!(typeCol.equals("")) && hasType) {
+                    newBean.setType(peptides.get(peptide).get(method).get("type"));
+                }
 
-            // initialize new epitope selection bean
-            EpitopeSelectionBean newBean = new EpitopeSelectionBean();
+                epitopes.addBean(newBean);
 
-            // set parameters with key and values from the map
-            newBean.setIncluded(false);
-            newBean.setExcluded(false);
-            newBean.setNeopeptide(key);
-            newBean.setImm(immMap.get(key));
-            alleleNames = newBean.prepareAlleleNames();
-            newBean.prepareImm(alleleNames);
-            if (!(methodCol.equals("")) && hasMethod) {
-                newBean.setMethod(otherMap.get(key).get("method"));
             }
-            newBean.setLength(key.length());
-            if (key.length() > maxLength) {
-                maxLength = key.length();
-            }
-            newBean.setMutation(otherMap.get(key).get("mutation"));
-            newBean.setGene(otherMap.get(key).get("gene"));
-            newBean.setTranscript(otherMap.get(key).get("transcript"));
-            if (hasTranscriptExpression) {
-                newBean.setTranscriptExpression(Float.parseFloat(otherMap.get(key).get("transcriptExpression")));
-            } else {
-                newBean.setTranscriptExpression(1f);
-            }
-            if (!(typeCol.equals("")) && hasType) {
-                newBean.setType(otherMap.get(key).get("type"));
-            }
-
-            epitopes.addBean(newBean);
-
         }
     }
 
@@ -326,13 +276,55 @@ public class ParserInputAllelesAsColumns {
 
     public Boolean checkAlleles(HashMap<String, String> alleles) {
         Boolean allelesCorrect = true;
+        for (String allele : alleles.keySet()) {
+            MyPortletUI.logger.info(alleles.get(allele));
+        }
         for (String allele : alleleNames) {
-            if (!alleles.containsValue(allele))  {
+            MyPortletUI.logger.info(allele);
+            if (!alleles.containsValue(allele)) {
                 allelesCorrect = false;
             }
         }
         return allelesCorrect;
     }
 
+    public HashMap<String, String> addValues(String[] columns) {
+        HashMap<String, String> values = new HashMap<>();
+        values.put("mutation", columns[mutation]);
+        values.put("gene", columns[gene]);
+        values.put("transcript", columns[transcript]);
+        values.put("transcriptExpression", columns[transcriptExpression]);
+        values.put(hlaA1allele, columns[hlaA1]);
+        values.put(hlaA2allele, columns[hlaA2]);
+        values.put(hlaB1allele, columns[hlaB1]);
+        values.put(hlaB2allele, columns[hlaB2]);
+        values.put(hlaC1allele, columns[hlaC1]);
+        values.put(hlaC2allele, columns[hlaC2]);
+        // if type column exists also read type
+        if (!(typeCol.equals("")) && hasType) {
+            values.put("type", columns[type]);
+        }
 
+        return values;
+    }
+
+    public HashMap<String, HashMap<String, String>> addMethodWithValues(String[] columns) {
+        HashMap<String, HashMap<String, String>> methodWithValues = new HashMap<>();
+        if (!(methodCol.equals("")) && hasMethod) {
+            methodWithValues.put(columns[method], addValues(columns));
+        } else {
+            methodWithValues.put("method", addValues(columns));
+        }
+
+        return methodWithValues;
+    }
+
+    public void addCompletePeptide(String[] columns) {
+        peptides.put(columns[neopeptide], addMethodWithValues(columns));
+    }
+
+    public String[] getAlleles() {
+        return alleles;
+    }
 }
+

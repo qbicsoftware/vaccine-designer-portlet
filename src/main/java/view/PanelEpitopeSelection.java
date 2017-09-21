@@ -75,14 +75,13 @@ public class PanelEpitopeSelection extends CustomComponent {
      * @param container bean item container including all epitope selection beans representing a
      *                  neopeptide of the uploaded input data
      */
-    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn) {
+    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn, String[] alleles) {
         this.container = container;
         this.setMethodColumn(methodColumn);
         dataGrid.setSizeFull();
 
         // Set Allele Names for Headers
-        String[] alleleNames =
-                container.getItem(container.firstItemId()).getBean().prepareAlleleNames();
+        String[] alleleNames = alleles;
         hlaA1 = alleleNames[0];
         hlaA2 = alleleNames[1];
         hlaB1 = alleleNames[2];
