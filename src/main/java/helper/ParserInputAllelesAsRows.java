@@ -276,7 +276,7 @@ public class ParserInputAllelesAsRows {
             newBean.setExcluded(false);
             newBean.setNeopeptide(key);
             newBean.setImm(immMap.get(key));
-            String[] alleles = new String[5];
+            String[] alleles = new String[6];
             alleleNames = newBean.prepareAlleleNames(alleles);
             newBean.prepareImm(alleleNames);
             if (!methodCol.equals("") && hasMethod) {

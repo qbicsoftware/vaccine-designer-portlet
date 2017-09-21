@@ -256,7 +256,6 @@ public class ParserInputAllelesAsColumns {
         return epitopes;
     }
 
-
     public Boolean getHasType() {
         return hasType;
     }
@@ -264,7 +263,6 @@ public class ParserInputAllelesAsColumns {
     public void setHasType(Boolean hasType) {
         this.hasType = hasType;
     }
-
 
     public Boolean getHasMethod() {
         return hasMethod;

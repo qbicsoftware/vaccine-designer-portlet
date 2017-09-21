@@ -35,6 +35,7 @@ public class MyPortletUI extends UI {
     private OpenBisClient openbis;
     private ConfigurationManager config = new ConfigurationManagerFactory().getInstance();
     private DescriptionHandler dh = new DescriptionHandler();
+    private Boolean success;
 
     @Override
     protected void init(VaadinRequest request) {
@@ -47,7 +48,7 @@ public class MyPortletUI extends UI {
         setContent(layout);
 
         String userID = "zxmqw74";
-        boolean success = true;
+        success = true;
         config = ConfigurationManagerFactory.getInstance();
 
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
@@ -67,7 +68,6 @@ public class MyPortletUI extends UI {
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
             Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
-            e.printStackTrace();
         }
 
         LayoutMain mainLayout;
@@ -93,7 +93,7 @@ public class MyPortletUI extends UI {
             logger.info("User \"" + userID + "\" connected to openBIS.");
 
         } else {
-            mainLayout = new LayoutMain();
+            mainLayout = new LayoutMain(success);
             setContent(mainLayout);
         }
 

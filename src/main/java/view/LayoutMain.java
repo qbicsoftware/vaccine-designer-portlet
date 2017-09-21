@@ -3,7 +3,6 @@ package view;
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Project;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
-import com.sun.org.apache.xml.internal.utils.WrongParserException;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Item;
@@ -49,6 +48,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private static Boolean hasType;
     private static Boolean hasUnc;
     private static Boolean hasDist;
+    private Boolean success;
     private Button nextButton, runButton, downloadButton, resetButton, registerButton;
     private HorizontalLayout buttonsLayout;
     private Accordion contentAccordion;
@@ -106,7 +106,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         initDatabase();
     }
 
-    public LayoutMain() {
+    public LayoutMain(Boolean success) {
+        this.success = success;
         init();
     }
 
@@ -879,7 +880,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         parameterPanel.reset();
         this.removeAllComponents();
         init();
-        initDatabase();
+        if (success) {
+            initDatabase();
+        }
         contentAccordion.setSelectedTab(uploadPanel);
         downloadFiles = new ArrayList<>();
     }
