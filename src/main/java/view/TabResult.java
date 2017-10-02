@@ -290,11 +290,23 @@ public class TabResult extends VerticalLayout {
         resultGrid.setColumnOrder("neoepitope", "type", "genes", "mutations", "immA1", "distA1",
                 "immA2", "distA2", "immB1", "distB1", "immB2", "distB2", "immC1", "distC1", "immC2",
                 "distC2");
+        resultGrid.getColumn("immA1").setHeaderCaption(alleles[0]);
+        resultGrid.getColumn("immA2").setHeaderCaption(alleles[3]);
+        resultGrid.getColumn("immB1").setHeaderCaption(alleles[1]);
+        resultGrid.getColumn("immB2").setHeaderCaption(alleles[4]);
+        resultGrid.getColumn("immC1").setHeaderCaption(alleles[2]);
+        resultGrid.getColumn("immC2").setHeaderCaption(alleles[5]);
+        resultGrid.removeColumn("distA1");
+        resultGrid.removeColumn("distA2");
+        resultGrid.removeColumn("distB1");
+        resultGrid.removeColumn("distB2");
+        resultGrid.removeColumn("distC1");
+        resultGrid.removeColumn("distC2");
         resultGrid.setEditorEnabled(false);
         resultGrid.setEditorBuffered(false);
         resultGrid.removeColumn("alleles");
         resultGrid.setSelectionMode(SelectionMode.NONE);
-        joinHeader();
+        //joinHeader();
         resultGrid.setImmediate(true);
         resultGrid.setVisible(true);
 
@@ -328,12 +340,12 @@ public class TabResult extends VerticalLayout {
         HeaderCell hlaC2Cell = hlaHeader.join("immC2", "distC2");
         hlaC2Cell.setText(hlaC2);
 
-        resultGrid.getColumn("immA1").setHeaderCaption("Immunogenicity");
-        resultGrid.getColumn("immA2").setHeaderCaption("Immunogenicity");
-        resultGrid.getColumn("immB1").setHeaderCaption("Immunogenicity");
-        resultGrid.getColumn("immB2").setHeaderCaption("Immunogenicity");
-        resultGrid.getColumn("immC1").setHeaderCaption("Immunogenicity");
-        resultGrid.getColumn("immC2").setHeaderCaption("Immunogenicity");
+        resultGrid.getColumn("immA1").setHeaderCaption("Score");
+        resultGrid.getColumn("immA2").setHeaderCaption("Score");
+        resultGrid.getColumn("immB1").setHeaderCaption("Score");
+        resultGrid.getColumn("immB2").setHeaderCaption("Score");
+        resultGrid.getColumn("immC1").setHeaderCaption("Score");
+        resultGrid.getColumn("immC2").setHeaderCaption("Score");
         resultGrid.getColumn("distA1").setHeaderCaption("Distance");
         resultGrid.getColumn("distA2").setHeaderCaption("Distance");
         resultGrid.getColumn("distB1").setHeaderCaption("Distance");

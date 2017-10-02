@@ -150,19 +150,19 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         tmpResultPath = tmpPath + username + "/tmp_result.txt";
         tmpDownloadPath = tmpPath + username + "/tmp_download.txt";
         tmpAllelesPath = tmpPath + username + "/tmp_alleles.txt";
-//        try {
-//            Files.deleteIfExists(Paths.get(allelePath));
-//            Files.deleteIfExists(Paths.get(excludePath));
-//            Files.deleteIfExists(Paths.get(includePath));
-//            Files.deleteIfExists(Paths.get(outputPath));
-//            Files.deleteIfExists(Paths.get(tmpDownloadPath));
-//            Files.deleteIfExists(Paths.get(inputPath));
-//            Files.deleteIfExists(Paths.get(tmpResultPath));
-//            Files.deleteIfExists(Paths.get(tmpAllelesPath));
-//        } catch (IOException e) {
-//            MyPortletUI.logger.error("File System error: Old files could not be deleted");
-//            e.printStackTrace();
-//        }
+        try {
+            Files.deleteIfExists(Paths.get(allelePath));
+            Files.deleteIfExists(Paths.get(excludePath));
+            Files.deleteIfExists(Paths.get(includePath));
+            Files.deleteIfExists(Paths.get(outputPath));
+            Files.deleteIfExists(Paths.get(tmpDownloadPath));
+            Files.deleteIfExists(Paths.get(inputPath));
+            Files.deleteIfExists(Paths.get(tmpResultPath));
+            Files.deleteIfExists(Paths.get(tmpAllelesPath));
+        } catch (IOException e) {
+            MyPortletUI.logger.error("File System error: Old files could not be deleted");
+            e.printStackTrace();
+        }
     }
 
     private void initDatabase() {
@@ -739,16 +739,17 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     System.out.println(line);
+                    MyPortletUI.logger.info(line);
                 }
                 if (0 == proc.waitFor()) {
                     proc.destroyForcibly();
                     prepareResults();
-                    //cleanFiles();
+                    cleanFiles();
                     loadingWindow.success();
                 } else {
                     proc.destroyForcibly();
                     loadingWindow.failure();
-                    //cleanFiles();
+                    cleanFiles();
                 }
             } catch (IOException e) {
                 MyPortletUI.logger.error("NeoOptiTope could not be found");
@@ -759,6 +760,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 Utils.notification("Error", dh.getComputationError(), "error");
                 MyPortletUI.logger.error("Computation interrupted");
                 e.printStackTrace();
+
             }
         });
 

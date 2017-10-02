@@ -174,18 +174,30 @@ public class ParserScriptResult {
             }
             newBean.setGenes(es[2]);
             newBean.setMutations(es[3]);
-            newBean.setImmA1(Float.parseFloat(es[5]));
-            newBean.setImmB1(Float.parseFloat(es[6]));
-            newBean.setImmC1(Float.parseFloat(es[7]));
-            newBean.setImmA2(Float.parseFloat(es[8]));
-            newBean.setImmB2(Float.parseFloat(es[9]));
-            newBean.setImmC2(Float.parseFloat(es[10]));
-            newBean.setDistA1(Float.parseFloat(es[11]));
-            newBean.setDistA2(Float.parseFloat(es[12]));
-            newBean.setDistB1(Float.parseFloat(es[13]));
-            newBean.setDistB2(Float.parseFloat(es[14]));
-            newBean.setDistC1(Float.parseFloat(es[15]));
-            newBean.setDistC2(Float.parseFloat(es[16]));
+            if (!es[5].equals("nan")) {
+                newBean.setImmA1(Float.parseFloat(es[5]));
+            }
+            if (!es[6].equals("nan")) {
+                newBean.setImmB1(Float.parseFloat(es[6]));
+            }
+            if (!es[7].equals("nan")) {
+                newBean.setImmC1(Float.parseFloat(es[7]));
+            }
+            if (!es[8].equals("nan")) {
+                newBean.setImmA2(Float.parseFloat(es[8]));
+            }
+            if (!es[9].equals("nan")) {
+                newBean.setImmB2(Float.parseFloat(es[9]));
+            }
+            if (!es[10].equals("nan")) {
+                newBean.setImmC2(Float.parseFloat(es[10]));
+            }
+//            newBean.setDistA1(Float.parseFloat(es[11]));
+//            newBean.setDistA2(Float.parseFloat(es[12]));
+//            newBean.setDistB1(Float.parseFloat(es[13]));
+//            newBean.setDistB2(Float.parseFloat(es[14]));
+//            newBean.setDistC1(Float.parseFloat(es[15]));
+//            newBean.setDistC2(Float.parseFloat(es[16]));
 
             epitopeResultBeans.addBean(newBean);
             line = br.readLine();

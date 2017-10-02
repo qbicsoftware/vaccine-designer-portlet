@@ -5,6 +5,7 @@ import life.qbic.MyPortletUI;
 import model.EpitopeSelectionBean;
 import view.LayoutMain;
 
+import javax.validation.constraints.Null;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,7 +83,6 @@ public class WriterScriptInput {
 
         writeInputFile(container);
 
-
     }
 
     /**
@@ -103,12 +103,12 @@ public class WriterScriptInput {
         for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext(); ) {
             EpitopeSelectionBean bean = i.next();
             for (String key : bean.getImm().keySet()) {
-                String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
-                if (!type.equals("") && LayoutMain.getHasType()) {
-                    peptide += ("\t" + bean.getType());
-                }
-                inputWriter.write(peptide);
-                inputWriter.newLine();
+                    String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
+                    if (!type.equals("") && LayoutMain.getHasType()) {
+                        peptide += ("\t" + bean.getType());
+                    }
+                    inputWriter.write(peptide);
+                    inputWriter.newLine();
             }
         }
 
