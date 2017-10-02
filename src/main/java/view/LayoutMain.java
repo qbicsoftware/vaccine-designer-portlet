@@ -115,14 +115,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         return hasType;
     }
 
-    public static Boolean getHasUnc() {
-        return hasUnc;
-    }
-
-    public static Boolean getHasDist() {
-        return hasDist;
-    }
-
     private void init() {
         this.addComponents(createContentAccordion(), createButtonsLayout());
         uploadPanel.getDataSelectionDatabaseButton().setEnabled(false);
@@ -158,19 +150,19 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         tmpResultPath = tmpPath + username + "/tmp_result.txt";
         tmpDownloadPath = tmpPath + username + "/tmp_download.txt";
         tmpAllelesPath = tmpPath + username + "/tmp_alleles.txt";
-        try {
-            Files.deleteIfExists(Paths.get(allelePath));
-            Files.deleteIfExists(Paths.get(excludePath));
-            Files.deleteIfExists(Paths.get(includePath));
-            Files.deleteIfExists(Paths.get(outputPath));
-            Files.deleteIfExists(Paths.get(tmpDownloadPath));
-            Files.deleteIfExists(Paths.get(inputPath));
-            Files.deleteIfExists(Paths.get(tmpResultPath));
-            Files.deleteIfExists(Paths.get(tmpAllelesPath));
-        } catch (IOException e) {
-            MyPortletUI.logger.error("File System error: Old files could not be deleted");
-            e.printStackTrace();
-        }
+//        try {
+//            Files.deleteIfExists(Paths.get(allelePath));
+//            Files.deleteIfExists(Paths.get(excludePath));
+//            Files.deleteIfExists(Paths.get(includePath));
+//            Files.deleteIfExists(Paths.get(outputPath));
+//            Files.deleteIfExists(Paths.get(tmpDownloadPath));
+//            Files.deleteIfExists(Paths.get(inputPath));
+//            Files.deleteIfExists(Paths.get(tmpResultPath));
+//            Files.deleteIfExists(Paths.get(tmpAllelesPath));
+//        } catch (IOException e) {
+//            MyPortletUI.logger.error("File System error: Old files could not be deleted");
+//            e.printStackTrace();
+//        }
     }
 
     private void initDatabase() {
@@ -492,18 +484,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 String immCol = uploadPanel.getImmColTf().getValue();
                 p.add(immCol);
 
-                String distCol = uploadPanel.getDistanceColTf().getValue();
-                if (!distCol.equals("")) {
-                    p.add("-d");
-                    p.add(uploadPanel.getDistanceColTf().getValue());
-                }
-
-                String uncCol = uploadPanel.getUncertaintyColTf().getValue();
-                if (!uncCol.equals("")) {
-                    p.add("-u");
-                    p.add(uploadPanel.getUncertaintyColTf().getValue());
-                }
-
                 String taaCol = uploadPanel.getTaaColTf().getValue();
                 if (!taaCol.equals("")) {
                     p.add("-taa");
@@ -552,7 +532,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
                 // writes alleles.txt, include.txt and exclude.txt
                 try {
-                    inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(), uploadPanel.getAllele_expressions(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue());
+                    inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(), uploadPanel.getAllele_expressions(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue());
                 } catch (IOException e) {
                     Utils.notification("Error!",
                             dh.getWriteInputError(), "error");
@@ -628,19 +608,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         if (!uploadPanel.getHlaAsColumns()) {
             ParserInputAllelesAsRows parser = new ParserInputAllelesAsRows();
             parser.parse(file, uploadPanel.getMethodColTf().getValue(),
-                    uploadPanel.getImmColTf().getValue(),
-                    uploadPanel.getUncertaintyColTf().getValue(),
-                    uploadPanel.getDistanceColTf().getValue(),
-                    uploadPanel.getTaaColTf().getValue());
-            if (!parser.checkAlleles(uploadPanel.getAlleles())){
-                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
-            }
+                    uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getAlleles());
+//            if (!parser.checkAlleles(uploadPanel.getAlleles())){
+//                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
+//            }
             hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
-            hasDist = parser.getHasDist();
-            hasUnc = parser.getHasUnc();
-            epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-                    uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles());
+            epitopeSelectionPanel.setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles());
             maxLength = parser.getMaxLength();
             if (uploadPanel.getTaaColTf().getValue().equals("")) {
                 epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -666,28 +640,28 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             }
         }
 
-        String distCol = uploadPanel.getDistanceColTf().getValue();
-        String uncCol = uploadPanel.getUncertaintyColTf().getValue();
-        if ((!uncCol.equals("")) || (!distCol.equals(""))) {
-            epitopeSelectionPanel.joinHeader();
-        }
-
-        if (distCol.equals("")) {
-            epitopeSelectionPanel.getDataGrid().removeColumn("distanceA1");
-            epitopeSelectionPanel.getDataGrid().removeColumn("distanceA2");
-            epitopeSelectionPanel.getDataGrid().removeColumn("distanceB1");
-            epitopeSelectionPanel.getDataGrid().removeColumn("distanceB2");
-            epitopeSelectionPanel.getDataGrid().removeColumn("distanceC1");
-            epitopeSelectionPanel.getDataGrid().removeColumn("distanceC2");
-        }
-        if (uncCol.equals("")) {
-            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA1");
-            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA2");
-            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB1");
-            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB2");
-            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC1");
-            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC2");
-        }
+//        String distCol = uploadPanel.getDistanceColTf().getValue();
+//        String uncCol = uploadPanel.getUncertaintyColTf().getValue();
+//        if ((!uncCol.equals("")) || (!distCol.equals(""))) {
+//            epitopeSelectionPanel.joinHeader();
+//        }
+//
+//        if (distCol.equals("")) {
+//            epitopeSelectionPanel.getDataGrid().removeColumn("distanceA1");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("distanceA2");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("distanceB1");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("distanceB2");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("distanceC1");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("distanceC2");
+//        }
+//        if (uncCol.equals("")) {
+//            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA1");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyA2");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB1");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyB2");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC1");
+//            epitopeSelectionPanel.getDataGrid().removeColumn("uncertaintyC2");
+//        }
 
         contentAccordion.getTab(epitopeSelectionPanel).setEnabled(true);
         contentAccordion.getTab(uploadPanel).setStyleName("upload-succeeded");
@@ -739,6 +713,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             try {
                 try {
                     Process mkdir_random = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir " + tmpPathRemote + random);
+                    System.out.println("ssh -i " + homePath + ".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir " + tmpPathRemote + random);
                     mkdir_random.waitFor();
                     scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM + random);
                     scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM + random);
@@ -768,12 +743,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 if (0 == proc.waitFor()) {
                     proc.destroyForcibly();
                     prepareResults();
-                    cleanFiles();
+                    //cleanFiles();
                     loadingWindow.success();
                 } else {
                     proc.destroyForcibly();
                     loadingWindow.failure();
-                    cleanFiles();
+                    //cleanFiles();
                 }
             } catch (IOException e) {
                 MyPortletUI.logger.error("NeoOptiTope could not be found");
@@ -790,6 +765,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         loadingWindow.getCancelBu().addClickListener((ClickListener) event -> {
             t.interrupt();
             proc.destroyForcibly();
+            cleanFiles();
             loadingWindow.close();
         });
 

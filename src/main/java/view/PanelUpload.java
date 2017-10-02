@@ -271,21 +271,21 @@ public class PanelUpload extends CustomComponent {
         immColTf.setRequired(true);
 
         // distance column
-        distanceColTf = new TextField("Distance Column");
-        distanceColTf.setStyleName("padded");
-        distanceColTf.setImmediate(true);
-        distanceColTf.setValue("");
-        distanceColTf.setDescription(dh.getUploadData_columnDistance());
+//        distanceColTf = new TextField("Distance Column");
+//        distanceColTf.setStyleName("padded");
+//        distanceColTf.setImmediate(true);
+//        distanceColTf.setValue("");
+//        distanceColTf.setDescription(dh.getUploadData_columnDistance());
 
         // uncertainty column
-        uncertaintyColTf = new TextField("Uncertainty Column");
-        uncertaintyColTf.setStyleName("padded");
-        uncertaintyColTf.setImmediate(true);
-        uncertaintyColTf.setValue("");
-        uncertaintyColTf.setDescription(dh.getUploadData_columnUncertainty());
+//        uncertaintyColTf = new TextField("Uncertainty Column");
+//        uncertaintyColTf.setStyleName("padded");
+//        uncertaintyColTf.setImmediate(true);
+//        uncertaintyColTf.setValue("");
+//        uncertaintyColTf.setDescription(dh.getUploadData_columnUncertainty());
 
         columnTFLayout.setStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-        columnTFLayout.addComponents(methodColTf, taaColTf, distanceColTf, uncertaintyColTf, immColTf);
+        columnTFLayout.addComponents(methodColTf, taaColTf, immColTf);
 
         allColumnLayout.addComponents(description, columnTFLayout);
         return allColumnLayout;
@@ -560,8 +560,6 @@ public class PanelUpload extends CustomComponent {
         rowImage.addClickListener((MouseEvents.ClickListener) event -> {
             hlaAsColumns = false;
             immColTf.setVisible(true);
-            distanceColTf.setVisible(true);
-            uncertaintyColTf.setVisible(true);
             colLayout.addStyleName("notselected");
             rowLayout.removeStyleName("notselected");
         });
@@ -570,13 +568,10 @@ public class PanelUpload extends CustomComponent {
         colImage.addClickListener((MouseEvents.ClickListener) event -> {
             hlaAsColumns = true;
             immColTf.setVisible(false);
-            distanceColTf.setValue("");
-            distanceColTf.setVisible(false);
-            uncertaintyColTf.setValue("");
-            uncertaintyColTf.setVisible(false);
             colLayout.removeStyleName("notselected");
             rowLayout.addStyleName("notselected");
         });
+        colImage.setWidth("40%");
         colImage.setWidth("40%");
         rowImage.setWidth("40%");
         colLayout.addComponent(colImage);

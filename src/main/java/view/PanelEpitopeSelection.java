@@ -75,13 +75,12 @@ public class PanelEpitopeSelection extends CustomComponent {
      * @param container bean item container including all epitope selection beans representing a
      *                  neopeptide of the uploaded input data
      */
-    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn, String[] alleles) {
+    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn, String[] alleleNames) {
         this.container = container;
         this.setMethodColumn(methodColumn);
         dataGrid.setSizeFull();
 
         // Set Allele Names for Headers
-        String[] alleleNames = alleles;
         hlaA1 = alleleNames[0];
         hlaA2 = alleleNames[1];
         hlaB1 = alleleNames[2];
@@ -94,14 +93,8 @@ public class PanelEpitopeSelection extends CustomComponent {
         dataGrid.setContainerDataSource(container);
 
         // adjust grid
-        dataGrid.setColumnOrder("included", "excluded", "neopeptide", "type", "length", "mutation",
-                "gene", "transcript", "transcriptExpression", "hlaA1", "distanceA1", "uncertaintyA1",
-                "hlaA2", "distanceA2", "uncertaintyA2", "hlaB1", "distanceB1", "uncertaintyB1", "hlaB2",
-                "distanceB2", "uncertaintyB2", "hlaC1", "distanceC1", "uncertaintyC1", "hlaC2",
-                "distanceC2", "uncertaintyC2");
+        dataGrid.setColumnOrder("included", "excluded", "neopeptide", "type", "length", "mutation", "gene", "transcript", "transcriptExpression", "hlaA1", "hlaA2", "hlaB1",  "hlaB2", "hlaC1",  "hlaC2");
         dataGrid.removeColumn("imm");
-        dataGrid.removeColumn("dist");
-        dataGrid.removeColumn("unc");
         dataGrid.setEditorEnabled(true);
         dataGrid.setEditorBuffered(false);
         dataGrid.setSelectionMode(SelectionMode.NONE);
@@ -127,30 +120,30 @@ public class PanelEpitopeSelection extends CustomComponent {
         dataGrid.getColumn("hlaC1").setHeaderCaption(hlaC1);
         dataGrid.getColumn("hlaC2").setEditable(false);
         dataGrid.getColumn("hlaC2").setHeaderCaption(hlaC2);
-        dataGrid.getColumn("distanceA1").setEditable(false);
-        dataGrid.getColumn("distanceA1").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceA2").setEditable(false);
-        dataGrid.getColumn("distanceA2").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceB1").setEditable(false);
-        dataGrid.getColumn("distanceB1").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceB2").setEditable(false);
-        dataGrid.getColumn("distanceB2").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceC1").setEditable(false);
-        dataGrid.getColumn("distanceC1").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceC2").setEditable(false);
-        dataGrid.getColumn("distanceC2").setHeaderCaption("Distance");
-        dataGrid.getColumn("uncertaintyA1").setEditable(false);
-        dataGrid.getColumn("uncertaintyA1").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyA2").setEditable(false);
-        dataGrid.getColumn("uncertaintyA2").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyB1").setEditable(false);
-        dataGrid.getColumn("uncertaintyB1").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyB2").setEditable(false);
-        dataGrid.getColumn("uncertaintyB2").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyC1").setEditable(false);
-        dataGrid.getColumn("uncertaintyC1").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyC2").setEditable(false);
-        dataGrid.getColumn("uncertaintyC2").setHeaderCaption("Uncertainty");
+//        dataGrid.getColumn("distanceA1").setEditable(false);
+//        dataGrid.getColumn("distanceA1").setHeaderCaption("Distance");
+//        dataGrid.getColumn("distanceA2").setEditable(false);
+//        dataGrid.getColumn("distanceA2").setHeaderCaption("Distance");
+//        dataGrid.getColumn("distanceB1").setEditable(false);
+//        dataGrid.getColumn("distanceB1").setHeaderCaption("Distance");
+//        dataGrid.getColumn("distanceB2").setEditable(false);
+//        dataGrid.getColumn("distanceB2").setHeaderCaption("Distance");
+//        dataGrid.getColumn("distanceC1").setEditable(false);
+//        dataGrid.getColumn("distanceC1").setHeaderCaption("Distance");
+//        dataGrid.getColumn("distanceC2").setEditable(false);
+//        dataGrid.getColumn("distanceC2").setHeaderCaption("Distance");
+//        dataGrid.getColumn("uncertaintyA1").setEditable(false);
+//        dataGrid.getColumn("uncertaintyA1").setHeaderCaption("Uncertainty");
+//        dataGrid.getColumn("uncertaintyA2").setEditable(false);
+//        dataGrid.getColumn("uncertaintyA2").setHeaderCaption("Uncertainty");
+//        dataGrid.getColumn("uncertaintyB1").setEditable(false);
+//        dataGrid.getColumn("uncertaintyB1").setHeaderCaption("Uncertainty");
+//        dataGrid.getColumn("uncertaintyB2").setEditable(false);
+//        dataGrid.getColumn("uncertaintyB2").setHeaderCaption("Uncertainty");
+//        dataGrid.getColumn("uncertaintyC1").setEditable(false);
+//        dataGrid.getColumn("uncertaintyC1").setHeaderCaption("Uncertainty");
+//        dataGrid.getColumn("uncertaintyC2").setEditable(false);
+//        dataGrid.getColumn("uncertaintyC2").setHeaderCaption("Uncertainty");
         dataGrid.getDefaultHeaderRow().getCell("included").setHtml("<font color='#2c972'>" + FontAwesome.CHECK_CIRCLE.getHtml() + "</font>");
         dataGrid.getDefaultHeaderRow().getCell("excluded").setHtml("<font color='#ed473b'>" +FontAwesome.TIMES_CIRCLE.getHtml()+ "</font>");
         dataGrid.getDefaultHeaderRow().setStyleName(ValoTheme.LABEL_BOLD);

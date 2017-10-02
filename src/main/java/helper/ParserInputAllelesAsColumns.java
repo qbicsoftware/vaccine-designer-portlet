@@ -205,12 +205,20 @@ public class ParserInputAllelesAsColumns {
                 newBean.setExcluded(false);
                 newBean.setNeopeptide(peptide);
                 try {
+                    HashMap<String, String> imm = new HashMap<>();
+                    imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele));
+                    imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele));
+                    imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele));
+                    imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele));
+                    imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele));
+                    imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele));
                     newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
                     newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
                     newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
                     newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
                     newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
                     newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
+                    newBean.setImm(imm);
                 } catch (NumberFormatException e) {
                     MyPortletUI.logger.error("Some of the peptides do not have valid entries");
                 }

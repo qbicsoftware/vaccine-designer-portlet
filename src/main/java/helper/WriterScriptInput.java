@@ -24,6 +24,7 @@ public class WriterScriptInput {
     private BufferedWriter inputWriter, includeWriter, excludeWriter, allelesWriter;
     private ArrayList<String> includedBeans, excludedBeans;
     private String type, uncertainty, distance, imm, inputPath, allelePath, includePath, excludePath;
+    private DescriptionHandler dh = new DescriptionHandler();
 
     /**
      * Constructor
@@ -42,11 +43,9 @@ public class WriterScriptInput {
      * @param container bean item container containing all neopeptides from the uploaded input file.
      * @throws IOException
      */
-    public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String imm, String type, String uncertainty, String distance) throws IOException {
+    public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String imm, String type) throws IOException {
         this.imm = imm;
         this.type = type;
-        this.uncertainty = uncertainty;
-        this.distance = distance;
         inputWriter = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(inputPath), "utf-8"));
         allelesWriter = new BufferedWriter(new OutputStreamWriter(
@@ -82,6 +81,8 @@ public class WriterScriptInput {
         excludeWriter.close();
 
         writeInputFile(container);
+
+
     }
 
     /**
@@ -96,12 +97,7 @@ public class WriterScriptInput {
         if (!type.equals("") && LayoutMain.getHasType()) {
             header += ("\t" + type);
         }
-        if (!uncertainty.equals("") && LayoutMain.getHasUnc()) {
-            header += ("\t" + uncertainty);
-        }
-        if (!distance.equals("") && LayoutMain.getHasDist()) {
-            header += ("\t" + distance);
-        }
+
         inputWriter.write(header);
         inputWriter.newLine();
         for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext(); ) {
@@ -110,12 +106,6 @@ public class WriterScriptInput {
                 String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
                 if (!type.equals("") && LayoutMain.getHasType()) {
                     peptide += ("\t" + bean.getType());
-                }
-                if (!uncertainty.equals("") && LayoutMain.getHasUnc()) {
-                    peptide += ("\t" + bean.getUnc().get(key));
-                }
-                if (!distance.equals("") && LayoutMain.getHasDist()) {
-                    peptide += ("\t" + bean.getDist().get(key));
                 }
                 inputWriter.write(peptide);
                 inputWriter.newLine();
@@ -168,13 +158,6 @@ public class WriterScriptInput {
                 allele_expressions.get("A") + "\t" +
                 allele_expressions.get("B") + "\t" +
                 allele_expressions.get("C") + "\t";
-        MyPortletUI.logger.info(alleles.get("A1"));
-        MyPortletUI.logger.info(alleles.get("A2"));
-        MyPortletUI.logger.info(alleles.get("B1"));
-        MyPortletUI.logger.info(alleles.get("B2"));
-        MyPortletUI.logger.info(alleles.get("C1"));
-        MyPortletUI.logger.info(alleles.get("C2"));
-
         return alleleString;
     }
 

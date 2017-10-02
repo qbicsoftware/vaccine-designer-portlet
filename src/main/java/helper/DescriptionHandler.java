@@ -76,8 +76,15 @@ public class DescriptionHandler {
     private String computationError = "The epitope selection on our server was interrupted. Please try again.";
     private String saveButtonDescription = "Save result file on your computer";
 
+    // WriteScriptInput
+    private String dataMissing = "Some data of the epitopes is missing. Please make sure to select a method with no missing entries in the table.";
+
     public DescriptionHandler() {
 
+    }
+
+    public String getDataMissing() {
+        return dataMissing;
     }
 
     public String getUploadData_selectUpload() {
