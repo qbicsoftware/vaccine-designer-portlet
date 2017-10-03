@@ -22,6 +22,7 @@ public class DescriptionHandler {
     private String uploadData_columnUncertainty = "Column name of prediction uncertainty.";
     private String uploadData_columnDistance = "Column name of distance-to-self calculation.";
     private String uploadData_columnTAA = "Column name specifying whether the peptide is a TAA or TSA (if not specified all peptides are assumed to be TSAs).";
+    private String uploadData_columnTranscriptExpression = "Column name specifying the transcript expression.";
 
     // PanelEpitopeSelection
     private String epitopeSelection = "Select the <b>peptide sequences</b> you would like to <b><font color='#ed473b'>exclude</font></b> or <b><font color='#2c972'>include</font></b> in your final solution. Double click on the corresponding peptide and check one of the boxes. Click next to continue with the parameter settings.";
@@ -81,6 +82,10 @@ public class DescriptionHandler {
 
     public DescriptionHandler() {
 
+    }
+
+    public String getUploadData_columnTranscriptExpression() {
+        return uploadData_columnTranscriptExpression;
     }
 
     public String getDataMissing() {

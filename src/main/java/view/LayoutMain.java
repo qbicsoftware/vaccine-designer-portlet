@@ -608,13 +608,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         if (!uploadPanel.getHlaAsColumns()) {
             ParserInputAllelesAsRows parser = new ParserInputAllelesAsRows();
             parser.parse(file, uploadPanel.getMethodColTf().getValue(),
-                    uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getAlleles());
+                    uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(), uploadPanel.getAlleles());
 //            if (!parser.checkAlleles(uploadPanel.getAlleles())){
 //                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
 //            }
-            hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
-            epitopeSelectionPanel.setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles());
+            hasDist = parser.getHasDist();
+            hasUnc = parser.getHasUnc();
+            epitopeSelectionPanel.setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasUnc, hasDist);
             maxLength = parser.getMaxLength();
             if (uploadPanel.getTaaColTf().getValue().equals("")) {
                 epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -628,10 +629,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             if (!parser.checkAlleles(uploadPanel.getAlleles())){
                 throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
             }
-            hasMethod = parser.getHasMethod();
             hasType = parser.getHasType();
+            hasDist = false;
+            hasUnc = false;
             epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-                    uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles());
+                    uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasUnc, hasDist);
             maxLength = parser.getMaxLength();
             if (uploadPanel.getTaaColTf().getValue().equals("")) {
                 epitopeSelectionPanel.getDataGrid().removeColumn("type");

@@ -13,8 +13,8 @@ import java.util.HashMap;
 public class EpitopeSelectionBean {
 
     private String neopeptide, transcript, mutation, gene, type, method;
-    private HashMap<String, String> imm;
-    private Float hlaA1, hlaA2, hlaB1, hlaB2, hlaC1, hlaC2, transcriptExpression;
+    private HashMap<String, String> imm, dist, unc;
+    private Float hlaA1, hlaA2, hlaB1, hlaB2, hlaC1, hlaC2, distA1, distA2, distB1, distB2, distC1, distC2, uncA1, uncA2, uncB1, uncB2, uncC1, uncC2, transcriptExpression;
     private int length;
     private Boolean included, excluded;
 
@@ -189,7 +189,116 @@ public class EpitopeSelectionBean {
         this.imm = alleleImmunigenicities;
     }
 
+    public HashMap<String, String> getDist() {
+        return dist;
+    }
 
+    public void setDist(HashMap<String, String> dist) {
+        this.dist = dist;
+    }
 
+    public HashMap<String, String> getUnc() {
+        return unc;
+    }
+
+    public void setUnc(HashMap<String, String> unc) {
+        this.unc = unc;
+    }
+
+    public Float getDistA1() {
+        return distA1;
+    }
+
+    public void setDistA1(Float distA1) {
+        this.distA1 = distA1;
+    }
+
+    public Float getDistA2() {
+        return distA2;
+    }
+
+    public void setDistA2(Float distA2) {
+        this.distA2 = distA2;
+    }
+
+    public Float getDistB1() {
+        return distB1;
+    }
+
+    public void setDistB1(Float distB1) {
+        this.distB1 = distB1;
+    }
+
+    public Float getDistB2() {
+        return distB2;
+    }
+
+    public void setDistB2(Float distB2) {
+        this.distB2 = distB2;
+    }
+
+    public Float getDistC1() {
+        return distC1;
+    }
+
+    public void setDistC1(Float distC1) {
+        this.distC1 = distC1;
+    }
+
+    public Float getDistC2() {
+        return distC2;
+    }
+
+    public void setDistC2(Float distC2) {
+        this.distC2 = distC2;
+    }
+
+    public Float getUncA1() {
+        return uncA1;
+    }
+
+    public void setUncA1(Float uncA1) {
+        this.uncA1 = uncA1;
+    }
+
+    public Float getUncA2() {
+        return uncA2;
+    }
+
+    public void setUncA2(Float uncA2) {
+        this.uncA2 = uncA2;
+    }
+
+    public Float getUncB1() {
+        return uncB1;
+    }
+
+    public void setUncB1(Float uncB1) {
+        this.uncB1 = uncB1;
+    }
+
+    public Float getUncB2() {
+        return uncB2;
+    }
+
+    public void setUncB2(Float uncB2) {
+        this.uncB2 = uncB2;
+    }
+
+    public Float getUncC1() {
+        return uncC1;
+    }
+
+    public void setUncC1(Float uncC1) {
+        this.uncC1 = uncC1;
+    }
+
+    public Float getUncC2() {
+        return uncC2;
+    }
+
+    public void setUncC2(Float uncC2) {
+        this.uncC2 = uncC2;
+    }
 }
 
