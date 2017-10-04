@@ -685,6 +685,10 @@ public class PanelUpload extends CustomComponent {
         return alleleFileSelectionCB;
     }
 
+    public TextField getTranscriptExpressionColTf() {
+        return transcriptExpressionColTf;
+    }
+
     public Boolean isHlalValid() {
         Boolean isAllValid;
         if (hlaA1TF.isValid() && hlaA2TF.isValid() && hlaB1TF.isValid() && hlaB2TF.isValid() && hlaC1TF.isValid() && hlaC2TF.isValid()) {

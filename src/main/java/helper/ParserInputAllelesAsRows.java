@@ -23,7 +23,7 @@ public class ParserInputAllelesAsRows {
     ;
     private int method, mutation, gene, transcript, transcriptExpression, neopeptide, hla,
             hla1BindingPrediction, uncertainty, distance, type, maxLength;
-    private String methodCol, immCol, uncertaintyCol, distanceCol, typeCol;
+    private String methodCol, immCol, uncertaintyCol, distanceCol, typeCol, transcriptExpressionCol;
     private HashMap<String, HashMap<String, HashMap<String, String>>> peptides;
     private BufferedReader brReader;
     private File file;
@@ -45,7 +45,7 @@ public class ParserInputAllelesAsRows {
      * @param typeCol        name of the type column
      * @throws IOException
      */
-    public void parse(File file, String methodCol, String immCol, String typeCol, String uncertaintyCol, String distanceCol, HashMap<String, String> allelesNames) throws Exception {
+    public void parse(File file, String methodCol, String immCol, String typeCol, String uncertaintyCol, String distanceCol, String transcriptExpressionCol, HashMap<String, String> allelesNames) throws Exception {
 
         this.immCol = immCol;
 
@@ -53,6 +53,8 @@ public class ParserInputAllelesAsRows {
         this.methodCol = methodCol;
         this.uncertaintyCol = uncertaintyCol;
         this.distanceCol = distanceCol;
+        this.transcriptExpressionCol = transcriptExpressionCol;
+
         this.file = file;
         this.alleleNames = allelesNames;
         hlaA1allele = allelesNames.get("A1");
@@ -87,6 +89,7 @@ public class ParserInputAllelesAsRows {
         hasType = false;
         hasDist = false;
         hasUnc = false;
+        hasTranscriptExpression = false;
         // for each tab separated header set the corresponding field to the counters value and set
         // counter + 1
 
@@ -100,10 +103,6 @@ public class ParserInputAllelesAsRows {
             } else if (h.equalsIgnoreCase("transcript") || h.equals("transcripts")) {
                 transcript = counter;
                 counter = counter + 1;
-            } else if (h.equalsIgnoreCase("transcript_expression")) {
-                transcriptExpression = counter;
-                counter = counter + 1;
-                hasTranscriptExpression = true;
             } else if (h.equalsIgnoreCase("neopeptide") || h.equalsIgnoreCase("mut_pep") || h.equalsIgnoreCase("peptide")) {
                 neopeptide = counter;
                 counter = counter + 1;
@@ -116,21 +115,26 @@ public class ParserInputAllelesAsRows {
                 hla1BindingPrediction = counter;
                 counter = counter + 1;
                 // just if a column name was given:
-            } else if (!typeCol.equals("") && h.equals(typeCol)) {
+            } else if (!typeCol.equals("") && h.equalsIgnoreCase(typeCol)) {
                 type = counter;
                 counter = counter + 1;
-            } else if (!methodCol.equals("") && h.equals(methodCol)) {
+                hasType = true;
+            } else if (!methodCol.equals("") && h.equalsIgnoreCase(methodCol)) {
                 method = counter;
                 counter = counter + 1;
                 hasMethod = true;
-            } else if (!uncertaintyCol.equals("") && h.equals(uncertaintyCol)) {
+            } else if (!uncertaintyCol.equals("") && h.equalsIgnoreCase(uncertaintyCol)) {
                 uncertainty = counter;
                 counter = counter + 1;
                 hasUnc = true;
-            } else if (!distanceCol.equals("") && h.equals(distanceCol)) {
+            } else if (!distanceCol.equals("") && h.equalsIgnoreCase(distanceCol)) {
                 distance = counter;
                 counter = counter + 1;
                 hasDist = true;
+            } else if (!transcriptExpressionCol.equals("") && h.equalsIgnoreCase(transcriptExpressionCol)) {
+                transcriptExpression = counter;
+                counter = counter + 1;
+                hasTranscriptExpression = true;
                 // if another header is found, ignore it at set counter + 1
             } else {
                 counter = counter + 1;
@@ -170,7 +174,7 @@ public class ParserInputAllelesAsRows {
                 if (!(typeCol.equals("")) && hasType) {
                     valuesMap.put("type", columns[type]);
                 }
-                if (hasTranscriptExpression) {
+                if (!(transcriptExpressionCol.equals("")) && hasTranscriptExpression) {
                     valuesMap.put("transcriptExpression", columns[transcriptExpression]);
                 }
                 peptides.get(columns[neopeptide]).put(columns[method], valuesMap);
@@ -190,7 +194,7 @@ public class ParserInputAllelesAsRows {
                 if (!(typeCol.equals("")) && hasType) {
                     valuesAddMap.put("type", columns[type]);
                 }
-                if (hasTranscriptExpression) {
+                if (!(transcriptExpressionCol.equals("")) && hasTranscriptExpression) {
                     valuesAddMap.put("transcriptExpression", columns[transcriptExpression]);
                 }
                 peptides.get(columns[neopeptide]).put(columns[method], valuesAddMap);
@@ -235,7 +239,7 @@ public class ParserInputAllelesAsRows {
                             newBean.setDistA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Dist")));
                         }
                     if (!(uncertaintyCol.equals("")) && hasUnc) {
-                            dist.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Unc"));
+                            unc.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Unc"));
                             newBean.setUncA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Unc")));
                         }
 
@@ -248,7 +252,7 @@ public class ParserInputAllelesAsRows {
                         newBean.setDistA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Dist")));
                     }
                     if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        dist.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Unc"));
+                        unc.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Unc"));
                         newBean.setUncA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Unc")));
                     }
 
@@ -261,7 +265,7 @@ public class ParserInputAllelesAsRows {
                         newBean.setDistB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Dist")));
                     }
                     if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        dist.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Unc"));
+                        unc.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Unc"));
                         newBean.setUncB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Unc")));
                     }
 
@@ -274,7 +278,7 @@ public class ParserInputAllelesAsRows {
                         newBean.setDistB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Dist")));
                     }
                     if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        dist.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Unc"));
+                        unc.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Unc"));
                         newBean.setUncB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Unc")));
                     }
 
@@ -287,7 +291,7 @@ public class ParserInputAllelesAsRows {
                         newBean.setDistC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Dist")));
                     }
                     if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        dist.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Unc"));
+                        unc.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Unc"));
                         newBean.setUncC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Unc")));
                     }
 
@@ -300,7 +304,7 @@ public class ParserInputAllelesAsRows {
                         newBean.setDistC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Dist")));
                     }
                     if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        dist.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Unc"));
+                        unc.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Unc"));
                         newBean.setUncC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Unc")));
                     }
 
@@ -321,7 +325,7 @@ public class ParserInputAllelesAsRows {
                     newBean.setMutation(peptides.get(peptide).get(method).get("mutation"));
                     newBean.setGene(peptides.get(peptide).get(method).get("gene"));
                     newBean.setTranscript(peptides.get(peptide).get(method).get("transcript"));
-                    if (hasTranscriptExpression) {
+                    if (!(transcriptExpressionCol.equals("")) && hasTranscriptExpression) {
                         newBean.setTranscriptExpression(Float.parseFloat(peptides.get(peptide).get(method).get("transcriptExpression")));
                     } else {
                         newBean.setTranscriptExpression(1f);
@@ -419,5 +423,7 @@ public class ParserInputAllelesAsRows {
         return alleles;
     }
 
-
+    public Boolean getHasTranscriptExpression() {
+        return hasTranscriptExpression;
+    }
 }

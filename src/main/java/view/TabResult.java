@@ -36,6 +36,7 @@ public class TabResult extends VerticalLayout {
     private Filterable filterable;
     private String[] alleles;
     private TabSheet optionTab;
+    private Boolean hasDist;
 
     /**
      * constructor, sets up a layout with a tab sheet if more than one solution was foung in the
@@ -45,8 +46,9 @@ public class TabResult extends VerticalLayout {
      *                    solutions
      * @param alleles     alleles stored in an array
      */
-    public TabResult(BeanItemContainer<ResultBean> resultBeans, String[] alleles) {
+    public TabResult(BeanItemContainer<ResultBean> resultBeans, String[] alleles, Boolean hasDist) {
         this.alleles = alleles;
+        this.hasDist = hasDist;
         this.setSpacing(true);
         optionTab = new TabSheet();
 
@@ -296,17 +298,25 @@ public class TabResult extends VerticalLayout {
         resultGrid.getColumn("immB2").setHeaderCaption(alleles[4]);
         resultGrid.getColumn("immC1").setHeaderCaption(alleles[2]);
         resultGrid.getColumn("immC2").setHeaderCaption(alleles[5]);
-        resultGrid.removeColumn("distA1");
-        resultGrid.removeColumn("distA2");
-        resultGrid.removeColumn("distB1");
-        resultGrid.removeColumn("distB2");
-        resultGrid.removeColumn("distC1");
-        resultGrid.removeColumn("distC2");
+        if (hasDist) {
+            joinHeader();
+        } else {
+            resultGrid.removeColumn("distA1");
+            resultGrid.removeColumn("distA2");
+            resultGrid.removeColumn("distB1");
+            resultGrid.removeColumn("distB2");
+            resultGrid.removeColumn("distC1");
+            resultGrid.removeColumn("distC2");
+            HeaderRow hlaHeader = resultGrid.prependHeaderRow();
+            HeaderCell hlaA1Cell = hlaHeader.join("immA1", "immA2", "immB1", "immB2", "immC1", "immC2");
+            hlaA1Cell.setText("Score");
+        }
+
         resultGrid.setEditorEnabled(false);
         resultGrid.setEditorBuffered(false);
         resultGrid.removeColumn("alleles");
         resultGrid.setSelectionMode(SelectionMode.NONE);
-        //joinHeader();
+
         resultGrid.setImmediate(true);
         resultGrid.setVisible(true);
 

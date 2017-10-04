@@ -23,7 +23,7 @@ public class ParserInputAllelesAsColumns {
     private String line;
     private int method, mutation, gene, transcript, transcriptExpression, neopeptide, hlaA1, hlaA2, hlaB1,
             hlaB2, hlaC1, hlaC2, type, maxLength;
-    private String methodCol, typeCol, hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele;
+    private String methodCol, typeCol, transcriptExpressionCol, hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele;
     private HashMap<String, HashMap<String, HashMap<String, String>>> peptides;
     private String[] alleleNames;
     private BufferedReader brReader;
@@ -45,10 +45,11 @@ public class ParserInputAllelesAsColumns {
      * @param typeCol name of the type column
      * @throws IOException
      */
-    public void parse(File file, String methodCol, String typeCol) throws IOException {
+    public void parse(File file, String methodCol, String typeCol, String transcriptExpressionCol) throws IOException {
 
         this.typeCol = typeCol;
         this.methodCol = methodCol;
+        this.transcriptExpressionCol = transcriptExpressionCol;
         this.file = file;
 
         // initialize bean item container for epitope selection beans
@@ -83,6 +84,9 @@ public class ParserInputAllelesAsColumns {
             if (!(methodCol.equals("")) && h.equals(methodCol)) {
                 hasMethod = true;
             }
+            if (!(transcriptExpressionCol.equals("") && h.equals(transcriptExpressionCol))) {
+                hasTranscriptExpression = true;
+            }
         }
 
     }
@@ -115,10 +119,6 @@ public class ParserInputAllelesAsColumns {
             } else if (h.equalsIgnoreCase("transcript") || h.equalsIgnoreCase("transcripts")) {
                 transcript = counter;
                 counter = counter + 1;
-            } else if (h.equalsIgnoreCase("transcript_expression")) {
-                transcriptExpression = counter;
-                counter = counter + 1;
-                hasTranscriptExpression = true;
             } else if (h.equalsIgnoreCase("sequence")) {
                 neopeptide = counter;
                 counter = counter + 1;
@@ -152,13 +152,16 @@ public class ParserInputAllelesAsColumns {
                 hlaC2allele = h.split(" ")[0];
                 counter = counter + 1;
                 // just if a column name was given:
-            } else if (!(typeCol.equals("")) && h.equals(typeCol)) {
+            } else if (!(typeCol.equals("")) && h.equals(typeCol) && hasType) {
                 type = counter;
                 counter = counter + 1;
-            } else if (!(methodCol.equals("")) && h.equals(methodCol)) {
+            } else if (!(methodCol.equals("")) && h.equals(methodCol) && hasMethod) {
                 method = counter;
                 counter = counter + 1;
                 // if another header is found, ignore it and set counter + 1
+            } else if (!(transcriptExpressionCol.equals("")) && h.equals(transcriptExpressionCol) && hasTranscriptExpression) {
+                transcriptExpression = counter;
+                counter = counter + 1;
             } else {
                 counter = counter + 1;
             }
@@ -235,7 +238,7 @@ public class ParserInputAllelesAsColumns {
                 newBean.setMutation(peptides.get(peptide).get(method).get("mutation"));
                 newBean.setGene(peptides.get(peptide).get(method).get("gene"));
                 newBean.setTranscript(peptides.get(peptide).get(method).get("transcript"));
-                if (hasTranscriptExpression) {
+                if (!(transcriptExpressionCol.equals("")) && hasTranscriptExpression) {
                     newBean.setTranscriptExpression(Float.parseFloat(peptides.get(peptide).get(method).get("transcriptExpression")));
                 } else {
                     newBean.setTranscriptExpression(1f);
@@ -299,7 +302,6 @@ public class ParserInputAllelesAsColumns {
         values.put("mutation", columns[mutation]);
         values.put("gene", columns[gene]);
         values.put("transcript", columns[transcript]);
-        values.put("transcriptExpression", columns[transcriptExpression]);
         values.put(hlaA1allele, columns[hlaA1]);
         values.put(hlaA2allele, columns[hlaA2]);
         values.put(hlaB1allele, columns[hlaB1]);
@@ -309,6 +311,9 @@ public class ParserInputAllelesAsColumns {
         // if type column exists also read type
         if (!(typeCol.equals("")) && hasType) {
             values.put("type", columns[type]);
+        }
+        if (!(transcriptExpressionCol.equals("") && hasTranscriptExpression)){
+            values.put("transcriptExpression", columns[transcriptExpression]);
         }
 
         return values;
@@ -331,6 +336,10 @@ public class ParserInputAllelesAsColumns {
 
     public String[] getAlleles() {
         return alleles;
+    }
+
+    public Boolean getHasTranscriptExpression() {
+        return hasTranscriptExpression;
     }
 }
 

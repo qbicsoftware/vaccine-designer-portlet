@@ -21,6 +21,7 @@ public class ParserScriptResult {
     private String line;
     private String[] alleles;
     private BufferedReader br;
+    private Boolean hasDist;
 
     /**
      * Constructor
@@ -34,9 +35,9 @@ public class ParserScriptResult {
      *
      * @param file output file of the epitope selection script
      */
-    public void parse(File file) {
+    public void parse(File file, Boolean hasDist) {
         resultBeans = new BeanItemContainer<>(ResultBean.class);
-
+        this.hasDist = hasDist;
         try {
 
             br = new BufferedReader(new FileReader(file));
@@ -176,28 +177,40 @@ public class ParserScriptResult {
             newBean.setMutations(es[3]);
             if (!es[5].equals("nan")) {
                 newBean.setImmA1(Float.parseFloat(es[5]));
+                if (hasDist) {
+                    newBean.setDistA1(Float.parseFloat(es[11]));
+                }
             }
             if (!es[6].equals("nan")) {
                 newBean.setImmB1(Float.parseFloat(es[6]));
+                if (hasDist) {
+                    newBean.setDistB1(Float.parseFloat(es[12]));
+                }
             }
             if (!es[7].equals("nan")) {
                 newBean.setImmC1(Float.parseFloat(es[7]));
+                if (hasDist) {
+                    newBean.setDistC1(Float.parseFloat(es[13]));
+                }
             }
             if (!es[8].equals("nan")) {
                 newBean.setImmA2(Float.parseFloat(es[8]));
+                if (hasDist) {
+                    newBean.setDistA2(Float.parseFloat(es[14]));
+                }
             }
             if (!es[9].equals("nan")) {
                 newBean.setImmB2(Float.parseFloat(es[9]));
+                if (hasDist) {
+                    newBean.setDistB2(Float.parseFloat(es[15]));
+                }
             }
             if (!es[10].equals("nan")) {
                 newBean.setImmC2(Float.parseFloat(es[10]));
+                if (hasDist) {
+                    newBean.setDistC2(Float.parseFloat(es[16]));
+                }
             }
-//            newBean.setDistA1(Float.parseFloat(es[11]));
-//            newBean.setDistA2(Float.parseFloat(es[12]));
-//            newBean.setDistB1(Float.parseFloat(es[13]));
-//            newBean.setDistB2(Float.parseFloat(es[14]));
-//            newBean.setDistC1(Float.parseFloat(es[15]));
-//            newBean.setDistC2(Float.parseFloat(es[16]));
 
             epitopeResultBeans.addBean(newBean);
             line = br.readLine();

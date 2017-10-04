@@ -24,7 +24,8 @@ public class WriterScriptInput {
 
     private BufferedWriter inputWriter, includeWriter, excludeWriter, allelesWriter;
     private ArrayList<String> includedBeans, excludedBeans;
-    private String type, uncertainty, distance, imm, inputPath, allelePath, includePath, excludePath;
+    private String type, unc, dist, imm, inputPath, allelePath, includePath, excludePath;
+    private Boolean hasTranscriptExpression, hasType, hasUnc, hasDist;
     private DescriptionHandler dh = new DescriptionHandler();
 
     /**
@@ -44,9 +45,15 @@ public class WriterScriptInput {
      * @param container bean item container containing all neopeptides from the uploaded input file.
      * @throws IOException
      */
-    public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String imm, String type) throws IOException {
+    public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String imm, String type, String unc, String dist, Boolean hasTranscriptExpression, Boolean hasType, Boolean hasUnc, Boolean hasDist) throws IOException {
         this.imm = imm;
         this.type = type;
+        this.unc = unc;
+        this.dist = dist;
+        this.hasTranscriptExpression = hasTranscriptExpression;
+        this.hasType = hasType;
+        this.hasUnc = hasUnc;
+        this.hasDist = hasDist;
         inputWriter = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(inputPath), "utf-8"));
         allelesWriter = new BufferedWriter(new OutputStreamWriter(
@@ -94,9 +101,16 @@ public class WriterScriptInput {
 
         // initialize buffered writer
         String header = "neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + imm + "\t" + "mutation";
-        if (!type.equals("") && LayoutMain.getHasType()) {
+        if (!type.equals("") && hasType) {
             header += ("\t" + type);
         }
+        if (!unc.equals("") && hasUnc) {
+            header += ("\t" + unc);
+        }
+        if (!dist.equals("") && hasDist) {
+            header += ("\t" + dist);
+        }
+        MyPortletUI.logger.info(header);
 
         inputWriter.write(header);
         inputWriter.newLine();
@@ -104,9 +118,15 @@ public class WriterScriptInput {
             EpitopeSelectionBean bean = i.next();
             for (String key : bean.getImm().keySet()) {
                     String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
-                    if (!type.equals("") && LayoutMain.getHasType()) {
+                if (!type.equals("") && hasType) {
                         peptide += ("\t" + bean.getType());
                     }
+                if (!unc.equals("") && hasUnc) {
+                    peptide += ("\t" + bean.getUnc().get(key));
+                }
+                if (!dist.equals("") && hasDist) {
+                    peptide += ("\t" + bean.getDist().get(key));
+                }
                     inputWriter.write(peptide);
                     inputWriter.newLine();
             }

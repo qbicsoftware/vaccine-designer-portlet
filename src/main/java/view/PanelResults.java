@@ -63,8 +63,8 @@ public class PanelResults extends CustomComponent {
      *                    selection script
      * @param alleles     alleles as an array
      */
-    public void addResultTab(BeanItemContainer<ResultBean> resultBeans, String[] alleles) {
-        TabResult tabResult = new TabResult(resultBeans, alleles);
+    public void addResultTab(BeanItemContainer<ResultBean> resultBeans, String[] alleles, Boolean hasDist) {
+        TabResult tabResult = new TabResult(resultBeans, alleles, hasDist);
         resultsTab.addTab(tabResult, "Result " + resultCounter);
         resultsTab.setStyleName(ValoTheme.TABSHEET_FRAMED);
         resultsTab.setSelectedTab(resultCounter - 1);

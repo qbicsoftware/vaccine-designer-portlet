@@ -40,7 +40,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     private BeanItemContainer<EpitopeSelectionBean> container;
     private String hlaA1, hlaA2, hlaB1, hlaB2, hlaC1, hlaC2;
     private HeaderRow header;
-    private TextField geneTf, neopeptideTf, lengthTf, mutationTf, transcriptTf, typeTf;
+    private TextField geneTf, neopeptideTf, lengthTf, mutationTf, transcriptTf, transcriptExpressionTf, typeTf;
     private Filterable filterable;
     private NativeSelect methodSelect;
     private String methodColumn;
@@ -75,7 +75,7 @@ public class PanelEpitopeSelection extends CustomComponent {
      * @param container bean item container including all epitope selection beans representing a
      *                  neopeptide of the uploaded input data
      */
-    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn, String[] alleleNames, boolean unc, boolean dist) {
+    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn, String[] alleleNames, boolean type, boolean transcriptExpression, boolean unc, boolean dist) {
         this.container = container;
         this.setMethodColumn(methodColumn);
         dataGrid.setSizeFull();
@@ -177,12 +177,23 @@ public class PanelEpitopeSelection extends CustomComponent {
         mutationTf.setSizeFull();
         transcriptTf = createFieldFilter(dataGrid.getColumn("transcript"));
         transcriptTf.setSizeFull();
-        typeTf = new TextField();
+        if (type) {
+            typeTf = createFieldFilter(dataGrid.getColumn("type"));
+            typeTf.setSizeFull();
+            setFilter(dataGrid.getColumn("transcriptExpression"), header, typeTf);
+        }
+        if (transcriptExpression) {
+            transcriptExpressionTf = createFieldFilter(dataGrid.getColumn("transcriptExpression"));
+            transcriptExpressionTf.setSizeFull();
+            setFilter(dataGrid.getColumn("transcriptExpression"), header, transcriptExpressionTf);
+        }
+
         setFilter(dataGrid.getColumn("neopeptide"), header, neopeptideTf);
         setFilter(dataGrid.getColumn("length"), header, lengthTf);
         setFilter(dataGrid.getColumn("gene"), header, geneTf);
         setFilter(dataGrid.getColumn("mutation"), header, mutationTf);
         setFilter(dataGrid.getColumn("transcript"), header, transcriptTf);
+
 
         HeaderCell selectionCell = header.join("included", "excluded");
         selectionCell.setText("Selection");
