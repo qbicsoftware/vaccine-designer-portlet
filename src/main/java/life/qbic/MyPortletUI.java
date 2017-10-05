@@ -68,6 +68,7 @@ public class MyPortletUI extends UI {
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
             Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
+            e.printStackTrace();
         }
 
         LayoutMain mainLayout;
@@ -87,7 +88,7 @@ public class MyPortletUI extends UI {
             }
 
             // initialize the View with sample types, spaces and the dictionaries of tissues and species
-            mainLayout = new LayoutMain(projects, openbis);
+            mainLayout = new LayoutMain(projects, openbis, success);
             setContent(mainLayout);
 
             logger.info("User \"" + userID + "\" connected to openBIS.");

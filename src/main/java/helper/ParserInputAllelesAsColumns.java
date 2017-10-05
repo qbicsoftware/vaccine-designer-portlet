@@ -282,16 +282,6 @@ public class ParserInputAllelesAsColumns {
         this.hasMethod = hasMethod;
     }
 
-    public Boolean checkAlleles(HashMap<String, String> alleles) {
-        Boolean allelesCorrect = true;
-        for (String allele : alleleNames) {
-            if (!alleles.containsValue(allele)) {
-                allelesCorrect = false;
-            }
-        }
-        return allelesCorrect;
-    }
-
     public HashMap<String, String> addValues(String[] columns) {
         HashMap<String, String> values = new HashMap<>();
         values.put("mutation", columns[mutation]);
