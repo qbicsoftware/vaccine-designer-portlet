@@ -231,84 +231,90 @@ public class ParserInputAllelesAsRows {
                     HashMap<String, String> imm = new HashMap<>();
                     HashMap<String, String> dist = new HashMap<>();
                     HashMap<String, String> unc = new HashMap<>();
-                if (peptides.get(peptide).get(method).get(hlaA1allele + " Score") != null) {
-                        imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Score"));
-                        newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Score")));
-                    if (!(distanceCol.equals("")) && hasDist) {
-                            dist.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Dist"));
-                            newBean.setDistA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Dist")));
+
+                    try {
+                        if (peptides.get(peptide).get(method).get(hlaA1allele + " Score") != null) {
+                            imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Score"));
+                            newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Score")));
+                            if (!(distanceCol.equals("")) && hasDist) {
+                                dist.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Dist"));
+                                newBean.setDistA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Dist")));
+                            }
+                            if (!(uncertaintyCol.equals("")) && hasUnc) {
+                                unc.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Unc"));
+                                newBean.setUncA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Unc")));
+                            }
+
                         }
-                    if (!(uncertaintyCol.equals("")) && hasUnc) {
-                            unc.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Unc"));
-                            newBean.setUncA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Unc")));
+                        if (peptides.get(peptide).get(method).get(hlaA2allele + " Score") != null) {
+                            imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Score"));
+                            newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Score")));
+                            if (!(distanceCol.equals("")) && hasDist) {
+                                dist.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Dist"));
+                                newBean.setDistA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Dist")));
+                            }
+                            if (!(uncertaintyCol.equals("")) && hasUnc) {
+                                unc.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Unc"));
+                                newBean.setUncA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Unc")));
+                            }
+
                         }
+                        if (peptides.get(peptide).get(method).get(hlaB1allele + " Score") != null) {
+                            imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Score"));
+                            newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Score")));
+                            if (!(distanceCol.equals("")) && hasDist) {
+                                dist.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Dist"));
+                                newBean.setDistB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Dist")));
+                            }
+                            if (!(uncertaintyCol.equals("")) && hasUnc) {
+                                unc.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Unc"));
+                                newBean.setUncB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Unc")));
+                            }
+
+                        }
+                        if (peptides.get(peptide).get(method).get(hlaB2allele + " Score") != null) {
+                            imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Score"));
+                            newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Score")));
+                            if (!(distanceCol.equals("")) && hasDist) {
+                                dist.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Dist"));
+                                newBean.setDistB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Dist")));
+                            }
+                            if (!(uncertaintyCol.equals("")) && hasUnc) {
+                                unc.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Unc"));
+                                newBean.setUncB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Unc")));
+                            }
+
+                        }
+                        if (peptides.get(peptide).get(method).get(hlaC1allele + " Score") != null) {
+                            imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Score"));
+                            newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Score")));
+                            if (!(distanceCol.equals("")) && hasDist) {
+                                dist.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Dist"));
+                                newBean.setDistC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Dist")));
+                            }
+                            if (!(uncertaintyCol.equals("")) && hasUnc) {
+                                unc.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Unc"));
+                                newBean.setUncC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Unc")));
+                            }
+
+                        }
+                        if (peptides.get(peptide).get(method).get(hlaC2allele + " Score") != null) {
+                            imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Score"));
+                            newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Score")));
+                            if (!(distanceCol.equals("")) && hasDist) {
+                                dist.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Dist"));
+                                newBean.setDistC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Dist")));
+                            }
+                            if (!(uncertaintyCol.equals("")) && hasUnc) {
+                                unc.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Unc"));
+                                newBean.setUncC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Unc")));
+                            }
+
+                        }
+                    } catch (NullPointerException e) {
 
                     }
-                if (peptides.get(peptide).get(method).get(hlaA2allele + " Score") != null) {
-                    imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Score"));
-                    newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Score")));
-                    if (!(distanceCol.equals("")) && hasDist) {
-                        dist.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Dist"));
-                        newBean.setDistA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Dist")));
-                    }
-                    if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        unc.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Unc"));
-                        newBean.setUncA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Unc")));
-                    }
 
-                }
-                if (peptides.get(peptide).get(method).get(hlaB1allele + " Score") != null) {
-                    imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Score"));
-                    newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Score")));
-                    if (!(distanceCol.equals("")) && hasDist) {
-                        dist.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Dist"));
-                        newBean.setDistB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Dist")));
-                    }
-                    if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        unc.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Unc"));
-                        newBean.setUncB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Unc")));
-                    }
-
-                }
-                if (peptides.get(peptide).get(method).get(hlaB2allele + " Score") != null) {
-                    imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Score"));
-                    newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Score")));
-                    if (!(distanceCol.equals("")) && hasDist) {
-                        dist.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Dist"));
-                        newBean.setDistB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Dist")));
-                    }
-                    if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        unc.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Unc"));
-                        newBean.setUncB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Unc")));
-                    }
-
-                }
-                if (peptides.get(peptide).get(method).get(hlaC1allele + " Score") != null) {
-                    imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Score"));
-                    newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Score")));
-                    if (!(distanceCol.equals("")) && hasDist) {
-                        dist.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Dist"));
-                        newBean.setDistC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Dist")));
-                    }
-                    if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        unc.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Unc"));
-                        newBean.setUncC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Unc")));
-                    }
-
-                }
-                if (peptides.get(peptide).get(method).get(hlaC2allele + " Score") != null) {
-                    imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Score"));
-                    newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Score")));
-                    if (!(distanceCol.equals("")) && hasDist) {
-                        dist.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Dist"));
-                        newBean.setDistC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Dist")));
-                    }
-                    if (!(uncertaintyCol.equals("")) && hasUnc) {
-                        unc.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Unc"));
-                        newBean.setUncC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Unc")));
-                    }
-
-                }
                     newBean.setImm(imm);
                     newBean.setDist(dist);
                     newBean.setUnc(unc);
@@ -339,17 +345,6 @@ public class ParserInputAllelesAsRows {
                 }
             }
     }
-//
-//    public Boolean checkAlleles(HashMap<String, String> alleles) {
-//        Boolean allelesCorrect = true;
-//        for (String allele : alleleNames) {
-//            System.out.println(allele);
-//            if (!alleles.containsValue(allele))  {
-//                allelesCorrect = false;
-//            }
-//        }
-//        return allelesCorrect;
-//    }
 
     /**
      * @return maximum length of a neopeptide in the file

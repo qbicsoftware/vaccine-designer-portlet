@@ -199,7 +199,6 @@ public class ParserInputAllelesAsColumns {
      * Sets the bean with its parameters and adds it to a bean item container.
      */
     public void setBean() {
-        MyPortletUI.logger.info(peptides.size() + " to parse...");
         for (String peptide : peptides.keySet()) {
             for (String method : peptides.get(peptide).keySet()) {
                 EpitopeSelectionBean newBean = new EpitopeSelectionBean();
@@ -223,7 +222,7 @@ public class ParserInputAllelesAsColumns {
                     newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
                     newBean.setImm(imm);
                 } catch (NumberFormatException e) {
-                    MyPortletUI.logger.error("Some of the peptides do not have valid entries");
+
                 }
                 alleles = new String[]{hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele};
                 alleleNames = newBean.prepareAlleleNames(alleles);
@@ -285,11 +284,7 @@ public class ParserInputAllelesAsColumns {
 
     public Boolean checkAlleles(HashMap<String, String> alleles) {
         Boolean allelesCorrect = true;
-        for (String allele : alleles.keySet()) {
-            MyPortletUI.logger.info(alleles.get(allele));
-        }
         for (String allele : alleleNames) {
-            MyPortletUI.logger.info(allele);
             if (!alleles.containsValue(allele)) {
                 allelesCorrect = false;
             }
