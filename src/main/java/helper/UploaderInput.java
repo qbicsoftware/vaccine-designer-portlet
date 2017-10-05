@@ -19,11 +19,12 @@ public class UploaderInput
     private File tempFile;
     private DescriptionHandler dh = new DescriptionHandler();
 
-
     /* (non-Javadoc)
      * @see com.vaadin.ui.Upload.Receiver#receiveUpload(java.lang.String, java.lang.String)
      */
     public OutputStream receiveUpload(String filename, String mimeType) {
+        progress.setIndeterminate(true);
+        progress.setVisible(true);
         try {
             tempFile = File.createTempFile("temp", ".txt");
             return new FileOutputStream(tempFile);
@@ -48,7 +49,7 @@ public class UploaderInput
     @Override
     public void uploadFailed(FailedEvent event) {
         Utils.notification("Upload failed!", dh.getUploadInputFailedError(), "error");
-        progress.setVisible(false);
+        progress.setVisible(true);
     }
 
     /**
@@ -70,7 +71,6 @@ public class UploaderInput
      */
     @Override
     public void uploadFinished(FinishedEvent event) {
-
     }
 }
 
