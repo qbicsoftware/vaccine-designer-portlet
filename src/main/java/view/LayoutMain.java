@@ -632,6 +632,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             hasDist = false;
             hasUnc = false;
             hasTranscriptExpression = parser.getHasTranscriptExpression();
+            MyPortletUI.logger.info(hasType);
+            MyPortletUI.logger.info(hasTranscriptExpression);
             epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
                     uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasType, hasTranscriptExpression, hasUnc, hasDist);
             maxLength = parser.getMaxLength();

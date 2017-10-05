@@ -76,7 +76,9 @@ public class ParserInputAllelesAsColumns {
         brReader = new BufferedReader(new FileReader(file));
         line = brReader.readLine();
         String[] headers = line.split("\t");
-
+        hasType = false;
+        hasMethod = false;
+        hasTranscriptExpression = false;
         for (String h : headers) {
             if (!(typeCol.equals("")) && h.equals(typeCol)) {
                 hasType = true;
