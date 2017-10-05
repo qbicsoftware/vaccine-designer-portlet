@@ -40,7 +40,7 @@ public class PanelEpitopeSelection extends CustomComponent {
     private BeanItemContainer<EpitopeSelectionBean> container;
     private String hlaA1, hlaA2, hlaB1, hlaB2, hlaC1, hlaC2;
     private HeaderRow header;
-    private TextField geneTf, neopeptideTf, lengthTf, mutationTf, transcriptTf, typeTf;
+    private TextField geneTf, neopeptideTf, lengthTf, mutationTf, transcriptTf, transcriptExpressionTf, typeTf;
     private Filterable filterable;
     private NativeSelect methodSelect;
     private String methodColumn;
@@ -75,31 +75,25 @@ public class PanelEpitopeSelection extends CustomComponent {
      * @param container bean item container including all epitope selection beans representing a
      *                  neopeptide of the uploaded input data
      */
-    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn) {
+    public void setDataGrid(BeanItemContainer<EpitopeSelectionBean> container, String methodColumn, String[] alleleNames, boolean type, boolean transcriptExpression, boolean unc, boolean dist) {
         this.container = container;
         this.setMethodColumn(methodColumn);
         dataGrid.setSizeFull();
 
         // Set Allele Names for Headers
-        String[] alleleNames =
-                container.getItem(container.firstItemId()).getBean().prepareAlleleNames();
-        hlaA1 = alleleNames[0];
-        hlaA2 = alleleNames[1];
-        hlaB1 = alleleNames[2];
-        hlaB2 = alleleNames[3];
-        hlaC1 = alleleNames[4];
-        hlaC2 = alleleNames[5];
+        hlaA1 = "HLA-" + alleleNames[0];
+        hlaA2 = "HLA-" + alleleNames[1];
+        hlaB1 = "HLA-" + alleleNames[2];
+        hlaB2 = "HLA-" + alleleNames[3];
+        hlaC1 = "HLA-" + alleleNames[4];
+        hlaC2 = "HLA-" + alleleNames[5];
 
 
         // set epitope selection bean item container as container data source
         dataGrid.setContainerDataSource(container);
 
         // adjust grid
-        dataGrid.setColumnOrder("included", "excluded", "neopeptide", "type", "length", "mutation",
-                "gene", "transcript", "transcriptExpression", "hlaA1", "distanceA1", "uncertaintyA1",
-                "hlaA2", "distanceA2", "uncertaintyA2", "hlaB1", "distanceB1", "uncertaintyB1", "hlaB2",
-                "distanceB2", "uncertaintyB2", "hlaC1", "distanceC1", "uncertaintyC1", "hlaC2",
-                "distanceC2", "uncertaintyC2");
+        dataGrid.setColumnOrder("included", "excluded", "neopeptide", "type", "length", "mutation", "gene", "transcript", "transcriptExpression", "hlaA1", "uncA1", "distA1", "hlaA2", "uncA2", "distA2", "hlaB1", "uncB1", "distB1", "hlaB2", "uncB2", "distB2", "hlaC1", "uncC1", "distC1", "hlaC2", "uncC2", "distC2");
         dataGrid.removeColumn("imm");
         dataGrid.removeColumn("dist");
         dataGrid.removeColumn("unc");
@@ -115,9 +109,10 @@ public class PanelEpitopeSelection extends CustomComponent {
         dataGrid.getColumn("mutation").setEditable(false);
         dataGrid.getColumn("transcript").setEditable(false);
         dataGrid.getColumn("transcriptExpression").setEditable(false);
+        dataGrid.getColumn("transcriptExpression").setHeaderCaption("Expression");
         dataGrid.getColumn("type").setEditable(false);
         dataGrid.getColumn("hlaA1").setEditable(false);
-        dataGrid.getColumn("hlaA1").setHeaderCaption(hlaA1);
+        dataGrid.getColumn("hlaA1").setHeaderCaption(hlaA1 );
         dataGrid.getColumn("hlaA2").setEditable(false);
         dataGrid.getColumn("hlaA2").setHeaderCaption(hlaA2);
         dataGrid.getColumn("hlaB1").setEditable(false);
@@ -128,30 +123,30 @@ public class PanelEpitopeSelection extends CustomComponent {
         dataGrid.getColumn("hlaC1").setHeaderCaption(hlaC1);
         dataGrid.getColumn("hlaC2").setEditable(false);
         dataGrid.getColumn("hlaC2").setHeaderCaption(hlaC2);
-        dataGrid.getColumn("distanceA1").setEditable(false);
-        dataGrid.getColumn("distanceA1").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceA2").setEditable(false);
-        dataGrid.getColumn("distanceA2").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceB1").setEditable(false);
-        dataGrid.getColumn("distanceB1").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceB2").setEditable(false);
-        dataGrid.getColumn("distanceB2").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceC1").setEditable(false);
-        dataGrid.getColumn("distanceC1").setHeaderCaption("Distance");
-        dataGrid.getColumn("distanceC2").setEditable(false);
-        dataGrid.getColumn("distanceC2").setHeaderCaption("Distance");
-        dataGrid.getColumn("uncertaintyA1").setEditable(false);
-        dataGrid.getColumn("uncertaintyA1").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyA2").setEditable(false);
-        dataGrid.getColumn("uncertaintyA2").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyB1").setEditable(false);
-        dataGrid.getColumn("uncertaintyB1").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyB2").setEditable(false);
-        dataGrid.getColumn("uncertaintyB2").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyC1").setEditable(false);
-        dataGrid.getColumn("uncertaintyC1").setHeaderCaption("Uncertainty");
-        dataGrid.getColumn("uncertaintyC2").setEditable(false);
-        dataGrid.getColumn("uncertaintyC2").setHeaderCaption("Uncertainty");
+        dataGrid.getColumn("distA1").setEditable(false);
+        dataGrid.getColumn("distA1").setHeaderCaption("Distance");
+        dataGrid.getColumn("distA2").setEditable(false);
+        dataGrid.getColumn("distA2").setHeaderCaption("Distance");
+        dataGrid.getColumn("distB1").setEditable(false);
+        dataGrid.getColumn("distB1").setHeaderCaption("Distance");
+        dataGrid.getColumn("distB2").setEditable(false);
+        dataGrid.getColumn("distB2").setHeaderCaption("Distance");
+        dataGrid.getColumn("distC1").setEditable(false);
+        dataGrid.getColumn("distC1").setHeaderCaption("Distance");
+        dataGrid.getColumn("distC2").setEditable(false);
+        dataGrid.getColumn("distC2").setHeaderCaption("Distance");
+        dataGrid.getColumn("uncA1").setEditable(false);
+        dataGrid.getColumn("uncA1").setHeaderCaption("Uncertainty");
+        dataGrid.getColumn("uncA2").setEditable(false);
+        dataGrid.getColumn("uncA2").setHeaderCaption("Uncertainty");
+        dataGrid.getColumn("uncB1").setEditable(false);
+        dataGrid.getColumn("uncB1").setHeaderCaption("Uncertainty");
+        dataGrid.getColumn("uncB2").setEditable(false);
+        dataGrid.getColumn("uncB2").setHeaderCaption("Uncertainty");
+        dataGrid.getColumn("uncC1").setEditable(false);
+        dataGrid.getColumn("uncC1").setHeaderCaption("Uncertainty");
+        dataGrid.getColumn("uncC2").setEditable(false);
+        dataGrid.getColumn("uncC2").setHeaderCaption("Uncertainty");
         dataGrid.getDefaultHeaderRow().getCell("included").setHtml("<font color='#2c972'>" + FontAwesome.CHECK_CIRCLE.getHtml() + "</font>");
         dataGrid.getDefaultHeaderRow().getCell("excluded").setHtml("<font color='#ed473b'>" +FontAwesome.TIMES_CIRCLE.getHtml()+ "</font>");
         dataGrid.getDefaultHeaderRow().setStyleName(ValoTheme.LABEL_BOLD);
@@ -173,24 +168,37 @@ public class PanelEpitopeSelection extends CustomComponent {
         // set up filter
         header = dataGrid.prependHeaderRow();
         neopeptideTf = createFieldFilter(dataGrid.getColumn("neopeptide"));
-        neopeptideTf.setWidth("120px");
+        neopeptideTf.setSizeFull();
         lengthTf = createFieldFilter(dataGrid.getColumn("length"));
-        lengthTf.setWidth("50px");
+        lengthTf.setSizeFull();
         geneTf = createFieldFilter(dataGrid.getColumn("gene"));
-        geneTf.setWidth("100px");
+        geneTf.setSizeFull();
         mutationTf = createFieldFilter(dataGrid.getColumn("mutation"));
-        mutationTf.setWidth("150px");
+        mutationTf.setSizeFull();
         transcriptTf = createFieldFilter(dataGrid.getColumn("transcript"));
-        transcriptTf.setWidth("120px");
-        typeTf = new TextField();
+        transcriptTf.setSizeFull();
+        if (type) {
+            typeTf = createFieldFilter(dataGrid.getColumn("type"));
+            typeTf.setSizeFull();
+            setFilter(dataGrid.getColumn("transcriptExpression"), header, typeTf);
+        }
+        if (transcriptExpression) {
+            transcriptExpressionTf = createFieldFilter(dataGrid.getColumn("transcriptExpression"));
+            transcriptExpressionTf.setSizeFull();
+            setFilter(dataGrid.getColumn("transcriptExpression"), header, transcriptExpressionTf);
+        }
+
         setFilter(dataGrid.getColumn("neopeptide"), header, neopeptideTf);
         setFilter(dataGrid.getColumn("length"), header, lengthTf);
         setFilter(dataGrid.getColumn("gene"), header, geneTf);
         setFilter(dataGrid.getColumn("mutation"), header, mutationTf);
         setFilter(dataGrid.getColumn("transcript"), header, transcriptTf);
 
+
         HeaderCell selectionCell = header.join("included", "excluded");
         selectionCell.setText("Selection");
+
+        joinHeader(unc, dist);
 
         filterable = (Filterable) dataGrid.getContainerDataSource();
 
@@ -210,29 +218,92 @@ public class PanelEpitopeSelection extends CustomComponent {
     /**
      * groups the header with the allele as title
      */
-    public void joinHeader() {
+    public void joinHeader(Boolean unc, Boolean dist) {
+        if (dist && unc) {
+            dataGrid.getColumn("hlaA1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaA2").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaB1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaB2").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaC1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaC2").setHeaderCaption("Score");
+            HeaderCell hlaA1Cell = header.join("hlaA1", "distA1", "uncA1");
+            hlaA1Cell.setText(hlaA1);
+            HeaderCell hlaA2Cell = header.join("hlaA2", "distA2", "uncA2");
+            hlaA2Cell.setText(hlaA2);
+            HeaderCell hlaB1Cell = header.join("hlaB1", "distB1", "uncB1");
+            hlaB1Cell.setText(hlaB1);
+            HeaderCell hlaB2Cell = header.join("hlaB2", "distB2", "uncB2");
+            hlaB2Cell.setText(hlaB2);
+            HeaderCell hlaC1Cell = header.join("hlaC1", "distC1", "uncC1");
+            hlaC1Cell.setText(hlaC1);
+            HeaderCell hlaC2Cell = header.join("hlaC2", "distC2", "uncC2");
+            hlaC2Cell.setText(hlaC2);
+        } else if (!dist && unc) {
+            dataGrid.getColumn("hlaA1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaA2").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaB1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaB2").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaC1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaC2").setHeaderCaption("Score");
+            dataGrid.removeColumn("distA1");
+            dataGrid.removeColumn("distA2");
+            dataGrid.removeColumn("distB1");
+            dataGrid.removeColumn("distB2");
+            dataGrid.removeColumn("distC1");
+            dataGrid.removeColumn("distC2");
+            HeaderCell hlaA1Cell = header.join("hlaA1", "uncA1");
+            hlaA1Cell.setText(hlaA1);
+            HeaderCell hlaA2Cell = header.join("hlaA2", "uncA2");
+            hlaA2Cell.setText(hlaA2);
+            HeaderCell hlaB1Cell = header.join("hlaB1", "uncB1");
+            hlaB1Cell.setText(hlaB1);
+            HeaderCell hlaB2Cell = header.join("hlaB2", "uncB2");
+            hlaB2Cell.setText(hlaB2);
+            HeaderCell hlaC1Cell = header.join("hlaC1", "uncC1");
+            hlaC1Cell.setText(hlaC1);
+            HeaderCell hlaC2Cell = header.join("hlaC2", "uncC2");
+            hlaC2Cell.setText(hlaC2);
+        } else if (!unc && dist) {
+            dataGrid.getColumn("hlaA1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaA2").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaB1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaB2").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaC1").setHeaderCaption("Score");
+            dataGrid.getColumn("hlaC2").setHeaderCaption("Score");
+            dataGrid.removeColumn("uncA1");
+            dataGrid.removeColumn("uncA2");
+            dataGrid.removeColumn("uncB1");
+            dataGrid.removeColumn("uncB2");
+            dataGrid.removeColumn("uncC1");
+            dataGrid.removeColumn("uncC2");
+            HeaderCell hlaA1Cell = header.join("hlaA1", "distA1");
+            hlaA1Cell.setText(hlaA1);
+            HeaderCell hlaA2Cell = header.join("hlaA2", "distA2");
+            hlaA2Cell.setText(hlaA2);
+            HeaderCell hlaB1Cell = header.join("hlaB1", "distB1");
+            hlaB1Cell.setText(hlaB1);
+            HeaderCell hlaB2Cell = header.join("hlaB2", "distB2");
+            hlaB2Cell.setText(hlaB2);
+            HeaderCell hlaC1Cell = header.join("hlaC1", "distC1");
+            hlaC1Cell.setText(hlaC1);
+            HeaderCell hlaC2Cell = header.join("hlaC2", "distC2");
+            hlaC2Cell.setText(hlaC2);
+        } else {
+            dataGrid.removeColumn("uncA1");
+            dataGrid.removeColumn("uncA2");
+            dataGrid.removeColumn("uncB1");
+            dataGrid.removeColumn("uncB2");
+            dataGrid.removeColumn("uncC1");
+            dataGrid.removeColumn("uncC2");
+            dataGrid.removeColumn("distA1");
+            dataGrid.removeColumn("distA2");
+            dataGrid.removeColumn("distB1");
+            dataGrid.removeColumn("distB2");
+            dataGrid.removeColumn("distC1");
+            dataGrid.removeColumn("distC2");
+        }
 
-        HeaderCell hlaA1Cell = header.join("hlaA1", "uncertaintyA1", "distanceA1");
-        hlaA1Cell.setText(hlaA1);
-        HeaderCell hlaA2Cell = header.join("hlaA2", "uncertaintyA2", "distanceA2");
-        hlaA2Cell.setText(hlaA2);
-        HeaderCell hlaB1Cell = header.join("hlaB1", "uncertaintyB1", "distanceB1");
-        hlaB1Cell.setText(hlaB1);
-        HeaderCell hlaB2Cell = header.join("hlaB2", "uncertaintyB2", "distanceB2");
-        hlaB2Cell.setText(hlaB2);
-        HeaderCell hlaC1Cell = header.join("hlaC1", "uncertaintyC1", "distanceC1");
-        hlaC1Cell.setText(hlaC1);
-        HeaderCell hlaC2Cell = header.join("hlaC2", "uncertaintyC2", "distanceC2");
-        hlaC2Cell.setText(hlaC2);
-
-        dataGrid.getColumn("hlaA1").setHeaderCaption("Score");
-        dataGrid.getColumn("hlaA2").setHeaderCaption("Score");
-        dataGrid.getColumn("hlaB1").setHeaderCaption("Score");
-        dataGrid.getColumn("hlaB2").setHeaderCaption("Score");
-        dataGrid.getColumn("hlaC1").setHeaderCaption("Score");
-        dataGrid.getColumn("hlaC2").setHeaderCaption("Score");
-    }
-
+        }
 
     /**
      * Sets up a filter for a certain column

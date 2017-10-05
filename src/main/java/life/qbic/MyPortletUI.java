@@ -35,20 +35,20 @@ public class MyPortletUI extends UI {
     private OpenBisClient openbis;
     private ConfigurationManager config = new ConfigurationManagerFactory().getInstance();
     private DescriptionHandler dh = new DescriptionHandler();
+    private Boolean success;
 
     @Override
     protected void init(VaadinRequest request) {
-        final String portletContextName = getPortletContextName(request);
-        final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
+        if (LiferayAndVaadinUtils.isLiferayPortlet()) {
+            final String portletContextName = getPortletContextName(request);
+            final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
+        }
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
         setContent(layout);
 
-        String userID = "MISSING SCREENNAME";
-        if (LiferayAndVaadinUtils.isLiferayPortlet()) {
-            userID = LiferayAndVaadinUtils.getUser().getScreenName();
-        }
-        boolean success = true;
+        String userID = "zxmqw74";
+        success = true;
         config = ConfigurationManagerFactory.getInstance();
 
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
@@ -68,6 +68,7 @@ public class MyPortletUI extends UI {
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
             Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
+            e.printStackTrace();
         }
 
         LayoutMain mainLayout;
@@ -87,13 +88,13 @@ public class MyPortletUI extends UI {
             }
 
             // initialize the View with sample types, spaces and the dictionaries of tissues and species
-            mainLayout = new LayoutMain(projects, openbis);
+            mainLayout = new LayoutMain(projects, openbis, success);
             setContent(mainLayout);
 
             logger.info("User \"" + userID + "\" connected to openBIS.");
 
         } else {
-            mainLayout = new LayoutMain();
+            mainLayout = new LayoutMain(success);
             setContent(mainLayout);
         }
 

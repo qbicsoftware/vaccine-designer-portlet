@@ -39,7 +39,7 @@ public class PanelUpload extends CustomComponent {
     private Panel uploadPanel;
     private VerticalLayout panelContent, databaseLayout, hlaExpressionLayout, columnLayout, dataLayout, fileTypeSelectionLayout, uploadLayout, alleleFileSelection;
     private HorizontalLayout buttonLayout, alleleTFLayout;
-    private TextField immColTf, distanceColTf, uncertaintyColTf, taaColTf, methodColTf, hlaA1TF, hlaB1TF, hlaC1TF, hlaA2TF, hlaB2TF, hlaC2TF, hlaAEVTF, hlaBEVTF, hlaCEVTF;
+    private TextField immColTf, distanceColTf, uncertaintyColTf, taaColTf, methodColTf, hlaA1TF, hlaB1TF, hlaC1TF, hlaA2TF, hlaB2TF, hlaC2TF, hlaAEVTF, hlaBEVTF, hlaCEVTF, transcriptExpressionColTf;
     private ComboBox projectSelectionCB;
     private ComboBox alleleFileSelectionCB;
     private Button uploadButton, dataSelectionUploadButton, dataSelectionDatabaseButton, manualButton, databaseButton, nextButton;
@@ -67,7 +67,7 @@ public class PanelUpload extends CustomComponent {
         allele_expressions = new HashMap<>();
         // Create the upload component and handle all its events
         inputReceiver = new UploaderInput();
-        //receiver.getProgress().setVisible(false);
+        inputReceiver.getProgress().setVisible(true);
         inputUpload = new Upload("Please Upload your Data", inputReceiver);
         inputUpload.setSizeFull();
         inputUpload.addProgressListener(inputReceiver);
@@ -178,10 +178,17 @@ public class PanelUpload extends CustomComponent {
                 if (hlaAsColumns != null) {
                     fileTypeSelectionLayout.setVisible(false);
                     columnLayout.setVisible(true);
+                    if (hlaAsColumns) {
+                        uncertaintyColTf.setVisible(false);
+                        distanceColTf.setVisible(false);
+                    } else {
+                        uncertaintyColTf.setVisible(true);
+                        distanceColTf.setVisible(true);
+                    }
                 } else {
                 }
             } else if (columnLayout.isVisible()) {
-                if (immColTf.isValid()) {
+                if (immColTf.isValid() || hlaAsColumns ) {
                     columnLayout.setVisible(false);
                     hlaExpressionLayout.setVisible(true);
                     if (alleleFileUpload) {
@@ -261,11 +268,18 @@ public class PanelUpload extends CustomComponent {
         taaColTf.setValue("");
         taaColTf.setDescription(dh.getUploadData_columnTAA());
 
+        // taa column
+        transcriptExpressionColTf = new TextField("Transcript Expression Column");
+        transcriptExpressionColTf.setStyleName("padded");
+        transcriptExpressionColTf.setImmediate(true);
+        transcriptExpressionColTf.setValue("");
+        transcriptExpressionColTf.setDescription(dh.getUploadData_columnTranscriptExpression());
+
         // immunogenicity column
         immColTf = new TextField("Immunogenicity Column");
         immColTf.setStyleName("padded");
         immColTf.setImmediate(true);
-        immColTf.setValue("SCORE");
+        immColTf.setValue("");
         immColTf.setDescription(dh.getUploadData_columnImm());
         immColTf.addValidator(new StringLengthValidator("Please enter a column name", 1, 100, true));
         immColTf.setRequired(true);
@@ -285,7 +299,7 @@ public class PanelUpload extends CustomComponent {
         uncertaintyColTf.setDescription(dh.getUploadData_columnUncertainty());
 
         columnTFLayout.setStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-        columnTFLayout.addComponents(methodColTf, taaColTf, distanceColTf, uncertaintyColTf, immColTf);
+        columnTFLayout.addComponents(immColTf, methodColTf, transcriptExpressionColTf, taaColTf, distanceColTf, uncertaintyColTf);
 
         allColumnLayout.addComponents(description, columnTFLayout);
         return allColumnLayout;
@@ -560,8 +574,6 @@ public class PanelUpload extends CustomComponent {
         rowImage.addClickListener((MouseEvents.ClickListener) event -> {
             hlaAsColumns = false;
             immColTf.setVisible(true);
-            distanceColTf.setVisible(true);
-            uncertaintyColTf.setVisible(true);
             colLayout.addStyleName("notselected");
             rowLayout.removeStyleName("notselected");
         });
@@ -570,13 +582,10 @@ public class PanelUpload extends CustomComponent {
         colImage.addClickListener((MouseEvents.ClickListener) event -> {
             hlaAsColumns = true;
             immColTf.setVisible(false);
-            distanceColTf.setValue("");
-            distanceColTf.setVisible(false);
-            uncertaintyColTf.setValue("");
-            uncertaintyColTf.setVisible(false);
             colLayout.removeStyleName("notselected");
             rowLayout.addStyleName("notselected");
         });
+        colImage.setWidth("40%");
         colImage.setWidth("40%");
         rowImage.setWidth("40%");
         colLayout.addComponent(colImage);
@@ -674,6 +683,10 @@ public class PanelUpload extends CustomComponent {
 
     public ComboBox getAlleleFileSelectionCB() {
         return alleleFileSelectionCB;
+    }
+
+    public TextField getTranscriptExpressionColTf() {
+        return transcriptExpressionColTf;
     }
 
     public Boolean isHlalValid() {
