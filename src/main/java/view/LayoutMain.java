@@ -764,7 +764,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
         getResults();
         downloadButton.setVisible(true);
-        String downloadFilePath = tmpResultPath.replace("tmp_result.txt", filename.split(".")[0] + "_epitopeSelection_results.tsv");
+        String downloadFilePath = tmpResultPath.replace("tmp_result.txt", filename + "_epitopeSelection_results.tsv");
         try {
             Process copy_download = Runtime.getRuntime().exec("cp " + tmpResultPath + " " + downloadFilePath);
             copy_download.waitFor();
