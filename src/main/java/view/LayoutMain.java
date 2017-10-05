@@ -136,20 +136,18 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
         File f = new File(tmpPath + username);
         try {
-            FileUtils.cleanDirectory(f);
-            FileUtils.forceDelete(f);
+            if (f.exists() && f.isDirectory()) {
+                FileUtils.cleanDirectory(f);
+                FileUtils.forceDelete(f);
+                Runtime.getRuntime().exec("mkdir " + tmpPath + username);
+            } else {
+                Runtime.getRuntime().exec("mkdir " + tmpPath + username);
+            }
         } catch (IOException e) {
-            MyPortletUI.logger.error("File System error: Old files could not be deleted");
+            MyPortletUI.logger.error("Could not write the folder on the file system");
             e.printStackTrace();
         }
-        if (!(f.exists() && f.isDirectory())) {
-            try {
-                Runtime.getRuntime().exec("mkdir " + tmpPath + username);
-            } catch (IOException e) {
-                MyPortletUI.logger.error("Could not write the folder on the file system");
-                e.printStackTrace();
-            }
-        }
+
         outputPath = tmpPath + username + "/output.txt";
         inputPath = tmpPath + username + "/input.txt";
         allelePath = tmpPath + username + "/alleles.txt";
@@ -619,7 +617,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             hasDist = parser.getHasDist();
             hasUnc = parser.getHasUnc();
             hasTranscriptExpression = parser.getHasTranscriptExpression();
-            epitopeSelectionPanel.setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(),hasType, hasTranscriptExpression, hasUnc, hasDist);
+            epitopeSelectionPanel.setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasType, hasTranscriptExpression, hasUnc, hasDist);
             maxLength = parser.getMaxLength();
             if (uploadPanel.getTaaColTf().getValue().equals("")) {
                 epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -766,7 +764,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
         getResults();
         downloadButton.setVisible(true);
-        String downloadFilePath = tmpResultPath.replace("tmp_result.txt", filename + "_epitopeSelection_results.tsv");
+        String downloadFilePath = tmpResultPath.replace("tmp_result.txt", filename.split(".")[0] + "_epitopeSelection_results.tsv");
         try {
             Process copy_download = Runtime.getRuntime().exec("cp " + tmpResultPath + " " + downloadFilePath);
             copy_download.waitFor();
@@ -899,13 +897,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         }
     }
 
-    public class AllelesException extends Exception {
-
-        public AllelesException(String message) {
-            super(message);
-        }
-    }
-
     public Boolean getHasType() {
         return hasType;
     }
@@ -920,5 +911,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     public Boolean getHasTranscriptExpression() {
         return hasTranscriptExpression;
+    }
+
+    public class AllelesException extends Exception {
+
+        public AllelesException(String message) {
+            super(message);
+        }
     }
 }
