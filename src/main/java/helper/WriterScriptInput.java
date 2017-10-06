@@ -24,7 +24,7 @@ public class WriterScriptInput {
 
     private BufferedWriter inputWriter, includeWriter, excludeWriter, allelesWriter;
     private ArrayList<String> includedBeans, excludedBeans;
-    private String type, unc, dist, imm, inputPath, allelePath, includePath, excludePath;
+    private String type, unc, dist, inputPath, allelePath, includePath, excludePath;
     private Boolean hasTranscriptExpression, hasType, hasUnc, hasDist;
     private DescriptionHandler dh = new DescriptionHandler();
 
@@ -45,8 +45,7 @@ public class WriterScriptInput {
      * @param container bean item container containing all neopeptides from the uploaded input file.
      * @throws IOException
      */
-    public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String imm, String type, String unc, String dist, Boolean hasTranscriptExpression, Boolean hasType, Boolean hasUnc, Boolean hasDist) throws IOException {
-        this.imm = imm;
+    public void writeInputData(BeanItemContainer<EpitopeSelectionBean> container, HashMap<String, String> alleles, HashMap<String, String> allele_expressions, String type, String unc, String dist, Boolean hasTranscriptExpression, Boolean hasType, Boolean hasUnc, Boolean hasDist) throws IOException {
         this.type = type;
         this.unc = unc;
         this.dist = dist;
@@ -100,7 +99,7 @@ public class WriterScriptInput {
     public void writeInputFile(BeanItemContainer<EpitopeSelectionBean> container) throws IOException {
 
         // initialize buffered writer
-        String header = "neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + imm + "\t" + "mutation";
+        String header = "neopeptide" + "\t" + "length_of_neopeptide" + "\t" + "gene" + "\t" + "transcript" + "\t" + "transcript_expression" + "\t" + "HLA" + "\t" + "score" + "\t" + "mutation";
         if (!type.equals("") && hasType) {
             header += ("\t" + type);
         }
@@ -178,6 +177,7 @@ public class WriterScriptInput {
                 allele_expressions.get("A") + "\t" +
                 allele_expressions.get("B") + "\t" +
                 allele_expressions.get("C") + "\t";
+        MyPortletUI.logger.info(alleleString);
         return alleleString;
     }
 

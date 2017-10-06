@@ -77,10 +77,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<DatasetBean>(DatasetBean.class);
     private DescriptionHandler dh = new DescriptionHandler();
 
-    //private String tmpPath = "/Users/spaethju/Desktop/";
-    private String tmpPath = "/tmp/";
-    //private String homePath = "/Users/spaethju/";
-    private String homePath = "/home/luser/";
+    private String tmpPath = "/Users/spaethju/Desktop/";
+    //private String tmpPath = "/tmp/";
+    private String homePath = "/Users/spaethju/";
+    //private String homePath = "/home/luser/";
     private String tmpPathRemote = "/home/jspaeth/";
     private String outputPath = "";
     private String inputPath = "";
@@ -190,7 +190,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                         Item item = alleleFileContainer.getItem(itemId);
                         String type = item.getItemProperty("type").toString();
                         filename = item.getItemProperty("name").toString();
-                        if (type.equalsIgnoreCase("Q_WF_NGS_HLATYPING_RESULTS") && (filename.contains(".txt") || filename.contains(".tsv"))) {
+                        if (type.equalsIgnoreCase("Q_WF_NGS_HLATYPING_RESULTS") && (filename.contains(".txt") || filename.contains(".tsv") || filename.contains(".alleles"))) {
                             uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("name"));
                         }
                     }
@@ -474,8 +474,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 p.add(tmpPathRemote + random + "/input.txt");
 
                 p.add("-imm");
-                String immCol = uploadPanel.getImmColTf().getValue();
-                p.add(immCol);
+                p.add("score");
 
                 String taaCol = uploadPanel.getTaaColTf().getValue();
                 if (!taaCol.equals("") && hasType) {
@@ -535,7 +534,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
                 // writes alleles.txt, include.txt and exclude.txt
                 try {
-                    inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(), uploadPanel.getAllele_expressions(), uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(), hasTranscriptExpression, hasType, hasUnc, hasDist);
+                    inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(), uploadPanel.getAllele_expressions(), uploadPanel.getTaaColTf().getValue(), uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(), hasTranscriptExpression, hasType, hasUnc, hasDist);
                 } catch (IOException e) {
                     Utils.notification("Error!",
                             dh.getWriteInputError(), "error");
@@ -727,12 +726,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 if (0 == proc.waitFor()) {
                     proc.destroyForcibly();
                     prepareResults();
-                    cleanFiles();
+                    //cleanFiles();
                     loadingWindow.success();
                 } else {
                     proc.destroyForcibly();
                     loadingWindow.failure();
-                    cleanFiles();
+                    //cleanFiles();
                 }
             } catch (IOException e) {
                 MyPortletUI.logger.error("NeoOptiTope could not be found");
