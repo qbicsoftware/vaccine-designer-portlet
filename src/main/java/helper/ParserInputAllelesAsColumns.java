@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -299,7 +298,7 @@ public class ParserInputAllelesAsColumns {
         if (!(typeCol.equals("")) && hasType) {
             values.put("type", columns[type]);
         }
-        if (!(transcriptExpressionCol.equals("") && hasTranscriptExpression)){
+        if (!(transcriptExpressionCol.equals("") && hasTranscriptExpression)) {
             values.put("transcriptExpression", columns[transcriptExpression]);
         }
 
