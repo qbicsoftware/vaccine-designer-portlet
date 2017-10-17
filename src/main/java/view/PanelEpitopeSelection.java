@@ -147,6 +147,24 @@ public class PanelEpitopeSelection extends CustomComponent {
         dataGrid.getColumn("uncC1").setHeaderCaption("Uncertainty");
         dataGrid.getColumn("uncC2").setEditable(false);
         dataGrid.getColumn("uncC2").setHeaderCaption("Uncertainty");
+        if (dataGrid.getColumn("hlaA1").getHeaderCaption().contains("null")) {
+            dataGrid.removeColumn("hlaA1");
+        }
+        if (dataGrid.getColumn("hlaA2").getHeaderCaption().contains("null")) {
+            dataGrid.removeColumn("hlaA2");
+        }
+        if (dataGrid.getColumn("hlaB1").getHeaderCaption().contains("null")) {
+            dataGrid.removeColumn("hlaB1");
+        }
+        if (dataGrid.getColumn("hlaB2").getHeaderCaption().contains("null")) {
+            dataGrid.removeColumn("hlaB2");
+        }
+        if (dataGrid.getColumn("hlaC1").getHeaderCaption().contains("null")) {
+            dataGrid.removeColumn("hlaC1");
+        }
+        if (dataGrid.getColumn("hlaC2").getHeaderCaption().contains("null")) {
+            dataGrid.removeColumn("hlaC2");
+        }
         dataGrid.getDefaultHeaderRow().getCell("included").setHtml("<font color='#2c972'>" + FontAwesome.CHECK_CIRCLE.getHtml() + "</font>");
         dataGrid.getDefaultHeaderRow().getCell("excluded").setHtml("<font color='#ed473b'>" +FontAwesome.TIMES_CIRCLE.getHtml()+ "</font>");
         dataGrid.getDefaultHeaderRow().setStyleName(ValoTheme.LABEL_BOLD);
