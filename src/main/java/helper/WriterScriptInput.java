@@ -1,11 +1,7 @@
 package helper;
 
 import com.vaadin.data.util.BeanItemContainer;
-import life.qbic.MyPortletUI;
 import model.EpitopeSelectionBean;
-import view.LayoutMain;
-
-import javax.validation.constraints.Null;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,8 +73,6 @@ public class WriterScriptInput {
         }
 
         String allelesHeadline = "A1\tA2\tB1\tB2\tC1\tC2\tA_expression\tB_expression\tC_expression";
-        MyPortletUI.logger.info(allelesHeadline);
-        MyPortletUI.logger.info(setAlleleRow(alleles, allele_expressions));
         allelesWriter.write(allelesHeadline);
         allelesWriter.newLine();
         allelesWriter.write(setAlleleRow(alleles, allele_expressions));
@@ -109,15 +103,11 @@ public class WriterScriptInput {
         if (!dist.equals("") && hasDist) {
             header += ("\t" + dist);
         }
-MyPortletUI.logger.info(container.size());
         inputWriter.write(header);
         inputWriter.newLine();
         for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext(); ) {
             EpitopeSelectionBean bean = i.next();
-            MyPortletUI.logger.info(bean.getImm());
-            MyPortletUI.logger.info(bean.getImm().keySet());
             for (String key : bean.getImm().keySet()) {
-                MyPortletUI.logger.info(key);
                     String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
                 if (!type.equals("") && hasType) {
                         peptide += ("\t" + bean.getType());

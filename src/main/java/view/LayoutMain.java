@@ -726,12 +726,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 if (0 == proc.waitFor()) {
                     proc.destroyForcibly();
                     prepareResults();
-                    //cleanFiles();
+                    cleanFiles();
                     loadingWindow.success();
                 } else {
                     proc.destroyForcibly();
                     loadingWindow.failure();
-                    //cleanFiles();
+                    cleanFiles();
                 }
             } catch (IOException e) {
                 MyPortletUI.logger.error("NeoOptiTope could not be found");

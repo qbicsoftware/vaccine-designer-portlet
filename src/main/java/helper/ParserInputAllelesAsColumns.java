@@ -202,53 +202,54 @@ public class ParserInputAllelesAsColumns {
     public void setBean() {
         for (String peptide : peptides.keySet()) {
             for (String method : peptides.get(peptide).keySet()) {
-                EpitopeSelectionBean newBean = new EpitopeSelectionBean();
-                // set parameters with key and values from the map
-                newBean.setIncluded(false);
-                newBean.setExcluded(false);
-                newBean.setNeopeptide(peptide);
-                HashMap<String, String> imm = new HashMap<>();
-                try {
-                    imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele));
-                    imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele));
-                    imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele));
-                    imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele));
-                    imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele));
-                    imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele));
-                    newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
-                    newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
-                    newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
-                    newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
-                    newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
-                    newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
-                } catch (NumberFormatException e) {
+                for (int i = 0; i < peptides.get(peptide).get(method).get("gene").split(",").length; i++) {
+                    EpitopeSelectionBean newBean = new EpitopeSelectionBean();
+                    // set parameters with key and values from the map
+                    newBean.setIncluded(false);
+                    newBean.setExcluded(false);
+                    newBean.setNeopeptide(peptide);
+                    HashMap<String, String> imm = new HashMap<>();
+                    try {
+                        imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele));
+                        imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele));
+                        imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele));
+                        imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele));
+                        imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele));
+                        imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele));
+                        newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
+                        newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
+                        newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
+                        newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
+                        newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
+                        newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
+                    } catch (NumberFormatException e) {
 
-                }
-                alleles = new String[]{hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele};
-                alleleNames = newBean.prepareAlleleNames(alleles);
-                //newBean.prepareImm(alleleNames);
-                if (!(methodCol.equals("")) && hasMethod) {
-                    newBean.setMethod(method);
-                }
-                newBean.setLength(peptide.length());
-                if (peptide.length() > maxLength) {
-                    maxLength = peptide.length();
-                }
-                newBean.setMutation(peptides.get(peptide).get(method).get("mutation"));
-                newBean.setGene(peptides.get(peptide).get(method).get("gene"));
-                newBean.setTranscript(peptides.get(peptide).get(method).get("transcript"));
-                if (!(transcriptExpressionCol.equals("")) && hasTranscriptExpression) {
-                    newBean.setTranscriptExpression(Float.parseFloat(peptides.get(peptide).get(method).get("transcriptExpression")));
-                } else {
-                    newBean.setTranscriptExpression(1f);
-                }
-                if (!(typeCol.equals("")) && hasType) {
-                    newBean.setType(peptides.get(peptide).get(method).get("type"));
-                }
-                newBean.setImm(imm);
+                    }
+                    alleles = new String[]{hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele};
+                    alleleNames = newBean.prepareAlleleNames(alleles);
+                    //newBean.prepareImm(alleleNames);
+                    if (!(methodCol.equals("")) && hasMethod) {
+                        newBean.setMethod(method);
+                    }
+                    newBean.setLength(peptide.length());
+                    if (peptide.length() > maxLength) {
+                        maxLength = peptide.length();
+                    }
+                    newBean.setMutation(peptides.get(peptide).get(method).get("mutation"));
+                    newBean.setGene(peptides.get(peptide).get(method).get("gene").split(",")[i]);
+                    newBean.setTranscript(peptides.get(peptide).get(method).get("transcript"));
+                    if (!(transcriptExpressionCol.equals("")) && hasTranscriptExpression) {
+                        newBean.setTranscriptExpression(Float.parseFloat(peptides.get(peptide).get(method).get("transcriptExpression").split(",")[i]));
+                    } else {
+                        newBean.setTranscriptExpression(1f);
+                    }
+                    if (!(typeCol.equals("")) && hasType) {
+                        newBean.setType(peptides.get(peptide).get(method).get("type"));
+                    }
+                    newBean.setImm(imm);
 
-                epitopes.addBean(newBean);
-
+                    epitopes.addBean(newBean);
+                }
             }
         }
     }
