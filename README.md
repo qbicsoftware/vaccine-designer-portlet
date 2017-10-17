@@ -1,4 +1,4 @@
-# vaccine-designer
+# Interactive Vaccine Designer
 A portlet for the interactive design of individualized vaccines
 
 ## General Information
