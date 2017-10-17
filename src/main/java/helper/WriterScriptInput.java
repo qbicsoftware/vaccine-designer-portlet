@@ -109,13 +109,15 @@ public class WriterScriptInput {
         if (!dist.equals("") && hasDist) {
             header += ("\t" + dist);
         }
-        MyPortletUI.logger.info(header);
-
+MyPortletUI.logger.info(container.size());
         inputWriter.write(header);
         inputWriter.newLine();
         for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext(); ) {
             EpitopeSelectionBean bean = i.next();
+            MyPortletUI.logger.info(bean.getImm());
+            MyPortletUI.logger.info(bean.getImm().keySet());
             for (String key : bean.getImm().keySet()) {
+                MyPortletUI.logger.info(key);
                     String peptide = bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean.getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean.getImm().get(key) + "\t" + bean.getMutation();
                 if (!type.equals("") && hasType) {
                         peptide += ("\t" + bean.getType());
@@ -177,7 +179,6 @@ public class WriterScriptInput {
                 allele_expressions.get("A") + "\t" +
                 allele_expressions.get("B") + "\t" +
                 allele_expressions.get("C") + "\t";
-        MyPortletUI.logger.info(alleleString);
         return alleleString;
     }
 

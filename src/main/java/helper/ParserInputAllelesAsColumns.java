@@ -207,8 +207,8 @@ public class ParserInputAllelesAsColumns {
                 newBean.setIncluded(false);
                 newBean.setExcluded(false);
                 newBean.setNeopeptide(peptide);
+                HashMap<String, String> imm = new HashMap<>();
                 try {
-                    HashMap<String, String> imm = new HashMap<>();
                     imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele));
                     imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele));
                     imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele));
@@ -221,7 +221,6 @@ public class ParserInputAllelesAsColumns {
                     newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
                     newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
                     newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
-                    newBean.setImm(imm);
                 } catch (NumberFormatException e) {
 
                 }
@@ -246,6 +245,7 @@ public class ParserInputAllelesAsColumns {
                 if (!(typeCol.equals("")) && hasType) {
                     newBean.setType(peptides.get(peptide).get(method).get("type"));
                 }
+                newBean.setImm(imm);
 
                 epitopes.addBean(newBean);
 
