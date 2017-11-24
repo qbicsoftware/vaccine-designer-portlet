@@ -78,8 +78,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private DescriptionHandler dh = new DescriptionHandler();
 
     //private String tmpPath = "/Users/spaethju/Desktop/";
-    private String tmpPath = "/tmp/";
     //private String homePath = "/Users/spaethju/";
+    private String tmpPath = "/tmp/";
     private String homePath = "/home/luser/";
     private String tmpPathRemote = "/home/jspaeth/";
     private String outputPath = "";
@@ -129,7 +129,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         generator = new RandomCharGenerator();
         random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
 
-        String username = "";
+        String username = "zxmqw74";
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
             username = LiferayAndVaadinUtils.getUser().getScreenName();
         }
