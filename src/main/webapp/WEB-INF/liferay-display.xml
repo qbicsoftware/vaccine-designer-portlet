@@ -3,6 +3,6 @@
 
 <display>
     <category name="Portlets">
-        <portlet id="Vaccine Designer"/>
+        <portlet id="Vaccine Designer" />
     </category>
 </display>
