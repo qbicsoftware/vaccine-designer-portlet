@@ -68,7 +68,7 @@ public class MyPortletUI extends UI {
             logger.error(
                     "User \"" + userID + "\" could not connect to openBIS and has been informed of this.");
             Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         LayoutMain mainLayout;

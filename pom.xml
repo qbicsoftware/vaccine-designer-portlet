@@ -15,6 +15,7 @@
         <vaadin.plugin.version>7.7.8</vaadin.plugin.version>
         <liferay.version>6.2.5</liferay.version>
         <liferay.maven.plugin.version>6.2.5</liferay.maven.plugin.version>
+        <jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
     </properties>
     <repositories>
         <repository>
@@ -28,9 +29,14 @@
             <url>http://maven.vaadin.com/vaadin-addons</url>
         </repository>
         <repository>
-            <id>nexusRelease</id>
+            <id>nexus-snap</id>
+            <name>qbic snapshots</name>
+            <url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-snapshots</url>
+        </repository>
+        <repository>
+            <id>nexus-release</id>
             <name>qbic release</name>
-            <url>https://peltzer.com.de/nexus/content/repositories/releases</url>
+            <url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-releases</url>
         </repository>
     </repositories>
 
@@ -104,20 +110,20 @@
             <groupId>com.liferay.portal</groupId>
             <artifactId>portal-service</artifactId>
             <version>${liferay.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.liferay.portal</groupId>
             <artifactId>util-java</artifactId>
             <version>${liferay.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>life.qbic.openbis</groupId>
             <artifactId>openbisclient</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
         </dependency>
 
         <dependency>
@@ -174,6 +180,15 @@
                             <directory>src/main/webapp/VAADIN/widgetsets</directory>
                         </fileset>
                     </filesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.plugin.version}</version>
+                <configuration>
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
                 </configuration>
             </plugin>
 
