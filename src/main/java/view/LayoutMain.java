@@ -77,11 +77,29 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<DatasetBean>(DatasetBean.class);
     private DescriptionHandler dh = new DescriptionHandler();
 
+    // local
     //private String tmpPath = "/Users/spaethju/Desktop/";
     //private String homePath = "/Users/spaethju/";
+    //private String sshKey = "key_rsa";
+    //private String epitopeSelectorContainer = "epitopeselector.img";
+
+    // testing
+    //private String tmpPath = "/tmp/";
+    //private String homePath = "/home/luser/";
+    //private String tmpPathRemote = "/home/jspaeth/";
+    //private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
+    //private String sshKey = "key_rsa";
+    //private String epitopeSelectorContainer = "epitopeselector.img";
+
+    // production
     private String tmpPath = "/tmp/";
-    private String homePath = "/home/luser/";
-    private String tmpPathRemote = "/home/jspaeth/";
+    private String homePath = "/home-link/zxmqw74/";
+    private String tmpPathRemote = "/home/lspaeth/";
+    private String epitopeSelectorVM = "lspaeth@qbic-epitope-selector.local";
+    private String sshKey = "epitope-selector";
+    private String epitopeSelectorContainer = "epitopeselector.simg";
+
+    // general
     private String outputPath = "";
     private String inputPath = "";
     private String allelePath = "";
@@ -92,7 +110,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private String remoteOutputPath = "";
     private String tmpAllelesPath = "";
     private String random = "";
-    private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de:";
     private String dropbox = "qeana08@data.qbic.uni-tuebingen.de";
     private String registerPath = "qeana08@data.qbic.uni-tuebingen.de:/mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming";
     private String filename = "";
@@ -368,8 +385,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 Process copy_result = Runtime.getRuntime().exec("cp " + tmpResultPath + " " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
                 copy_result.waitFor();
                 MyPortletUI.logger.info("cp " + tmpResultPath + " " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
-                scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName, registerPath);
-                Process markAsFinished = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/key_rsa " + dropbox + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_" + resultName);
+                scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName, registerPath, sshKey);
+                Process markAsFinished = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/" + sshKey + " " + dropbox + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_" + resultName);
                 Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
                 remove_result.waitFor();
                 MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
@@ -451,7 +468,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 runButton.setCaption("Re-Run");
                 runButton.setDescription(dh.getRerunButtonDescription());
                 try {
-                    Process mkdir = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir " + tmpPathRemote + random);
+                    Process mkdir = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/"+ sshKey + " " + epitopeSelectorVM +" mkdir " + tmpPathRemote + random);
                     mkdir.waitFor();
                 } catch (IOException | InterruptedException e) {
                     MyPortletUI.logger.error("Couldn't create folder on virtual machine.");
@@ -461,14 +478,15 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 ArrayList<String> p = new ArrayList<>();
                 p.add("ssh");
                 p.add("-i");
-                p.add(homePath + ".ssh/key_rsa");
-                p.add("jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de");
+                p.add(homePath + ".ssh/" + sshKey);
+                p.add(epitopeSelectorVM);
 
                 p.add("singularity");
                 p.add("run");
                 p.add("--bind");
+                //TODO WATCH HERE IF IT WORKS!
                 p.add("/root/COIN/bin/:/usr/local/bin/");
-                p.add("epitopeselector.img");
+                p.add(epitopeSelectorContainer);
 
                 p.add("-i");
                 p.add(tmpPathRemote + random + "/input.txt");
@@ -692,13 +710,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
             try {
                 try {
-                    Process mkdir_random = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir " + tmpPathRemote + random);
-                    System.out.println("ssh -i " + homePath + ".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de mkdir " + tmpPathRemote + random);
+                    Process mkdir_random = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/"+ sshKey + " " + epitopeSelectorVM + " mkdir " + tmpPathRemote + random);
+                    System.out.println("ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " mkdir " + tmpPathRemote + random);
                     mkdir_random.waitFor();
-                    scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM + random);
-                    scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM + random);
-                    scpFile.scpToRemote(homePath, includePath, epitopeSelectorVM + random);
-                    scpFile.scpToRemote(homePath, excludePath, epitopeSelectorVM + random);
+                    scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM +":" + random, sshKey);
+                    scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM+":" + random, sshKey);
+                    scpFile.scpToRemote(homePath, includePath, epitopeSelectorVM+":" + random, sshKey);
+                    scpFile.scpToRemote(homePath, excludePath, epitopeSelectorVM+":" + random, sshKey);
                 } catch (IOException | InterruptedException e) {
                     MyPortletUI.logger.error("Could not copy the files to the VM");
                     e.printStackTrace();
@@ -762,7 +780,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
      * Prepares the result to show them in the "Results" tab of the content accordion.
      */
     private void prepareResults() {
-        scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath);
+        scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath, sshKey);
         getResults();
         downloadButton.setVisible(true);
         String downloadFilePath = tmpResultPath.replace("tmp_result.txt", filename + "_epitopeSelection_results.tsv");
@@ -809,7 +827,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private void cleanFiles() {
         try {
             try {
-                Process remove_randomRemote = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/key_rsa jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de rm -rf " + tmpPathRemote + random);
+                Process remove_randomRemote = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " rm -rf " + tmpPathRemote + random);
                 remove_randomRemote.waitFor();
                 random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
             } catch (IOException | InterruptedException e) {
