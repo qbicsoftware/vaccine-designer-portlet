@@ -7,7 +7,7 @@
              version="2.0">
 
     <portlet>
-        <description>This is an Interactive Vaccine Designer portlet</description>
+        <description>This is an interactive Vaccine Designer</description>
         <portlet-name>Vaccine Designer</portlet-name>
         <display-name>Vaccine Designer</display-name>
 
