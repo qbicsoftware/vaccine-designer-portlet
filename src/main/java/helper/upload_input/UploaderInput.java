@@ -1,7 +1,9 @@
-package helper;
+package helper.upload_input;
 
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Upload.*;
+import helper.DescriptionHandler;
+import helper.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;

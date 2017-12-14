@@ -1,6 +1,7 @@
-package helper;
+package helper.parser;
 
 import com.vaadin.data.util.BeanItemContainer;
+import helper.Utils;
 import model.EpitopeResultBean;
 import model.ResultBean;
 

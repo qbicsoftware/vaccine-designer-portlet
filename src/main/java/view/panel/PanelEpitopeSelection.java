@@ -1,4 +1,4 @@
-package view;
+package view.panel;
 
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
@@ -22,8 +22,6 @@ import model.EpitopeSelectionBean;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
-
-import static java.awt.Color.red;
 
 /**
  * The class {@link PanelEpitopeSelection} represents a component for showing the uploaded epitope

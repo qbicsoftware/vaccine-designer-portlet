@@ -1,4 +1,4 @@
-package view;
+package view.panel;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.converter.StringToDoubleConverter;
@@ -18,7 +18,7 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Grid.SingleSelectionModel;
 import com.vaadin.ui.themes.ValoTheme;
 import helper.DescriptionHandler;
-import helper.UploaderInput;
+import helper.upload_input.UploaderInput;
 import helper.Utils;
 import model.DatasetBean;
 
@@ -258,7 +258,7 @@ public class PanelUpload extends CustomComponent {
         methodColTf = new TextField("Method Column");
         methodColTf.setStyleName("padded");
         methodColTf.setImmediate(true);
-        methodColTf.setValue("");
+        methodColTf.setValue("method");
         methodColTf.setDescription(dh.getUploadData_columnMethod());
 
         // taa column
@@ -272,14 +272,14 @@ public class PanelUpload extends CustomComponent {
         transcriptExpressionColTf = new TextField("Transcript Expression Column");
         transcriptExpressionColTf.setStyleName("padded");
         transcriptExpressionColTf.setImmediate(true);
-        transcriptExpressionColTf.setValue("");
+        transcriptExpressionColTf.setValue("transcript_expression");
         transcriptExpressionColTf.setDescription(dh.getUploadData_columnTranscriptExpression());
 
         // immunogenicity column
         immColTf = new TextField("Immunogenicity Column");
         immColTf.setStyleName("padded");
         immColTf.setImmediate(true);
-        immColTf.setValue("");
+        immColTf.setValue("prediction_score");
         immColTf.setDescription(dh.getUploadData_columnImm());
         immColTf.addValidator(new StringLengthValidator("Please enter a column name", 1, 100, true));
         immColTf.setRequired(true);
@@ -326,14 +326,14 @@ public class PanelUpload extends CustomComponent {
         hlaA1TF = new TextField();
         hlaA1TF.setStyleName("padded");
         hlaA1TF.setImmediate(true);
-        hlaA1TF.setValue("HLA-A*24:02");
+        hlaA1TF.setValue("HLA-A*03:01");
         hlaA1TF.setRequired(true);
         hlaA1TF.addValidator(hlaValidator);
         hlaA1TF.setDescription("HLA-A Allele");
         hlaA2TF = new TextField();
         hlaA2TF.setStyleName("padded");
         hlaA2TF.setImmediate(true);
-        hlaA2TF.setValue("HLA-A*29:02");
+        hlaA2TF.setValue("HLA-A*68:01");
         hlaA2TF.setDescription("HLA-A Allele");
         hlaA2TF.setRequired(true);
         hlaA2TF.addValidator(hlaValidator);
@@ -358,14 +358,14 @@ public class PanelUpload extends CustomComponent {
         hlaB1TF = new TextField();
         hlaB1TF.setStyleName("padded");
         hlaB1TF.setImmediate(true);
-        hlaB1TF.setValue("HLA-B*37:01");
+        hlaB1TF.setValue("HLA-B*15:01");
         hlaB1TF.setDescription("HLA-B Allele");
         hlaB1TF.setRequired(true);
         hlaB1TF.addValidator(hlaValidator);
         hlaB2TF = new TextField();
         hlaB2TF.setStyleName("padded");
         hlaB2TF.setImmediate(true);
-        hlaB2TF.setValue("HLA-B*44:03");
+        hlaB2TF.setValue("HLA-B*40:01");
         hlaB2TF.setDescription("HLA-B Allele");
         hlaB2TF.setRequired(true);
         hlaB2TF.addValidator(hlaValidator);
@@ -390,14 +390,14 @@ public class PanelUpload extends CustomComponent {
         hlaC1TF = new TextField();
         hlaC1TF.setStyleName("padded");
         hlaC1TF.setImmediate(true);
-        hlaC1TF.setValue("HLA-C*16:01");
+        hlaC1TF.setValue("HLA-C*03:03");
         hlaC1TF.setDescription("HLA-C Allele");
         hlaC1TF.setRequired(true);
         hlaC1TF.addValidator(hlaValidator);
         hlaC2TF = new TextField();
         hlaC2TF.setStyleName("padded");
         hlaC2TF.setImmediate(true);
-        hlaC2TF.setValue("HLA-C*06:02");
+        hlaC2TF.setValue("HLA-C*03:04");
         hlaC2TF.setDescription("HLA-C Allele");
         hlaC2TF.setRequired(true);
         hlaC2TF.addValidator(hlaValidator);

@@ -1,6 +1,7 @@
-package helper;
+package helper.writer;
 
 import com.vaadin.data.util.BeanItemContainer;
+import helper.DescriptionHandler;
 import model.EpitopeSelectionBean;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;

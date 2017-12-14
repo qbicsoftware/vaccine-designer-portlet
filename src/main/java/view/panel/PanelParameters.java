@@ -1,4 +1,4 @@
-package view;
+package view.panel;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.converter.StringToFloatConverter;
