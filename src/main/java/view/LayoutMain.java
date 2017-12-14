@@ -87,6 +87,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private BeanItemContainer<DatasetBean> container;
     private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<DatasetBean>(DatasetBean.class);
     private DescriptionHandler dh = new DescriptionHandler();
+    private FileDownloader downloader;
 
     // local
     /**
@@ -813,8 +814,11 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        if (downloader != null && downloadButton.getExtensions().contains(downloader)) {
+            downloadButton.removeExtension(downloader);
+        }
         Resource res = new FileResource(new File(downloadFilePath));
-        FileDownloader downloader = new FileDownloader(res);
+        downloader = new FileDownloader(res);
         downloader.extend(downloadButton);
         if (uploadPanel.getUseDatabase()) {
             registerButton.setVisible(true);
