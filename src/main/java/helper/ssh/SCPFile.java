@@ -1,4 +1,4 @@
-package helper;
+package helper.ssh;
 
 import life.qbic.MyPortletUI;
 

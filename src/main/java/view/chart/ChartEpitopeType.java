@@ -1,4 +1,4 @@
-package view;
+package view.chart;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.PointClickEvent;

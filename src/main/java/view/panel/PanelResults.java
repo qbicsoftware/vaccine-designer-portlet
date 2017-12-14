@@ -1,4 +1,4 @@
-package view;
+package view.panel;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;

@@ -1,4 +1,4 @@
-package helper;
+package helper.database;
 
 import ch.systemsx.cisd.openbis.dss.client.api.v1.DataSet;
 import ch.systemsx.cisd.openbis.plugin.query.shared.api.v1.dto.QueryTableModel;

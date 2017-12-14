@@ -1,4 +1,4 @@
-package helper;
+package helper.parser;
 
 import com.vaadin.data.util.BeanItemContainer;
 import life.qbic.MyPortletUI;

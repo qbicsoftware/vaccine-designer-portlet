@@ -22,11 +22,22 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.themes.ValoTheme;
 import helper.*;
+import helper.database.DBFileHandler;
+import helper.parser.ParserAlleleFile;
+import helper.parser.ParserInputAllelesAsColumns;
+import helper.parser.ParserInputAllelesAsRows;
+import helper.parser.ParserScriptResult;
+import helper.ssh.SCPFile;
+import helper.upload_input.UploaderInput;
+import helper.writer.WriterResults;
+import helper.writer.WriterScriptInput;
 import life.qbic.MyPortletUI;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 import model.DatasetBean;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import view.panel.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -78,26 +89,37 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private DescriptionHandler dh = new DescriptionHandler();
 
     // local
-    //private String tmpPath = "/Users/spaethju/Desktop/";
-    //private String homePath = "/Users/spaethju/";
-    //private String sshKey = "key_rsa";
-    //private String epitopeSelectorContainer = "epitopeselector.img";
+  //  /**
+    private String tmpPath = "/Users/spaethju/Desktop/";
+    private String homePath = "/Users/spaethju/";
+    private String tmpPathRemote = "/home/jspaeth/";
+    private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
+    private String sshKey = "key_rsa";
+    private String epitopeSelectorContainer = "epitopeselector.img";
+    private String cbcPath = "/root/COIN/bin/";
+   //  **/
 
     // testing
-    //private String tmpPath = "/tmp/";
-    //private String homePath = "/home/luser/";
-    //private String tmpPathRemote = "/home/jspaeth/";
-    //private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
-    //private String sshKey = "key_rsa";
-    //private String epitopeSelectorContainer = "epitopeselector.img";
+    /**
+    private String tmpPath = "/tmp/";
+    private String homePath = "/home/luser/";
+    private String tmpPathRemote = "/home/jspaeth/";
+    private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
+    private String sshKey = "key_rsa";
+    private String epitopeSelectorContainer = "epitopeselector.img";
+     private String cbcPath = "/root/COIN/bin/";
+     **/
 
     // production
+    /**
     private String tmpPath = "/tmp/";
     private String homePath = "/home-link/zxmqw74/";
-    private String tmpPathRemote = "/home/lspaeth/";
-    private String epitopeSelectorVM = "lspaeth@qbic-epitope-selector.local";
+    private String tmpPathRemote = "/home/jspaeth/";
+    private String epitopeSelectorVM = "jspaeth@qbic-epitope-selector.local";
     private String sshKey = "epitope-selector";
     private String epitopeSelectorContainer = "epitopeselector.simg";
+     private String cbcPath = "/root/cbc/bin/";
+    // **/
 
     // general
     private String outputPath = "";
@@ -260,7 +282,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                         sampleBarcode = sample.getCode();
                     }
                 }
-                String filename = uploadPanel.getSelected().getBean().getName();
+                filename = uploadPanel.getSelected().getBean().getName();
                 code = uploadPanel.getSelected().getBean().getCode();
                 path = uploadPanel.getSelected().getBean().getDssPath();
                 folder = path.replace("original/", "").replace(filename, "");
@@ -388,6 +410,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 scpFile.scpToRemote(homePath, tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName, registerPath, sshKey);
                 Process markAsFinished = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/" + sshKey + " " + dropbox + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_" + resultName);
                 Process remove_result = Runtime.getRuntime().exec("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
+                System.out.println(remove_result.getInputStream());
                 remove_result.waitFor();
                 MyPortletUI.logger.info("rm -f " + tmpPath + LiferayAndVaadinUtils.getUser().getScreenName() + "/" + resultName);
             } catch (IOException | InterruptedException e) {
@@ -485,7 +508,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 p.add("run");
                 p.add("--bind");
                 //TODO WATCH HERE IF IT WORKS!
-                p.add("/root/COIN/bin/:/usr/local/bin/");
+                p.add(cbcPath +":/usr/local/bin/");
                 p.add(epitopeSelectorContainer);
 
                 p.add("-i");
@@ -783,7 +806,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         scpFile.scpFromRemote(homePath, epitopeSelectorVM, remoteOutputPath, outputPath, sshKey);
         getResults();
         downloadButton.setVisible(true);
-        String downloadFilePath = tmpResultPath.replace("tmp_result.txt", filename + "_epitopeSelection_results.tsv");
+        String downloadFilePath = tmpResultPath.replace("tmp_result.txt", FilenameUtils.removeExtension(filename) + "_epitopeSelection_results.tsv");
         try {
             Process copy_download = Runtime.getRuntime().exec("cp " + tmpResultPath + " " + downloadFilePath);
             copy_download.waitFor();

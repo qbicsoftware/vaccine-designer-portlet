@@ -11,8 +11,8 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.WrappedPortletSession;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import helper.DBConfig;
-import helper.DBManager;
+import helper.database.DBConfig;
+import helper.database.DBManager;
 import helper.DescriptionHandler;
 import helper.Utils;
 import life.qbic.openbis.openbisclient.OpenBisClient;
@@ -23,8 +23,12 @@ import view.LayoutMain;
 
 import javax.portlet.PortletContext;
 import javax.portlet.PortletSession;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 @Theme("mytheme")
 @SuppressWarnings("serial")
@@ -36,6 +40,7 @@ public class MyPortletUI extends UI {
     private ConfigurationManager config = new ConfigurationManagerFactory().getInstance();
     private DescriptionHandler dh = new DescriptionHandler();
     private Boolean success;
+    private String url, pw, mysqlPW, mysqlUser, userID;
 
     @Override
     protected void init(VaadinRequest request) {
@@ -43,11 +48,13 @@ public class MyPortletUI extends UI {
             final String portletContextName = getPortletContextName(request);
             final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
         }
+
+        getCredentials();
+
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
         setContent(layout);
 
-        String userID = "zxmqw74";
         success = true;
         config = ConfigurationManagerFactory.getInstance();
 
@@ -60,8 +67,13 @@ public class MyPortletUI extends UI {
         // establish connection to the OpenBIS API
         try {
             logger.debug("trying to connect to openbis");
-            openbis = new OpenBisClient(config.getDataSourceUser(), config.getDataSourcePassword(),
-                    config.getDataSourceUrl());
+            if (LiferayAndVaadinUtils.isLiferayPortlet()) {
+                openbis = new OpenBisClient(config.getDataSourceUser(), config.getDataSourcePassword(),
+                        config.getDataSourceUrl());
+            } else {
+                openbis = new OpenBisClient(userID, pw, url);
+            }
+
             openbis.login();
         } catch (Exception e) {
             success = false;
@@ -123,4 +135,37 @@ public class MyPortletUI extends UI {
 
         return result;
     }
+
+    public void getCredentials() {
+        Properties prop = new Properties();
+        InputStream input = null;
+
+        try {
+
+            input = new FileInputStream("/Users/spaethju/liferay/qbic-ext.properties");
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property value and print it out
+            url = prop.getProperty("datasource.url");
+            pw = prop.getProperty("datasource.password");
+            userID = prop.getProperty("datasource.user");
+            mysqlPW = prop.getProperty("mysql.pass");
+            mysqlUser = prop.getProperty("mysql.user");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
 }

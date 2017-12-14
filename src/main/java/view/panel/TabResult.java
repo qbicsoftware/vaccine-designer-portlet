@@ -1,4 +1,4 @@
-package view;
+package view.panel;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.PointClickListener;
@@ -15,6 +15,8 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
 import model.ResultBean;
+import view.chart.ChartEpitopeType;
+import view.chart.ChartGene;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
