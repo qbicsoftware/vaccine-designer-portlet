@@ -89,7 +89,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private DescriptionHandler dh = new DescriptionHandler();
 
     // local
-  //  /**
+    /**
     private String tmpPath = "/Users/spaethju/Desktop/";
     private String homePath = "/Users/spaethju/";
     private String tmpPathRemote = "/home/jspaeth/";
@@ -100,7 +100,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    //  **/
 
     // testing
-    /**
+    ///**
     private String tmpPath = "/tmp/";
     private String homePath = "/home/luser/";
     private String tmpPathRemote = "/home/jspaeth/";
@@ -108,7 +108,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private String sshKey = "key_rsa";
     private String epitopeSelectorContainer = "epitopeselector.img";
      private String cbcPath = "/root/COIN/bin/";
-     **/
+    // **/
 
     // production
     /**
