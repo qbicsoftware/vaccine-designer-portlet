@@ -114,10 +114,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     // production
     ///**
     private String tmpPath = "/tmp/";
-    private String homePath = "/home-link/zxmqw74/";
+    private String homePath = "/home-link/tomcat-liferay/";
     private String tmpPathRemote = "/home/jspaeth/";
     private String epitopeSelectorVM = "jspaeth@qbic-epitope-selector.local";
-    private String sshKey = "epitope-selector";
+    private String sshKey = "id_rsa";
     private String epitopeSelectorContainer = "epitopeselector.simg";
      private String cbcPath = "/root/cbc/bin/";
     // **/
@@ -735,7 +735,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             try {
                 try {
                     Process mkdir_random = Runtime.getRuntime().exec("ssh -i " + homePath + ".ssh/"+ sshKey + " " + epitopeSelectorVM + " mkdir " + tmpPathRemote + random);
-                    System.out.println("ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " mkdir " + tmpPathRemote + random);
                     mkdir_random.waitFor();
                     scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM +":" + random, sshKey);
                     scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM+":" + random, sshKey);
