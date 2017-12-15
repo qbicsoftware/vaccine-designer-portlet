@@ -126,7 +126,7 @@
             <groupId>com.liferay.portal</groupId>
             <artifactId>portal-service</artifactId>
             <version>${liferay.version}</version>
-            <!-- compile for local testing - provided for portlet -->
+            <!-- compile for local testing - provided for liferay -->
             <scope>provided</scope>
         </dependency>
 
@@ -134,7 +134,7 @@
             <groupId>com.liferay.portal</groupId>
             <artifactId>util-java</artifactId>
             <version>${liferay.version}</version>
-            <!-- compile for local testing - provided for portlet -->
+            <!-- compile for local testing - provided for liferay -->
             <scope>provided</scope>
         </dependency>
 
