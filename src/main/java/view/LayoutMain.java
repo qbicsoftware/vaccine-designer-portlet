@@ -465,7 +465,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             epitopeSelectionPanel.getContainer().removeAllContainerFilters();
             if (!uploadPanel.getMethodColTf().getValue().equals("")) {
                 epitopeSelectionPanel.applyMethodFilter();
-                parameterPanel.update();
                 setParameterRange();
             }
             epitopeSelectionPanel.getGeneTf().setValue("");
