@@ -49,7 +49,7 @@ public class MyPortletUI extends UI {
             final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
         }
 
-        //getCredentials();
+        getCredentials();
 
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);

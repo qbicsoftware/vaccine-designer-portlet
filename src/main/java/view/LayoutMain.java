@@ -90,7 +90,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private FileDownloader downloader;
 
     // local
-    /**
+    ///**
     private String tmpPath = "/Users/spaethju/Desktop/";
     private String homePath = "/Users/spaethju/";
     private String tmpPathRemote = "/home/jspaeth/";
@@ -101,7 +101,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    //  **/
 
     // testing
-    ///**
+    /**
     private String tmpPath = "/tmp/";
     private String homePath = "/home/luser/";
     private String tmpPathRemote = "/home/jspaeth/";
