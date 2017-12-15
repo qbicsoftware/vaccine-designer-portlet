@@ -693,7 +693,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             epitopeSelectionPanel.getContainer().removeAllContainerFilters();
             if (!uploadPanel.getMethodColTf().getValue().equals("")) {
                 epitopeSelectionPanel.applyMethodFilter();
-                parameterPanel.update();
                 setParameterRange();
             }
             epitopeSelectionPanel.getGeneTf().setValue("");
@@ -708,7 +707,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         } else {
             epitopeSelectionPanel.getMethodSelect().addValueChangeListener((ValueChangeListener) event -> {
                 epitopeSelectionPanel.applyMethodFilter();
-                parameterPanel.update();
                 setParameterRange();
                 epitopeSelectionPanel.getDataGrid().setEnabled(true);
                 nextButton.setEnabled(true);
@@ -831,7 +829,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             if (!uploadPanel.getMethodColTf().getValue().equals("")) {
                 epitopeSelectionPanel.applyMethodFilter();
                 setParameterRange();
-                parameterPanel.update();
             }
             epitopeSelectionPanel.getGeneTf().setValue("");
             epitopeSelectionPanel.getMutationTf().setValue("");
