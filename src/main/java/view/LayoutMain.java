@@ -101,7 +101,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    //  **/
 
     // testing
-    /**
+    ///**
     private String tmpPath = "/tmp/";
     private String homePath = "/home/luser/";
     private String tmpPathRemote = "/home/jspaeth/";
@@ -112,7 +112,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     // **/
 
     // production
-    ///**
+    /**
     private String tmpPath = "/tmp/";
     private String homePath = "/home-link/tomcat-liferay/";
     private String tmpPathRemote = "/home/jspaeth/";
