@@ -1,0 +1,121 @@
+// Global variable overrides. Must be declared before importing Valo.
+// Defines the plaintext font size, weight and family. Font size affects general component sizing.
+//$v-font-size: 16px;
+//$v-font-weight: 300;
+//$v-font-family: "Open Sans", sans-serif;
+// Defines the border used by all components.
+//$v-border: 1px solid (v-shade 0.7);
+//$v-border-radius: 4px;
+// Affects the color of some component elements, e.g Button, Panel title, etc
+//$v-background-color: hsl(210, 0%, 98%);
+// Affects the color of content areas, e.g  Panel and Window content, TextField input etc
+//$v-app-background-color: $v-background-color;
+// Affects the visual appearance of all components
+//$v-gradient: v-linear 8%;
+//$v-bevel-depth: 30%;
+//$v-shadow-opacity: 5%;
+// Defines colors for indicating status (focus, success, failure)
+//$v-focus-color: valo-focus-color(); // Calculates a suitable color automatically
+//$v-friendly-color: #2c9720;
+//$v-error-indicator-color: #ed473b;
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+/* Import the valo theme. */
+/* This only allows us to use the mixins defined in it and does not add any styles by itself. */
+@import "../valo/valo.scss";
+
+/* This contains all of your theme. */
+/* If somebody wants to extend the theme she will include this mixin. */
+@mixin mytheme {
+  /* Include all the styles from the valo theme */
+  @include valo;
+
+  /* Insert your theme rules here */
+  .header {
+    color: valo-focus-color();
+    font-size: 25px;
+    font-weight: bold;
+    font-variant: small-caps;
+  }
+
+  .v-accordion-item-open .v-accordion-item-caption .v-caption {
+    color: valo-focus-color();
+    font-weight: bold;
+  }
+
+  .out {
+    color: #ed473b;
+  }
+  .in {
+    color: #2c9720;
+  }
+
+  .v-grid-row.excluded {
+    color: #ed473b;
+  }
+  .v-grid-row.included {
+    color: #2c9720;
+    font-weight: bold;
+  }
+
+  .v-upload .gwt-FileUpload {
+    font-size: 12px;
+  }
+
+  .parameter {
+    color: valo-focus-color();
+    font-size: 25px;
+  }
+
+  .center {
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto
+  }
+
+  .padded {
+    padding: 10px 10px 15px 10px;
+  }
+
+  .info {
+    color: #2c9720;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .v-slider .v-caption {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .notselected {
+    opacity: 0.5;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+
+  .button_huge {
+    font-size: 3.5em;
+  }
+
+  .v-label.description {
+    border-left: 6px solid valo-focus-color();
+    background-color: #e6f0ff;
+    padding-top: 6px;
+    padding-right: 10px;
+    padding-left: 6px;
+    padding-bottom: 6px;
+    margin-top: 5px;
+    margin-right: 15px;
+    margin-left: 5px;
+    margin-bottom: 20px;
+
+  }
+
+  .v-textfield {
+    height: 50px;
+  }
+
+}
