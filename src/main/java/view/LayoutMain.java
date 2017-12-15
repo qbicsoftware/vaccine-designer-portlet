@@ -91,14 +91,14 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
     // local
     /**
-    private String tmpPath = "/Users/spaethju/Desktop/";
-    private String homePath = "/Users/spaethju/";
-    private String tmpPathRemote = "/home/jspaeth/";
-    private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
-    private String sshKey = "key_rsa";
-    private String epitopeSelectorContainer = "epitopeselector.img";
-    private String cbcPath = "/root/COIN/bin/";
-   //  **/
+     private String tmpPath = "/Users/spaethju/Desktop/";
+     private String homePath = "/Users/spaethju/";
+     private String tmpPathRemote = "/home/jspaeth/";
+     private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
+     private String sshKey = "key_rsa";
+     private String epitopeSelectorContainer = "epitopeselector.img";
+     private String cbcPath = "/root/COIN/bin/";
+     //  **/
 
     // testing
     /**
@@ -108,19 +108,19 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
     private String sshKey = "key_rsa";
     private String epitopeSelectorContainer = "epitopeselector.img";
-     private String cbcPath = "/root/COIN/bin/";
+    private String cbcPath = "/root/COIN/bin/";
     // **/
 
     // production
     ///**
-    private String tmpPath = "/tmp/";
-    private String homePath = "/home-link/tomcat-liferay/";
-    private String tmpPathRemote = "/home/jspaeth/";
-    private String epitopeSelectorVM = "jspaeth@qbic-epitope-selector.local";
-    private String sshKey = "id_rsa";
-    private String epitopeSelectorContainer = "epitopeselector.simg";
+     private String tmpPath = "/tmp/";
+     private String homePath = "/home-link/tomcat-liferay/";
+     private String tmpPathRemote = "/home/jspaeth/";
+     private String epitopeSelectorVM = "jspaeth@qbic-epitope-selector.local";
+     private String sshKey = "id_rsa";
+     private String epitopeSelectorContainer = "epitopeselector.simg";
      private String cbcPath = "/root/cbc/bin/";
-    // **/
+     // **/
 
     // general
     private String outputPath = "";
@@ -465,7 +465,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             epitopeSelectionPanel.getContainer().removeAllContainerFilters();
             if (!uploadPanel.getMethodColTf().getValue().equals("")) {
                 epitopeSelectionPanel.applyMethodFilter();
-                parameterPanel.update();
                 setParameterRange();
             }
             epitopeSelectionPanel.getGeneTf().setValue("");
@@ -694,7 +693,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             epitopeSelectionPanel.getContainer().removeAllContainerFilters();
             if (!uploadPanel.getMethodColTf().getValue().equals("")) {
                 epitopeSelectionPanel.applyMethodFilter();
-                parameterPanel.update();
                 setParameterRange();
             }
             epitopeSelectionPanel.getGeneTf().setValue("");
@@ -709,7 +707,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         } else {
             epitopeSelectionPanel.getMethodSelect().addValueChangeListener((ValueChangeListener) event -> {
                 epitopeSelectionPanel.applyMethodFilter();
-                parameterPanel.update();
                 setParameterRange();
                 epitopeSelectionPanel.getDataGrid().setEnabled(true);
                 nextButton.setEnabled(true);
@@ -832,7 +829,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             if (!uploadPanel.getMethodColTf().getValue().equals("")) {
                 epitopeSelectionPanel.applyMethodFilter();
                 setParameterRange();
-                parameterPanel.update();
             }
             epitopeSelectionPanel.getGeneTf().setValue("");
             epitopeSelectionPanel.getMutationTf().setValue("");
