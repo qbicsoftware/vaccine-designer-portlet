@@ -94,6 +94,3 @@ The Interactive Vaccine Designer is avaiable as a portlet of [QPortal](https://p
 ## Authors
 
 * **Julian Späth** - *Initial work* - [Quantitative Biology Center Tübingen](https://www.uni-tuebingen.de/einrichtungen/zentrale-einrichtungen/zentrum-fuer-quantitative-biologie-qbic.html)
-
-## Problems
-If you recognize any bugs or other problems please send an e-mail with the description of your problem directly to [Julian Späth](mailto:spaethju@posteo.de).

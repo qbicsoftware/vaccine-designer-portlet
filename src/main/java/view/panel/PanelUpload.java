@@ -461,7 +461,7 @@ public class PanelUpload extends CustomComponent {
         downloadManualButton = new Button("How-to");
         downloadManualButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         downloadManualButton.setIcon(FontAwesome.BOOK);
-        Resource res = new FileResource(new File(basepath + "/WEB-INF/files/Interactive_Vaccine_Designer.pdf"));
+        Resource res = new FileResource(new File(basepath + "/WEB-INF/files/vaccineDesigner_howto.pdf"));
         FileDownloader downloader = new FileDownloader(res);
         downloader.extend(downloadManualButton);
 
