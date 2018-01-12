@@ -7,9 +7,7 @@ import com.vaadin.data.validator.NullValidator;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.event.SelectionEvent.SelectionListener;
-import com.vaadin.server.FileResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinService;
+import com.vaadin.server.*;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -42,7 +40,7 @@ public class PanelUpload extends CustomComponent {
     private TextField immColTf, distanceColTf, uncertaintyColTf, taaColTf, methodColTf, hlaA1TF, hlaB1TF, hlaC1TF, hlaA2TF, hlaB2TF, hlaC2TF, hlaAEVTF, hlaBEVTF, hlaCEVTF, transcriptExpressionColTf;
     private ComboBox projectSelectionCB;
     private ComboBox alleleFileSelectionCB;
-    private Button uploadButton, dataSelectionUploadButton, dataSelectionDatabaseButton, manualButton, databaseButton, nextButton;
+    private Button uploadButton, dataSelectionUploadButton, dataSelectionDatabaseButton, manualButton, databaseButton, nextButton, downloadManualButton;
     private Grid datasetGrid;
     private BeanItem<DatasetBean> selected;
     private Boolean useDatabase;
@@ -51,12 +49,16 @@ public class PanelUpload extends CustomComponent {
     private HashMap<String, String> alleles, allele_expressions;
     private DescriptionHandler dh = new DescriptionHandler();
     private Label hlaDescription, databaseUploadDescription;
-    private NullValidator nv = new NullValidator("Please choose an allele file from the database", false);
+    private NullValidator nv = new NullValidator("Please choose an allele file from the " +
+            "database", false);
+    private String basepath;
 
     /**
      * Constructor
      */
     public PanelUpload() {
+        basepath = VaadinService.getCurrent()
+                .getBaseDirectory().getAbsolutePath();
         init();
     }
 
@@ -456,7 +458,14 @@ public class PanelUpload extends CustomComponent {
             alleleFileSelection.setVisible(true);
         });
 
-        dataSelectionLayout.addComponents(dataSelectionUploadButton, dataSelectionDatabaseButton);
+        downloadManualButton = new Button("How-to");
+        downloadManualButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        downloadManualButton.setIcon(FontAwesome.BOOK);
+        Resource res = new FileResource(new File(basepath + "/WEB-INF/files/vaccineDesigner_howto.pdf"));
+        FileDownloader downloader = new FileDownloader(res);
+        downloader.extend(downloadManualButton);
+
+        dataSelectionLayout.addComponents(dataSelectionUploadButton, dataSelectionDatabaseButton, downloadManualButton);
         dataSelectionLayout.setComponentAlignment(dataSelectionUploadButton, Alignment.MIDDLE_CENTER);
         dataSelectionLayout.setComponentAlignment(dataSelectionDatabaseButton, Alignment.MIDDLE_CENTER);
 
@@ -567,8 +576,6 @@ public class PanelUpload extends CustomComponent {
         HorizontalLayout rowLayout = new HorizontalLayout();
         rowLayout.addStyleName("clickable");
         rowLayout.addStyleName("notselected");
-        String basepath = VaadinService.getCurrent()
-                .getBaseDirectory().getAbsolutePath();
         FileResource rowRe = new FileResource(new File(basepath + "/WEB-INF/images/row.png"));
         Image rowImage = new Image(null, rowRe);
         rowImage.addClickListener((MouseEvents.ClickListener) event -> {
