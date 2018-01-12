@@ -507,7 +507,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
                 p.add("singularity");
                 p.add("run");
                 p.add("--bind");
-                //TODO WATCH HERE IF IT WORKS!
                 p.add(cbcPath +":/usr/local/bin/");
                 p.add(epitopeSelectorContainer);
 
