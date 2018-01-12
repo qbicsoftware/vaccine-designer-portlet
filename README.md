@@ -1,10 +1,11 @@
-<img src="/Users/spaethju/Downloads/qbic_logo.png"
+<img src="img/vaccine_designer/qbic_logo.png"
      style="float: right; 
      margin-right: 10px;
      width: 20%;" />
+
 # Interactive Vaccine Designer 
 
-A portlet for the interactive design of individualized vaccines 
+A portlet for the interactive design of individualized vaccines. 
 
 ## Getting Started
 
@@ -27,15 +28,15 @@ The Interactive Vaccine Designer is avaiable as a portlet of [QPortal](https://p
 	* Make sure the alleles fit to your input file, this is not done automatically yet. 
 5. Choose a file from your directory and press the *Upload*-Button
 
-![start](/Users/spaethju/Desktop/vaccine_designer/start.png)
+![start](img/vaccine_designer/start.png)
 
-![1](/Users/spaethju/Desktop/vaccine_designer/1.png)
+![1](img/vaccine_designer/1.png)
 
-![2](/Users/spaethju/Desktop/vaccine_designer/2.png)
+![2](img/vaccine_designer/2.png)
 
-![3](/Users/spaethju/Desktop/vaccine_designer/3.png)
+![3](img/vaccine_designer/3.png)
 
-![4](/Users/spaethju/Desktop/vaccine_designer/4.png)
+![4](img/vaccine_designer/4.png)
 
 **Choose file from database**
 
@@ -51,9 +52,9 @@ The Interactive Vaccine Designer is avaiable as a portlet of [QPortal](https://p
 5. Choose a project from your space and the epitope prediction file of your choice. Also choose an allele file.
 	* Make sure the allele-file fits to your input file, this is not done automatically yet. 
 
-![4](/Users/spaethju/Desktop/vaccine_designer/9.png)
+![5](img/vaccine_designer/9.png)
 
-![4](/Users/spaethju/Desktop/vaccine_designer/10.png)
+![6](img/vaccine_designer/10.png)
 
 ### Epitope Pre-Selection
 
@@ -62,14 +63,14 @@ The Interactive Vaccine Designer is avaiable as a portlet of [QPortal](https://p
 3. Peptides you do not want to have in your final set can be marked as excluded, so they are ignored during the computation
 4. Click on the *Next*-Button to continue.
 
-![5](/Users/spaethju/Desktop/vaccine_designer/5.png)
+![7](img/vaccine_designer/5.png)
 
 ### Parameter Adjustment
 
 1. Set the parameter values as needed, but be aware that for some parameter combinations the interavtive vaccine designer cannot compute a solution. Choose the parameters wisely.
 2. Press the *Run*-Button to start the computation. Is the computation takes to much time it can be easily canceled by pressing the *Cancel*-Button. If the computation is not successfull a corresponding notification shows up and you should try to check if your parameters do make sense or if you falsely described your epitope prediction or allele file.
 
-![6](/Users/spaethju/Desktop/vaccine_designer/6.png)
+![8](img/vaccine_designer/6.png)
 
 ### Results Overview
 
@@ -79,9 +80,9 @@ The Interactive Vaccine Designer is avaiable as a portlet of [QPortal](https://p
 4. The *Save*-Button downloads all of the computed results in a Text-File to save it on a directory on your Computer.
 5. Did you choose the database file upload there is an additional Button called *Register*. That button registers your current results to the corresponding project in the database.
 
-![7](/Users/spaethju/Desktop/vaccine_designer/7.png)
+![9](img/vaccine_designer/7.png)
 
-![8](/Users/spaethju/Desktop/vaccine_designer/8.png)
+![10](img/vaccine_designer/8.png)
 
 ## Built With
 
