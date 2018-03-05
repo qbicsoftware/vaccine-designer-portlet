@@ -92,5 +92,5 @@ The Interactive Vaccine Designer is avaiable as a portlet of [QPortal](https://p
 
 
 ## Authors
-
+* **Christopher Mohr** - [Applied Bioinformatics](https://abi.inf.uni-tuebingen.de/)
 * **Julian Späth** - *Initial work* - [Quantitative Biology Center Tübingen](https://www.uni-tuebingen.de/einrichtungen/zentrale-einrichtungen/zentrum-fuer-quantitative-biologie-qbic.html)
