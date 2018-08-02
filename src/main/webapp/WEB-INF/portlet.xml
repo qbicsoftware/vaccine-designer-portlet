@@ -10,7 +10,7 @@
     <description>Interactive Vaccine Designer Portlet for the design of individualized vaccines
       against cancer.
     </description>
-    <portlet-name>vaccine-designer-portlet</portlet-name>
+    <portlet-name>${project.artifactId}</portlet-name>
     <display-name>Vaccine Designer Portlet</display-name>
 
     <portlet-class>com.vaadin.server.VaadinPortlet</portlet-class>
