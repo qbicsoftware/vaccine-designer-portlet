@@ -1,3 +1,4 @@
+// If you edit this file you need to compile the theme. See README.md for details.
 // Global variable overrides. Must be declared before importing Valo.
 // Defines the plaintext font size, weight and family. Font size affects general component sizing.
 //$v-font-size: 16px;
@@ -31,6 +32,7 @@
   @include valo;
 
   /* Insert your theme rules here */
+
   .header {
     color: valo-focus-color();
     font-size: 25px;
@@ -118,4 +120,9 @@
     height: 50px;
   }
 
+  .portlet-footer {
+    font-size: 9pt;
+    text-align: right;
+    padding-top: 50px;
+  }
 }

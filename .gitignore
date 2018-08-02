@@ -2,6 +2,9 @@
 .classpath
 .project
 .settings/
+
+# VS Code
+.vscode
  
 # Intellij
 .idea/
@@ -12,5 +15,10 @@
 .DS_Store
  
 # Maven
-log/
 target/
+
+# Some of our applications generate logs, which should be ignored by git
+logs/
+
+# Other
+**/.factorypath
