@@ -2,7 +2,7 @@
 #
 
 # use fast-boot container-based hosts
-sudo: false
+sudo: false 
 dist: trusty
 
 # no need to check for oracle's java
@@ -21,23 +21,28 @@ branches:
   - development
 
 # added to make logs look cleaner, crisper, certified fresh
-before_install: unset _JAVA_OPTIONS
+before_install: unset _JAVA_OPTIONS 
 
 # speed up builds by telling Travis that we don't need any special "installation"
 install: true
 
+# check if we need to add a license file for Vaadin charts
+before_script: if [ "$VAADIN_CHARTS_LICENSE_CODE" != "" ]; then
+                  echo "$VAADIN_CHARTS_LICENSE_CODE" > ~/.vaadin.charts.developer.license;
+               fi;
+
 # as agreed in our SOP, build everything (don't deploy, just try to 'mvn install' locally, which covers all phases)
 script: mvn --quiet --activate-profiles !development-build,!release-build --settings .travis.settings.xml clean cobertura:cobertura install
 # upload code coverage report, generate maven site (javadocs, documentation, static code analysis, etc.)
-after_success:
+after_success: 
 - bash <(curl -s https://codecov.io/bash)
 - mvn --quiet --activate-profiles !development-build,!release-build --settings .travis.settings.xml site
 
 # upload to maven
 deploy:
-# as agreed in our SOP, builds on development branch will deploy to our maven repository after validating
-# the artifact has a proper SNAPSHOT version
-# artifact will be installed in our testing instance if it is a .war file
+  # as agreed in our SOP, builds on development branch will deploy to our maven repository after validating
+  # the artifact has a proper SNAPSHOT version
+  # artifact will be installed in our testing instance if it is a .war file
 - skip_cleanup: true
   provider: script
   script: mvn --quiet --activate-profiles development-build,!release-build --settings .travis.settings.xml deploy
@@ -52,7 +57,7 @@ deploy:
   script: mvn --quiet --activate-profiles !development-build,release-build --settings .travis.settings.xml deploy
   on:
     branch: master
-    tags: true
+    condition: '"$TRAVIS_EVENT_TYPE" = "push"'
 
 # change according to your needs, but we recommend to deactivate email notifications
 # for now, we configured Travis to send a notification to the #travis-ci channel 
@@ -60,9 +65,16 @@ notifications:
   email:
     on_success: never
     on_failure: never
-  slack:
+  slack: 
     on_success: never
     on_failure: always
     # edit the following section if you want to get slack notifications
     rooms:
-    - secure: "***"
+      - secure: "***"
+#
+# credentials
+env:
+  global:
+    - secure: "M0BJs8G2FLZkwPvsboWjLaBfd3lROLr8Fbtb6GWO4EK6baPjWk4CpUtGEFhizEqUP622ib89lC9Qtbcr0gGcDH1psjQWmFq+i68JZzEqZ1Gb+6sjys5QMtZCSUXMr9FRSRezf9OghFS1xG76reTo+GngsLz8zpqjnmizNqZCEz1rP6k1k8zKfG7n0nG7uoc2SLV2IlBz0bRSi30EYzsmccY50ONvuBiiTEgLyHToOwaS7tiC6qlOq2Xc+u4W3qkT1w/zwlBVN4T7kT/8nHWnAj98UyA4jvgGPWNvGIeI5aVM2Hin3P6rB/9+ThX36m5bxzsfSub2Xlj4gsW3PSAeyqtt0fGrdjQ6PSbHxOSBjLFdMTZgeg3XlXTVojAMQVsepbbdOQ9l25kn/v+1L4MqXbG6Wab0eHqmACqclUy3r9DQQYgD+0WchrgLTBfqTDfWxfrn26pXy83UpFWygqJFIOz+Y5kZPCED2UoA+YLpcViurzQVRVJCXE9Xl2KQb+QR9pyqgTlwsrvLY986mF/Ans2ZjnjckcDokoB9zw6NWdYRfGYrmKDAYL+xzhWrZ+42eyyncwFSKbq9wK74EaK50PQ1EEN+IyCwTI6YCzcOp85XcvNdGNArPKwHlpX6Dv/Ufdn2Xaz4uVSrJTbRs99J2QePa2+J79eefjcRKd4wfi8="
+    - secure: "bMxsVyeCaxNFqoXh6jB6qdtRkTPP6P4jvqbDxAIrX57UGLBd/aMJfNThsAXGGVUJzqO7XssMcGilMVfKgOb4x8aDHgTNoMIzr2kKZA3BcJzzw+XUERVP5gpmeIjBM2CzdYLqbAdEGMJzTd6SCGCTG8HOyDL1D3kOvaIKnQQuol5FmK3VM3S9PDKeXEZAX/8+WqgBzbUOksy45N88eBwAPOvbuO9sE6K22aeJXbzDmYJEFN8eQv68eD5nhHYnqfVqFIkNIjPQXQj5572rj1vYDutvLUX4Pql8AxS5SmG1ZKYym79hQrkY+CD8//tkC8DEdbziLP05+LCOSmBo7bnurIDgD9p/BpYbtdPUzoQA9tVq5mfRQsdvEzEdh9BurTlIYXVG8EXKPCpYW0/4D14T7Ddo0SJQ4nHo1vmqsnewZ3KlJIBUz3ytZnS0P3x74AEayw/nCxgXFiT20NKeBFsQ5TkzXncxGZfu9aw2svLEhsx3kEdy4lHotYYb/v7Ew7M/4Gxq6tMQJQb2t9TpkN15FslFfjGQWqan0mdYd24pYCe80BDmRvH8EBodTueBZXQCafi6JEsp4qL0I9WkofLGDK5RtMeyTmJoZ4l57812D7oq1iSzogBikRLaknoNJxjf01qwDp5ESi0cs43GpIClyxyQWJjnTBjiNlGPohyL62c="
+    - secure: "Ok8I2QU29tGGAtqvpZaXNWH6MwNthF9AA+sofDyCVkQ80mBrYdeBla1mBf5ooOKHwcETrQkzrckdI/wirK/k3UtRr5kOTCg6N/WvyzXz0uLMMPoHTdJ3M7fZ18cEqt+ZeIMA7ZRE8nbqwvBOr050JWko1Z6wBviEct0A16ZZqt8m1pW2ghle6Rcf0bw6/ruDRxhOA45fq7BxeNRtFR4S+PiC0KykGtE+YQ/E8gYpEVGGa0TGX2raPNmfCn2rUTGZ0rydAN+tJI4znOdtlhFllcTrTfI3RRFOv2bgPt1feVxtY09TmalayNehwlVPEeii1i3JvJD1emSAc2z4K3QHpcwJLbm4UJVThKgbuCDWoL82BBpyQQxpnL3OL3YJY7L15wGAgPhV5ILkkldMYqFqgMW2VBYCdhGBJ5hiYCkGQNUs7I/0k/Kwfrz23pEYyRO+58AmYjqKczpaNm9P6HPqkB2S52s4u/9bQVDH5lCVjostfcqYUKFk8IqNF0tVfOCqGe9mvNrd8l4A7tdYj0TA8tBj4twVnnEOjxbt+gOdgFTQFmMc8F6qqai8+FCPD50uDm1EcdtAarVI96RjCdBqUt26Q6fnznl9U/nkXcbAvc2a5wZhT0N7BoN1dxUY+MuV9wTZg8YSBww8DSd4EKLrUuVDgxaRl2ZeO/RiaQOOzd4="
