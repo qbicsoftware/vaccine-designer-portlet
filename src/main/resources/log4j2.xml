@@ -1,0 +1,15 @@
+<Configuration status="INFO">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{dd.MM.yyyy HH:mm:ss} [%level] [%logger{1}] - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger additivity="false" level="info" name="life.qbic">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Root level="all">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

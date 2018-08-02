@@ -1,20 +1,29 @@
 <?xml version="1.0"?>
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
-    <display-name>Vaccine Designer</display-name>
-    <servlet>
-        <servlet-name>Vaccine Designer</servlet-name>
-        <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0"
+  xmlns="http://java.sun.com/xml/ns/j2ee">
 
-        <init-param>
-            <param-name>UI</param-name>
-            <param-value>life.qbic.MyPortletUI</param-value>
-        </init-param>
+  <!-- Set to false only if you know what you are doing. -->
+  <!-- You don't know what you're doing but want to know?
+     Check this out: https://vaadin.com/docs/v7/framework/advanced/advanced-debug.html#advanced.debug -->
+  <context-param>
+    <param-name>productionMode</param-name>
+    <param-value>true</param-value>
+  </context-param>
 
-    </servlet>
+  <display-name>Vaccine Designer Portlet</display-name>
+  <servlet>
+    <servlet-name>vaccine-designer-portlet</servlet-name>
+    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
 
-    <servlet-mapping>
-        <servlet-name>Vaccine Designer</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
+    <init-param>
+      <param-name>UI</param-name>
+      <param-value>life.qbic.portal.portlet.MyPortletUI</param-value>
+    </init-param>
+
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>vaccine-designer-portlet</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
 </web-app>

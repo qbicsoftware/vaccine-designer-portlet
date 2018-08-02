@@ -13073,3 +13073,9 @@ div.v-layout.v-horizontal.v-widget {
 .mytheme .v-textfield {
 	height: 50px;
 }
+
+.mytheme .portlet-footer {
+	font-size: 9pt;
+	text-align: right;
+	padding-top: 50px;
+}
