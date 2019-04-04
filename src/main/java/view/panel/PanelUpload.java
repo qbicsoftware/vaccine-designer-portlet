@@ -35,7 +35,10 @@ import helper.Utils;
 import helper.upload_input.UploaderInput;
 import java.io.File;
 import java.util.HashMap;
+
 import model.DatasetBean;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The class {@link PanelUpload} represents a component which allows the user to define column names
@@ -66,6 +69,7 @@ public class PanelUpload extends CustomComponent {
   private NullValidator nv = new NullValidator("Please choose an allele file from the " +
       "database", false);
   private String basepath;
+  private static final Logger LOG = LogManager.getLogger(PanelUpload.class);
 
   /**
    * Constructor
@@ -458,6 +462,7 @@ public class PanelUpload extends CustomComponent {
     dataSelectionUploadButton.setStyleName(ValoTheme.BUTTON_LARGE);
     dataSelectionUploadButton.setIcon(FontAwesome.DESKTOP);
     dataSelectionUploadButton.addClickListener((Button.ClickListener) event -> {
+      LOG.info("Upload data from directory");
       useDatabase = false;
       dataLayout.setVisible(false);
       buttonLayout.setVisible(true);
@@ -470,6 +475,7 @@ public class PanelUpload extends CustomComponent {
     dataSelectionDatabaseButton.setStyleName(ValoTheme.BUTTON_LARGE);
     dataSelectionDatabaseButton.setIcon(FontAwesome.DATABASE);
     dataSelectionDatabaseButton.addClickListener((Button.ClickListener) event -> {
+      LOG.info("DATABASE selected");
       useDatabase = true;
       dataLayout.setVisible(false);
       buttonLayout.setVisible(true);
@@ -495,9 +501,6 @@ public class PanelUpload extends CustomComponent {
     return allDataSelectionLayout;
   }
 
-  public Panel getUploadPanel() {
-    return uploadPanel;
-  }
 
   public VerticalLayout createDatabaseSelection() {
     databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUpload());
