@@ -31,9 +31,11 @@ import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import helper.DescriptionHandler;
+import helper.EpitopePredictionFileHelper;
 import helper.Utils;
 import helper.upload_input.UploaderInput;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import model.DatasetBean;
@@ -67,7 +69,7 @@ public class PanelUpload extends CustomComponent {
   private DescriptionHandler dh = new DescriptionHandler();
   private Label hlaDescription, databaseUploadDescription;
   private NullValidator nv = new NullValidator("Please choose an allele file from the " +
-      "database", false);
+          "database", false);
   private String basepath;
   private static final Logger LOG = LogManager.getLogger(PanelUpload.class);
 
@@ -76,7 +78,7 @@ public class PanelUpload extends CustomComponent {
    */
   public PanelUpload() {
     basepath = VaadinService.getCurrent()
-        .getBaseDirectory().getAbsolutePath();
+            .getBaseDirectory().getAbsolutePath();
     init();
   }
 
@@ -116,8 +118,8 @@ public class PanelUpload extends CustomComponent {
     fileTypeSelectionLayout.setVisible(false);
 
     panelContent
-        .addComponents(dataLayout, alleleFileSelection, fileTypeSelectionLayout, uploadLayout,
-            columnLayout, hlaExpressionLayout, databaseLayout, buttonLayout);
+            .addComponents(dataLayout, alleleFileSelection, fileTypeSelectionLayout, uploadLayout,
+                    columnLayout, hlaExpressionLayout, databaseLayout, buttonLayout);
     panelContent.setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
 
     // Create the panel
@@ -223,19 +225,17 @@ public class PanelUpload extends CustomComponent {
           Utils.notification("Error", dh.getUploadData_immValidatorDescription(), "error");
         }
       } else if (hlaExpressionLayout.isVisible()) {
-        if (isHlaExpressionlValid()) {
+        if (isHlaValid() && isHlaExpressionlValid()) {
           if (!alleleFileUpload) {
-            if (isHlalValid()) {
-              alleles.clear();
-              alleles.put("A1", hlaA1TF.getValue().replace("HLA-", ""));
-              alleles.put("A2", hlaA2TF.getValue().replace("HLA-", ""));
-              alleles.put("B1", hlaB1TF.getValue().replace("HLA-", ""));
-              alleles.put("B2", hlaB2TF.getValue().replace("HLA-", ""));
-              alleles.put("C1", hlaC1TF.getValue().replace("HLA-", ""));
-              alleles.put("C2", hlaC2TF.getValue().replace("HLA-", ""));
-            } else {
-              Utils.notification("Error", dh.getUploadData_hlaValidatorDescription(), "error");
-            }
+            alleles.clear();
+            alleles.put("A1", hlaA1TF.getValue().replace("HLA-", ""));
+            alleles.put("A2", hlaA2TF.getValue().replace("HLA-", ""));
+            alleles.put("B1", hlaB1TF.getValue().replace("HLA-", ""));
+            alleles.put("B2", hlaB2TF.getValue().replace("HLA-", ""));
+            alleles.put("C1", hlaC1TF.getValue().replace("HLA-", ""));
+            alleles.put("C2", hlaC2TF.getValue().replace("HLA-", ""));
+          } else {
+            Utils.notification("Error", dh.getUploadData_hlaValidatorDescription(), "error");
           }
           allele_expressions.put("A", hlaAEVTF.getValue());
           allele_expressions.put("B", hlaBEVTF.getValue());
@@ -246,7 +246,7 @@ public class PanelUpload extends CustomComponent {
             databaseLayout.setVisible(true);
             if (alleleFileUpload) {
               databaseUploadDescription = createDescriptionLabel(
-                  dh.getUploadData_databaseUploadAndAllele());
+                      dh.getUploadData_databaseUploadAndAllele());
               alleleFileSelectionCB.addValidator(nv);
             } else {
               databaseUploadDescription = createDescriptionLabel(dh.getUploadData_databaseUpload());
@@ -322,8 +322,8 @@ public class PanelUpload extends CustomComponent {
 
     columnTFLayout.setStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
     columnTFLayout
-        .addComponents(immColTf, methodColTf, transcriptExpressionColTf, taaColTf, distanceColTf,
-            uncertaintyColTf);
+            .addComponents(immColTf, methodColTf, transcriptExpressionColTf, taaColTf, distanceColTf,
+                    uncertaintyColTf);
 
     allColumnLayout.addComponents(description, columnTFLayout);
     return allColumnLayout;
@@ -345,31 +345,27 @@ public class PanelUpload extends CustomComponent {
     hlaALabel.addStyleName(ValoTheme.LABEL_COLORED);
     hlaALabel.addStyleName(ValoTheme.LABEL_BOLD);
     StringLengthValidator hlaValidator = new StringLengthValidator(
-        "Please enter a valid HLA-allele");
-    hlaValidator.setMinLength(7);
-    hlaValidator.setMaxLength(9);
+            "Please enter a valid HLA-allele");
     hlaA1TF = new TextField();
     hlaA1TF.setStyleName("padded");
     hlaA1TF.setImmediate(true);
     hlaA1TF.setValue("A*01:01");
-    hlaA1TF.setRequired(true);
-    hlaA1TF.addValidator(hlaValidator);
     hlaA1TF.setDescription("HLA-A Allele");
     hlaA2TF = new TextField();
     hlaA2TF.setStyleName("padded");
     hlaA2TF.setImmediate(true);
     hlaA2TF.setValue("A*25:01");
     hlaA2TF.setDescription("HLA-A Allele");
-    hlaA2TF.setRequired(true);
-    hlaA2TF.addValidator(hlaValidator);
     hlaAEVTF = new TextField("HLA-A expression");
     hlaAEVTF.setStyleName("padded");
     hlaAEVTF.setImmediate(true);
     hlaAEVTF.setDescription("HLA-A expression");
-    hlaAEVTF.setRequired(true);
     hlaAEVTF.setConverter(new StringToDoubleConverter());
-    hlaAEVTF.addValidator(new DoubleRangeValidator("Please enter a float value", 0.0, 1000.0));
+    DoubleRangeValidator expressionValidator = new DoubleRangeValidator("Please enter a float value", 0.0, 1000.0);
+    hlaAEVTF.addValidator(expressionValidator);
     hlaAEVTF.setValue("10,0");
+    hlaAEVTF.setNullRepresentation("");
+    hlaAEVTF.setInvalidAllowed(false);
     hlaAEVTF.setNullSettingAllowed(false);
     hlaALayout.addComponents(hlaALabel, hlaA1TF, hlaA2TF);
 
@@ -385,23 +381,20 @@ public class PanelUpload extends CustomComponent {
     hlaB1TF.setImmediate(true);
     hlaB1TF.setValue("B*08:01");
     hlaB1TF.setDescription("HLA-B Allele");
-    hlaB1TF.setRequired(true);
-    hlaB1TF.addValidator(hlaValidator);
     hlaB2TF = new TextField();
     hlaB2TF.setStyleName("padded");
     hlaB2TF.setImmediate(true);
     hlaB2TF.setValue("B*18:01");
     hlaB2TF.setDescription("HLA-B Allele");
-    hlaB2TF.setRequired(true);
-    hlaB2TF.addValidator(hlaValidator);
     hlaBEVTF = new TextField("HLA-B expression");
     hlaBEVTF.setStyleName("padded");
     hlaBEVTF.setImmediate(true);
     hlaBEVTF.setDescription("HLA-B expression");
-    hlaBEVTF.setRequired(true);
     hlaBEVTF.setConverter(new StringToDoubleConverter());
     hlaBEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, 1000.0));
     hlaBEVTF.setValue("10,0");
+    hlaBEVTF.setNullRepresentation("");
+    hlaBEVTF.setInvalidAllowed(false);
     hlaBEVTF.setNullSettingAllowed(false);
     hlaBLayout.addComponents(hlaBLabel, hlaB1TF, hlaB2TF);
 
@@ -417,23 +410,20 @@ public class PanelUpload extends CustomComponent {
     hlaC1TF.setImmediate(true);
     hlaC1TF.setValue("C*07:01");
     hlaC1TF.setDescription("HLA-C Allele");
-    hlaC1TF.setRequired(true);
-    hlaC1TF.addValidator(hlaValidator);
     hlaC2TF = new TextField();
     hlaC2TF.setStyleName("padded");
     hlaC2TF.setImmediate(true);
     hlaC2TF.setValue("C*12:03");
     hlaC2TF.setDescription("HLA-C Allele");
-    hlaC2TF.setRequired(true);
-    hlaC2TF.addValidator(hlaValidator);
     hlaCEVTF = new TextField("HLA-C expression");
     hlaCEVTF.setStyleName("padded");
     hlaCEVTF.setImmediate(true);
     hlaCEVTF.setDescription("HLA-C expression");
-    hlaCEVTF.setRequired(true);
     hlaCEVTF.setConverter(new StringToDoubleConverter());
     hlaCEVTF.addValidator(new DoubleRangeValidator("Please enter a float number", 0.0, 1000.0));
     hlaCEVTF.setValue("10,0");
+    hlaCEVTF.setNullRepresentation("");
+    hlaCEVTF.setInvalidAllowed(false);
     hlaCEVTF.setNullSettingAllowed(false);
     hlaCLayout.addComponents(hlaCLabel, hlaC1TF, hlaC2TF);
 
@@ -487,12 +477,12 @@ public class PanelUpload extends CustomComponent {
     downloadManualButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
     downloadManualButton.setIcon(FontAwesome.BOOK);
     Resource res = new FileResource(
-        new File(basepath + "/WEB-INF/files/vaccineDesigner_howto.pdf"));
+            new File(basepath + "/WEB-INF/files/vaccineDesigner_howto.pdf"));
     FileDownloader downloader = new FileDownloader(res);
     downloader.extend(downloadManualButton);
 
     dataSelectionLayout.addComponents(dataSelectionUploadButton, dataSelectionDatabaseButton,
-        downloadManualButton);
+            downloadManualButton);
     dataSelectionLayout.setComponentAlignment(dataSelectionUploadButton, Alignment.MIDDLE_CENTER);
     dataSelectionLayout.setComponentAlignment(dataSelectionDatabaseButton, Alignment.MIDDLE_CENTER);
 
@@ -629,7 +619,7 @@ public class PanelUpload extends CustomComponent {
 
   public Label createDescriptionLabel(String info) {
     Label descriptionLabel = new Label(FontAwesome.INFO_CIRCLE.getHtml() + "    " + info,
-        ContentMode.HTML);
+            ContentMode.HTML);
     descriptionLabel.addStyleName("description");
     return descriptionLabel;
   }
@@ -718,24 +708,55 @@ public class PanelUpload extends CustomComponent {
     return transcriptExpressionColTf;
   }
 
-  public Boolean isHlalValid() {
-    Boolean isAllValid;
-    if (hlaA1TF.isValid() && hlaA2TF.isValid() && hlaB1TF.isValid() && hlaB2TF.isValid() && hlaC1TF
-        .isValid() && hlaC2TF.isValid()) {
-      isAllValid = true;
-    } else {
-      isAllValid = false;
+  public Boolean isHlaValid() {
+
+    ArrayList<String> alleles = new ArrayList<>();
+    alleles.add(hlaA1TF.getValue());
+    alleles.add(hlaA2TF.getValue());
+    alleles.add(hlaB1TF.getValue());
+    alleles.add(hlaB2TF.getValue());
+    alleles.add(hlaC1TF.getValue());
+    alleles.add(hlaC2TF.getValue());
+
+    for (String allele : alleles) {
+      if (!allele.trim().equals("")) {
+        return true;
+      }
     }
-    return isAllValid;
+    LOG.error("No allele specified.");
+    Utils.notification("Allele error", "At least one allele has to be specified.", "error");
+    return false;
   }
 
-  public Boolean isHlaExpressionlValid() {
-    Boolean isAllValid;
-    if (hlaAEVTF.isValid() && hlaBEVTF.isValid() && hlaCEVTF.isValid()) {
-      isAllValid = true;
-    } else {
-      isAllValid = false;
+
+  private Boolean isHlaExpressionlValid() {
+    hlaAEVTF.validate();
+    hlaBEVTF.validate();
+    hlaCEVTF.validate();
+
+    for (String hla : getAlleles().keySet()) {
+      if (hla.contains("A") && !getAlleles().get(hla).trim().equals("")) {
+        if (hlaAEVTF.getValue() == null || !hlaAEVTF.isValid()) {
+          LOG.error("No expression value for HLA-A alleles found");
+          Utils.notification("No HLA-A expression specified", "Please specify an expression value for the given HLA-A allele(s).", "error");
+          return false;
+        }
+      }
+      if (hla.contains("B") && !getAlleles().get(hla).trim().equals("")) {
+        if (hlaBEVTF.getValue() == null || !hlaBEVTF.isValid()) {
+          LOG.error("No expression value for HLA-B alleles found");
+          Utils.notification("No HLA-A expression specified", "Please specify an expression value for the given HLA-A allele(s).", "error");
+          return false;
+        }
+      }
+      if (hla.contains("C") && !getAlleles().get(hla).trim().equals("")) {
+        if (hlaCEVTF.getValue() == null || !hlaCEVTF.isValid()) {
+          LOG.error("No expression value for HLA-C alleles found");
+          Utils.notification("No HLA-A expression specified", "Please specify an expression value for the given HLA-A allele(s).", "error");
+          return false;
+        }
+      }
     }
-    return isAllValid;
+    return true;
   }
 }

@@ -7,6 +7,7 @@ import view.panel.PanelUpload;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class EpitopePredictionFileHelper {
@@ -16,6 +17,7 @@ public class EpitopePredictionFileHelper {
     public EpitopePredictionFileHelper() {
 
     }
+
 
     private static void isStringInHeader(String[] header, String column) throws Exception{
         if (!Arrays.asList(header).contains(column.trim()) && !column.trim().equals("")){
@@ -31,13 +33,15 @@ public class EpitopePredictionFileHelper {
     private static void isAlleleInHeader(String[] header, String allele) throws Exception{
         List<String> headerList = new ArrayList<>();
         Arrays.asList(header).forEach((title) -> headerList.add(title.replace("HLA-", "")) );
-        String allele_column_name = allele.trim() + " score";
-        if (!headerList.contains(allele_column_name)){
-            LOG.error("Epitope prediction file does not contain allele " + allele + ".");
-            Utils.notification("Allele error",
-                    "The epitope prediction file does not contain allele " + allele + ".",
-                    "error");
-            throw new Exception();
+        String allele_column_name = allele + " score";
+        if (!allele.equals("")) {
+            if (!headerList.contains(allele_column_name)) {
+                LOG.error("Epitope prediction file does not contain allele " + allele + ".");
+                Utils.notification("Allele error",
+                        "The epitope prediction file does not contain allele " + allele + ".",
+                        "error");
+                throw new Exception();
+            }
         }
     }
 
@@ -68,7 +72,7 @@ public class EpitopePredictionFileHelper {
     private static void compareFileHeaderWithAlleles(File file, PanelUpload uploadPanel) throws Exception {
         String[] header = readHeader(file);
         for (String allele : uploadPanel.getAlleles().values()) {
-            isAlleleInHeader(header, allele);
+            isAlleleInHeader(header, allele.trim());
         }
     }
 

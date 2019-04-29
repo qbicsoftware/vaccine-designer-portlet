@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+
 import model.EpitopeSelectionBean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +45,7 @@ public class ParserInputAllelesAsColumns {
    *
    * @param typeCol name of the type column
    */
-  public void parse(File file, String methodCol, String typeCol, String transcriptExpressionCol)
+  public void parse(File file, String methodCol, String typeCol, String transcriptExpressionCol, List alleles)
       throws IOException {
 
     this.typeCol = typeCol;
@@ -60,7 +62,7 @@ public class ParserInputAllelesAsColumns {
     line = brReader.readLine();
 
     try {
-      setHeaders();
+      setHeaders(alleles);
       readInput();
       setBean();
     } catch (NullPointerException e) {
@@ -98,7 +100,7 @@ public class ParserInputAllelesAsColumns {
    * corresponding variable. Distancy, uncertainty and type column will just be included if a column
    * name was given for them.
    */
-  public void setHeaders() {
+  public void setHeaders(List alleles) {
 
     // splits the line tab seperarated
     String[] headers = line.split("\t");
@@ -126,30 +128,30 @@ public class ParserInputAllelesAsColumns {
         counter = counter + 1;
       } else if (h.equalsIgnoreCase("length")) {
         counter = counter + 1;
-      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 0)) {
+      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 0) && alleles.contains(h.split(" ")[0])) {
         hlaA1 = counter;
         hlaA1allele = h.split(" ")[0];
         counter = counter + 1;
         a++;
-      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 1)) {
+      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 1) && alleles.contains(h.split(" ")[0])) {
         hlaA2 = counter;
         hlaA2allele = h.split(" ")[0];
         counter = counter + 1;
-      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 0)) {
+      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 0) && alleles.contains(h.split(" ")[0])) {
         hlaB1 = counter;
         hlaB1allele = h.split(" ")[0];
         counter = counter + 1;
         b++;
-      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 1)) {
+      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 1) && alleles.contains(h.split(" ")[0])) {
         hlaB2 = counter;
         hlaB2allele = h.split(" ")[0];
         counter = counter + 1;
-      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 0)) {
+      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 0) && alleles.contains(h.split(" ")[0])) {
         hlaC1 = counter;
         hlaC1allele = h.split(" ")[0];
         counter = counter + 1;
         c++;
-      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 1)) {
+      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 1) && alleles.contains(h.split(" ")[0])) {
         hlaC2 = counter;
         hlaC2allele = h.split(" ")[0];
         counter = counter + 1;

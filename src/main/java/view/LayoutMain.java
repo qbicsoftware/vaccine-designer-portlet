@@ -108,7 +108,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   // local
   ///*
   private String tmpPath = "/home/spaethju/Downloads/qbicdatasets201904030434/";
-  private String homePath = "/home/spaethju/";
+  private String homePath = "/home/spaethju/Downdloads/qbicdatasets201904030434/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
   private String sshKey = "key_rsa";
@@ -718,7 +718,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       ParserInputAllelesAsColumns parser = new ParserInputAllelesAsColumns();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
           uploadPanel.getTaaColTf().getValue(),
-          uploadPanel.getTranscriptExpressionColTf().getValue());
+          uploadPanel.getTranscriptExpressionColTf().getValue(),
+              new ArrayList<>(uploadPanel.getAlleles().values()));
       hasType = parser.getHasType();
       hasDist = false;
       hasUnc = false;
@@ -817,12 +818,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         if (0 == proc.waitFor()) {
           proc.destroyForcibly();
           prepareResults();
-          cleanFiles();
+          //cleanFiles();
           loadingWindow.success();
         } else {
           proc.destroyForcibly();
           loadingWindow.failure();
-          cleanFiles();
+          //cleanFiles();
         }
       } catch (IOException e) {
         LOG.error("NeoOptiTope could not be found");
@@ -840,7 +841,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     loadingWindow.getCancelBu().addClickListener((ClickListener) event -> {
       t.interrupt();
       proc.destroyForcibly();
-      cleanFiles();
+      //cleanFiles();
       loadingWindow.close();
     });
 
