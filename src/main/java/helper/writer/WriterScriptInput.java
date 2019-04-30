@@ -113,21 +113,23 @@ public class WriterScriptInput {
     for (Iterator<EpitopeSelectionBean> i = container.getItemIds().iterator(); i.hasNext(); ) {
       EpitopeSelectionBean bean = i.next();
       for (String key : bean.getImm().keySet()) {
-        String peptide =
-            bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean
-                .getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean
-                .getImm().get(key) + "\t" + bean.getMutation();
-        if (!type.equals("") && hasType) {
-          peptide += ("\t" + bean.getType());
+        if (key != null) {
+          String peptide =
+                  bean.getNeopeptide() + "\t" + bean.getLength() + "\t" + bean.getGene() + "\t" + bean
+                          .getTranscript() + "\t" + bean.getTranscriptExpression() + "\t" + key + "\t" + bean
+                          .getImm().get(key) + "\t" + bean.getMutation();
+          if (!type.equals("") && hasType) {
+            peptide += ("\t" + bean.getType());
+          }
+          if (!unc.equals("") && hasUnc) {
+            peptide += ("\t" + bean.getUnc().get(key));
+          }
+          if (!dist.equals("") && hasDist) {
+            peptide += ("\t" + bean.getDist().get(key));
+          }
+          inputWriter.write(peptide);
+          inputWriter.newLine();
         }
-        if (!unc.equals("") && hasUnc) {
-          peptide += ("\t" + bean.getUnc().get(key));
-        }
-        if (!dist.equals("") && hasDist) {
-          peptide += ("\t" + bean.getDist().get(key));
-        }
-        inputWriter.write(peptide);
-        inputWriter.newLine();
       }
     }
 

@@ -108,7 +108,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   // local
   ///*
   private String tmpPath = "/home/spaethju/Downloads/qbicdatasets201904030434/";
-  private String homePath = "/home/spaethju/Downdloads/qbicdatasets201904030434/";
+  private String homePath = "/home/spaethju/Downloads/qbicdatasets201904030434/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
   private String sshKey = "key_rsa";

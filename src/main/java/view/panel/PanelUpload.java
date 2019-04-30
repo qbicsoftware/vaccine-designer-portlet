@@ -128,7 +128,7 @@ public class PanelUpload extends CustomComponent {
     setCompositionRoot(uploadPanel);
   }
 
-  public VerticalLayout createUpload() {
+  private VerticalLayout createUpload() {
     uploadButton = new Button("Upload");
     uploadButton.setEnabled(false);
 
@@ -145,7 +145,7 @@ public class PanelUpload extends CustomComponent {
     return allUploadLayout;
   }
 
-  public HorizontalLayout createButtons() {
+  private HorizontalLayout createButtons() {
     HorizontalLayout buttonsLayout = new HorizontalLayout();
     buttonsLayout.setSizeFull();
     buttonsLayout.setSpacing(true);
@@ -351,6 +351,7 @@ public class PanelUpload extends CustomComponent {
     hlaA1TF.setImmediate(true);
     hlaA1TF.setValue("A*01:01");
     hlaA1TF.setDescription("HLA-A Allele");
+    hlaA1TF.setInvalidAllowed(false);
     hlaA2TF = new TextField();
     hlaA2TF.setStyleName("padded");
     hlaA2TF.setImmediate(true);
@@ -367,6 +368,8 @@ public class PanelUpload extends CustomComponent {
     hlaAEVTF.setNullRepresentation("");
     hlaAEVTF.setInvalidAllowed(false);
     hlaAEVTF.setNullSettingAllowed(false);
+    hlaAEVTF.setRequired(true);
+    hlaAEVTF.setRequiredError("Transcript expression must be filled in.");
     hlaALayout.addComponents(hlaALabel, hlaA1TF, hlaA2TF);
 
     VerticalLayout hlaBLayout = new VerticalLayout();
@@ -381,6 +384,7 @@ public class PanelUpload extends CustomComponent {
     hlaB1TF.setImmediate(true);
     hlaB1TF.setValue("B*08:01");
     hlaB1TF.setDescription("HLA-B Allele");
+    hlaB1TF.setInvalidAllowed(false);
     hlaB2TF = new TextField();
     hlaB2TF.setStyleName("padded");
     hlaB2TF.setImmediate(true);
@@ -396,6 +400,8 @@ public class PanelUpload extends CustomComponent {
     hlaBEVTF.setNullRepresentation("");
     hlaBEVTF.setInvalidAllowed(false);
     hlaBEVTF.setNullSettingAllowed(false);
+    hlaBEVTF.setRequired(true);
+    hlaBEVTF.setRequiredError("Transcript expression must be filled in.");
     hlaBLayout.addComponents(hlaBLabel, hlaB1TF, hlaB2TF);
 
     VerticalLayout hlaCLayout = new VerticalLayout();
@@ -410,6 +416,7 @@ public class PanelUpload extends CustomComponent {
     hlaC1TF.setImmediate(true);
     hlaC1TF.setValue("C*07:01");
     hlaC1TF.setDescription("HLA-C Allele");
+    hlaC1TF.setInvalidAllowed(false);
     hlaC2TF = new TextField();
     hlaC2TF.setStyleName("padded");
     hlaC2TF.setImmediate(true);
@@ -425,7 +432,10 @@ public class PanelUpload extends CustomComponent {
     hlaCEVTF.setNullRepresentation("");
     hlaCEVTF.setInvalidAllowed(false);
     hlaCEVTF.setNullSettingAllowed(false);
+    hlaCEVTF.setRequired(true);
+    hlaCEVTF.setRequiredError("Transcript expression must be filled in.");
     hlaCLayout.addComponents(hlaCLabel, hlaC1TF, hlaC2TF);
+
 
     alleleTFLayout.addComponents(hlaALayout, hlaBLayout, hlaCLayout);
     alleleEVTFLayout.addComponents(hlaAEVTF, hlaBEVTF, hlaCEVTF);
@@ -718,14 +728,16 @@ public class PanelUpload extends CustomComponent {
     alleles.add(hlaC1TF.getValue());
     alleles.add(hlaC2TF.getValue());
 
-    for (String allele : alleles) {
-      if (!allele.trim().equals("")) {
-        return true;
-      }
+    for (int i = 0; i<=4; i=i+2) {
+        if (alleles.get(i).trim().equals("") && alleles.get(i+1).trim().equals("")) {
+            LOG.error("No allele specified.");
+            Utils.notification("Allele error", "At least one HLA-A, HLA-B and HLA-C allele has to be specified.", "error");
+            return false;
+        }
     }
-    LOG.error("No allele specified.");
-    Utils.notification("Allele error", "At least one allele has to be specified.", "error");
-    return false;
+
+    return true;
+
   }
 
 

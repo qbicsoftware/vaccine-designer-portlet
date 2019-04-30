@@ -25,7 +25,7 @@ public class ParserInputAllelesAsColumns {
   private String line;
   private int method, mutation, gene, transcript, transcriptExpression, neopeptide, hlaA1, hlaA2, hlaB1,
       hlaB2, hlaC1, hlaC2, type, maxLength;
-  private String methodCol, typeCol, transcriptExpressionCol, hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele;
+  private String methodCol, typeCol, transcriptExpressionCol, hlaA1allele, hlaA2allele, hlaB1allele , hlaB2allele, hlaC1allele, hlaC2allele;
   private HashMap<String, HashMap<String, HashMap<String, String>>> peptides;
   private String[] alleleNames;
   private BufferedReader brReader;
@@ -111,6 +111,7 @@ public class ParserInputAllelesAsColumns {
 
     // for each tab separated header set the corresponding field to the counters value and set
     // counter + 1
+    System.out.println(alleles.toString());
     for (String h : headers) {
       h.trim();
       h.replace("HLA-", "");
@@ -176,7 +177,7 @@ public class ParserInputAllelesAsColumns {
   /**
    * Reads the input of the file and saves it in different maps.
    */
-  public void readInput() throws IOException {
+  private void readInput() throws IOException {
 
     // initialize maps
     peptides = new HashMap<>();
@@ -198,10 +199,12 @@ public class ParserInputAllelesAsColumns {
     brReader.close();
   }
 
+
   /**
    * Sets the bean with its parameters and adds it to a bean item container.
    */
   public void setBean() {
+    System.out.println("SET BEAN");
     for (String peptide : peptides.keySet()) {
       for (String method : peptides.get(peptide).keySet()) {
         for (int i = 0; i < peptides.get(peptide).get(method).get("gene").split(",").length; i++) {
@@ -211,22 +214,40 @@ public class ParserInputAllelesAsColumns {
           newBean.setExcluded(false);
           newBean.setNeopeptide(peptide);
           HashMap<String, String> imm = new HashMap<>();
-          try {
             imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele));
             imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele));
             imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele));
             imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele));
             imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele));
             imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele));
-            newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
-            newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
-            newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
-            newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
-            newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
-            newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
-          } catch (NumberFormatException e) {
 
-          }
+
+            try {
+            newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+              newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
+            } catch (NumberFormatException e) {
+            }
+
+
           alleles = new String[]{hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele,
               hlaC2allele};
           alleleNames = newBean.prepareAlleleNames(alleles);
