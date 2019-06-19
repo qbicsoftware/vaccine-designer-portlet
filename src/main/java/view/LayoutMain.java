@@ -27,6 +27,7 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import helper.DescriptionHandler;
+import helper.EpitopePredictionFileHelper;
 import helper.RandomCharGenerator;
 import helper.Utils;
 import helper.database.DBFileHandler;
@@ -38,16 +39,14 @@ import helper.ssh.SCPFile;
 import helper.upload_input.UploaderInput;
 import helper.writer.WriterResults;
 import helper.writer.WriterScriptInput;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import life.qbic.openbis.openbisclient.OpenBisClient;
@@ -101,24 +100,24 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String sampleCode;
   private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
   private BeanItemContainer<DatasetBean> container;
-  private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<DatasetBean>(
+  private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<>(
       DatasetBean.class);
   private DescriptionHandler dh = new DescriptionHandler();
   private FileDownloader downloader;
 
   // local
-  ///**
-  private String tmpPath = "/Users/spaethju/Desktop/";
-  private String homePath = "/Users/spaethju/";
+  ///*
+  private String tmpPath = "/home/spaethju/Downloads/";
+  private String homePath = "/home/spaethju/Downloads/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
   private String sshKey = "key_rsa";
   private String epitopeSelectorContainer = "epitopeselector.img";
   private String cbcPath = "/root/COIN/bin/";
-  //  **/
+  //  */
 
   // testing
-  /**
+  /*
    private String tmpPath = "/tmp/";
    private String homePath = "/home/luser/";
    private String tmpPathRemote = "/home/jspaeth/";
@@ -129,13 +128,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
    // **/
 
   // production
-  /**
+  /*
    * private String tmpPath = "/tmp/"; private String homePath = "/home-link/tomcat-liferay/";
    * private String tmpPathRemote = "/home/jspaeth/"; private String epitopeSelectorVM =
    * "jspaeth@qbic-epitope-selector.local"; private String sshKey = "id_rsa"; private String
    * epitopeSelectorContainer = "epitopeselector.simg"; private String cbcPath = "/root/cbc/bin/";
    * //
-   **/
+   */
 
   // general
   private String outputPath = "";
@@ -228,7 +227,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         dataSets = openbis.getDataSetsOfProjectByIdentifier(
             uploadPanel.getProjectSelectionCB().getValue().toString());
       } catch (NullPointerException e) {
-        Utils.notification("Error", "Dataset could not be found in openbis", "error");
+        Utils.notification("Error", "Dataset could not be found in database", "error");
       }
       container = fileHandler.fillTable(dataSets);
       alleleFileContainer.removeAllItems();
@@ -312,6 +311,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, folder + filename);
+          System.out.println();
           Files.copy(in, destination);
           File file = new File(tmpDownloadPath);
           if (uploadPanel.getAlleleFileUpload()) {
@@ -331,12 +331,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
               "Your alleles did not fit to your epitope prediction file. Please try again.",
               "error");
           LOG.error("Alleles do not fit to the epitope prediction file");
-          reset();
+
         } catch (Exception e) {
           LOG.error("Something went wrong while uploading/Parsing the file");
           Utils.notification("Upload failed", dh.getUploadInputFailedError(), "error");
           e.printStackTrace();
-          reset();
+
         }
       } else {
         Utils.notification("Error", dh.getNoAlleleFileSelected(), "error");
@@ -677,19 +677,27 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     } catch (Exception e) {
       Utils.notification("Upload failed", dh.getProcessingDataError(), "error");
       e.printStackTrace();
-      reset();
+
     }
 
   }
 
+
   private void processingData(File file) throws Exception {
+
+    try {
+      EpitopePredictionFileHelper.compareFileHeaderWithColumns(file, uploadPanel, uploadPanel.getHlaAsColumns());
+    } catch (Exception e) {
+      return;
+    }
+
     Boolean hasMethod;
     if (!uploadPanel.getHlaAsColumns()) {
       ParserInputAllelesAsRows parser = new ParserInputAllelesAsRows();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
           uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(),
           uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(),
-          uploadPanel.getTranscriptExpressionColTf().getValue(), uploadPanel.getAlleles());
+          uploadPanel.getTranscriptExpressionColTf().getValue(), new ArrayList<>(uploadPanel.getAlleles().values()));
 //            if (!parser.checkAlleles(uploadPanel.getAlleles())){
 //                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
 //            }
@@ -706,17 +714,16 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       } else {
         epitopeSelectionPanel.addTypeFilter();
       }
-    } else if (uploadPanel.getHlaAsColumns()) {
+    } else {
       ParserInputAllelesAsColumns parser = new ParserInputAllelesAsColumns();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
           uploadPanel.getTaaColTf().getValue(),
-          uploadPanel.getTranscriptExpressionColTf().getValue());
+          uploadPanel.getTranscriptExpressionColTf().getValue(),
+              new ArrayList<>(uploadPanel.getAlleles().values()));
       hasType = parser.getHasType();
       hasDist = false;
       hasUnc = false;
       hasTranscriptExpression = parser.getHasTranscriptExpression();
-      LOG.info(hasType);
-      LOG.info(hasTranscriptExpression);
       epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
           uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasType,
           hasTranscriptExpression, hasUnc, hasDist);
@@ -811,12 +818,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         if (0 == proc.waitFor()) {
           proc.destroyForcibly();
           prepareResults();
-          cleanFiles();
+          //cleanFiles();
           loadingWindow.success();
         } else {
           proc.destroyForcibly();
           loadingWindow.failure();
-          cleanFiles();
+          //cleanFiles();
         }
       } catch (IOException e) {
         LOG.error("NeoOptiTope could not be found");
@@ -834,7 +841,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     loadingWindow.getCancelBu().addClickListener((ClickListener) event -> {
       t.interrupt();
       proc.destroyForcibly();
-      cleanFiles();
+      //cleanFiles();
       loadingWindow.close();
     });
 
@@ -989,21 +996,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     }
   }
 
-  public Boolean getHasType() {
-    return hasType;
-  }
-
-  public Boolean getHasUnc() {
-    return hasUnc;
-  }
-
-  public Boolean getHasDist() {
-    return hasDist;
-  }
-
-  public Boolean getHasTranscriptExpression() {
-    return hasTranscriptExpression;
-  }
 
   public class AllelesException extends Exception {
 

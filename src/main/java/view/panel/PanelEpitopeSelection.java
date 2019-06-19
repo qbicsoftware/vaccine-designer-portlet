@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 import model.EpitopeSelectionBean;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * The class {@link PanelEpitopeSelection} represents a component for showing the uploaded epitope
@@ -561,6 +562,10 @@ public class PanelEpitopeSelection extends CustomComponent {
     @Override
     public Class<String> getPresentationType() {
       return String.class;
+    }
+
+    public String toString() {
+      return ToStringBuilder.reflectionToString(this);
     }
 
   }

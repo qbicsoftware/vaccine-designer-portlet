@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+
 import model.EpitopeSelectionBean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +25,7 @@ public class ParserInputAllelesAsColumns {
   private String line;
   private int method, mutation, gene, transcript, transcriptExpression, neopeptide, hlaA1, hlaA2, hlaB1,
       hlaB2, hlaC1, hlaC2, type, maxLength;
-  private String methodCol, typeCol, transcriptExpressionCol, hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele, hlaC2allele;
+  private String methodCol, typeCol, transcriptExpressionCol, hlaA1allele, hlaA2allele, hlaB1allele , hlaB2allele, hlaC1allele, hlaC2allele;
   private HashMap<String, HashMap<String, HashMap<String, String>>> peptides;
   private String[] alleleNames;
   private BufferedReader brReader;
@@ -43,7 +45,7 @@ public class ParserInputAllelesAsColumns {
    *
    * @param typeCol name of the type column
    */
-  public void parse(File file, String methodCol, String typeCol, String transcriptExpressionCol)
+  public void parse(File file, String methodCol, String typeCol, String transcriptExpressionCol, List alleles)
       throws IOException {
 
     this.typeCol = typeCol;
@@ -60,7 +62,7 @@ public class ParserInputAllelesAsColumns {
     line = brReader.readLine();
 
     try {
-      setHeaders();
+      setHeaders(alleles);
       readInput();
       setBean();
     } catch (NullPointerException e) {
@@ -98,7 +100,7 @@ public class ParserInputAllelesAsColumns {
    * corresponding variable. Distancy, uncertainty and type column will just be included if a column
    * name was given for them.
    */
-  public void setHeaders() {
+  public void setHeaders(List alleles) {
 
     // splits the line tab seperarated
     String[] headers = line.split("\t");
@@ -126,30 +128,30 @@ public class ParserInputAllelesAsColumns {
         counter = counter + 1;
       } else if (h.equalsIgnoreCase("length")) {
         counter = counter + 1;
-      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 0)) {
+      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 0) && alleles.contains(h.split(" ")[0])) {
         hlaA1 = counter;
         hlaA1allele = h.split(" ")[0];
         counter = counter + 1;
         a++;
-      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 1)) {
+      } else if (h.startsWith("A*") && h.endsWith("score") && (a == 1) && alleles.contains(h.split(" ")[0])) {
         hlaA2 = counter;
         hlaA2allele = h.split(" ")[0];
         counter = counter + 1;
-      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 0)) {
+      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 0) && alleles.contains(h.split(" ")[0])) {
         hlaB1 = counter;
         hlaB1allele = h.split(" ")[0];
         counter = counter + 1;
         b++;
-      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 1)) {
+      } else if (h.startsWith("B*") && h.endsWith("score") && (b == 1) && alleles.contains(h.split(" ")[0])) {
         hlaB2 = counter;
         hlaB2allele = h.split(" ")[0];
         counter = counter + 1;
-      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 0)) {
+      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 0) && alleles.contains(h.split(" ")[0])) {
         hlaC1 = counter;
         hlaC1allele = h.split(" ")[0];
         counter = counter + 1;
         c++;
-      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 1)) {
+      } else if (h.startsWith("C*") && h.endsWith("score") && (c == 1) && alleles.contains(h.split(" ")[0])) {
         hlaC2 = counter;
         hlaC2allele = h.split(" ")[0];
         counter = counter + 1;
@@ -174,7 +176,7 @@ public class ParserInputAllelesAsColumns {
   /**
    * Reads the input of the file and saves it in different maps.
    */
-  public void readInput() throws IOException {
+  private void readInput() throws IOException {
 
     // initialize maps
     peptides = new HashMap<>();
@@ -196,10 +198,12 @@ public class ParserInputAllelesAsColumns {
     brReader.close();
   }
 
+
   /**
    * Sets the bean with its parameters and adds it to a bean item container.
    */
   public void setBean() {
+    System.out.println("SET BEAN");
     for (String peptide : peptides.keySet()) {
       for (String method : peptides.get(peptide).keySet()) {
         for (int i = 0; i < peptides.get(peptide).get(method).get("gene").split(",").length; i++) {
@@ -209,22 +213,40 @@ public class ParserInputAllelesAsColumns {
           newBean.setExcluded(false);
           newBean.setNeopeptide(peptide);
           HashMap<String, String> imm = new HashMap<>();
-          try {
             imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele));
             imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele));
             imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele));
             imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele));
             imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele));
             imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele));
-            newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
-            newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
-            newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
-            newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
-            newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
-            newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
-          } catch (NumberFormatException e) {
 
-          }
+
+            try {
+            newBean.setHlaA1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaA2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaB1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaB2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+              newBean.setHlaC1(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele)));
+            } catch (NumberFormatException e) {
+            }
+            try {
+            newBean.setHlaC2(Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele)));
+            } catch (NumberFormatException e) {
+            }
+
+
           alleles = new String[]{hlaA1allele, hlaA2allele, hlaB1allele, hlaB2allele, hlaC1allele,
               hlaC2allele};
           alleleNames = newBean.prepareAlleleNames(alleles);

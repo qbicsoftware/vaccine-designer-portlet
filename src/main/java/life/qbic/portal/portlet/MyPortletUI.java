@@ -40,10 +40,11 @@ public class MyPortletUI extends QBiCPortletUI {
 
   private static final Logger LOG = LogManager.getLogger(MyPortletUI.class);
   private OpenBisClient openbis;
-  private ConfigurationManager config = new ConfigurationManagerFactory().getInstance();
   private DescriptionHandler dh = new DescriptionHandler();
-  private Boolean success;
-  private String url, pw, mysqlPW, mysqlUser, userID;
+  private String url;
+  private String pw;
+  private String userID;
+  private final ConfigurationManager config = ConfigurationManagerFactory.getInstance();
 
   @Override
   protected Layout getPortletContent(final VaadinRequest request) {
@@ -56,37 +57,34 @@ public class MyPortletUI extends QBiCPortletUI {
       final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
     }
 
-    getCredentials();
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setMargin(true);
 
-    success = true;
-    config = ConfigurationManagerFactory.getInstance();
+    Boolean success = true;
 
-    if (PortalUtils.isLiferayPortlet()) {
-      LOG.info("Vaccine Designer is running on Liferay and user is logged in.");
-      userID = PortalUtils.getUser().getScreenName();
-      LOG.info("UserID = " + userID);
-
-    }
     // establish connection to the OpenBIS API
     try {
       LOG.debug("trying to connect to openbis");
       if (PortalUtils.isLiferayPortlet()) {
+        LOG.info("Vaccine Designer is running on as Portlet and user is logged in.");
+        userID = PortalUtils.getUser().getScreenName();
+        LOG.info("UserID = " + userID);
         openbis = new OpenBisClient(config.getDataSourceUser(), config.getDataSourcePassword(),
             config.getDataSourceUrl());
       } else {
+        LOG.info("Vaccine Designer is running locally.");
+        getCredentials();
         openbis = new OpenBisClient(userID, pw, url);
       }
 
       openbis.login();
     } catch (Exception e) {
       success = false;
-      LOG.error(
+      LOG.warn(
           "User could not connect to openBIS and has been informed of this.");
       Utils.notification("Error", dh.getDatabaseConnectionError(), "error");
-      //e.printStackTrace();
+      e.printStackTrace();
     }
 
     LayoutMain mainLayout;
@@ -95,7 +93,7 @@ public class MyPortletUI extends QBiCPortletUI {
       final List<String> spaces = openbis.getUserSpaces(userID);
 
       // stuff from mysql database
-      DBConfig mysqlConfig = new DBConfig(config.getMsqlHost(), config.getMysqlPort(),
+      DBConfig mysqlConfig = new DBConfig(config.getMysqlHost(), config.getMysqlPort(),
           config.getMysqlDB(), config.getMysqlUser(), config.getMysqlPass());
       @SuppressWarnings("unused")
       DBManager dbm = new DBManager(mysqlConfig);
@@ -142,13 +140,13 @@ public class MyPortletUI extends QBiCPortletUI {
     return result;
   }
 
-  public void getCredentials() {
+  private void getCredentials() {
     Properties prop = new Properties();
     InputStream input = null;
 
     try {
 
-      input = new FileInputStream("/Users/spaethju/qbic-ext.properties");
+      input = new FileInputStream("/home/spaethju/Dokumente/developer.properties");
 
       // load a properties file
       prop.load(input);
@@ -157,8 +155,7 @@ public class MyPortletUI extends QBiCPortletUI {
       url = prop.getProperty("datasource.url");
       pw = prop.getProperty("datasource.password");
       userID = prop.getProperty("datasource.user");
-      mysqlPW = prop.getProperty("mysql.pass");
-      mysqlUser = prop.getProperty("mysql.user");
+
 
     } catch (IOException ex) {
       LOG.info("No openBIS connection available.");

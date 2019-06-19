@@ -1,5 +1,7 @@
 package model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.HashMap;
 
 /**
@@ -282,6 +284,10 @@ public class EpitopeSelectionBean {
 
   public void setUncC2(Float uncC2) {
     this.uncC2 = uncC2;
+  }
+
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
   }
 }
 
