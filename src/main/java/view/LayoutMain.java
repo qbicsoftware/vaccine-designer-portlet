@@ -46,7 +46,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import life.qbic.openbis.openbisclient.OpenBisClient;
@@ -101,12 +100,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String alleleFileCode, alleleFileName, alleleDssPath, alleleFileFolder;
   private BeanItemContainer<DatasetBean> container;
   private BeanItemContainer<DatasetBean> alleleFileContainer = new BeanItemContainer<>(
-      DatasetBean.class);
+          DatasetBean.class);
   private DescriptionHandler dh = new DescriptionHandler();
   private FileDownloader downloader;
 
   // local
-  ///*
+  /*
   private String tmpPath = "/home/spaethju/Downloads/";
   private String homePath = "/home/spaethju/Downloads/";
   private String tmpPathRemote = "/home/jspaeth/";
@@ -114,18 +113,18 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private String sshKey = "key_rsa";
   private String epitopeSelectorContainer = "epitopeselector.img";
   private String cbcPath = "/root/COIN/bin/";
-  //  */
+    */
 
   // testing
-  /*
-   private String tmpPath = "/tmp/";
-   private String homePath = "/home/luser/";
-   private String tmpPathRemote = "/home/jspaeth/";
-   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
-   private String sshKey = "key_rsa";
-   private String epitopeSelectorContainer = "epitopeselector.img";
-   private String cbcPath = "/root/COIN/bin/";
-   // **/
+
+  private String tmpPath = "/tmp/";
+  private String homePath = "/home/luser/";
+  private String tmpPathRemote = "/home/jspaeth/";
+  private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
+  private String sshKey = "key_rsa";
+  private String epitopeSelectorContainer = "epitopeselector.img";
+  private String cbcPath = "/root/COIN/bin/";
+
 
   // production
   /*
@@ -225,7 +224,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       List<DataSet> dataSets = new ArrayList<>();
       try {
         dataSets = openbis.getDataSetsOfProjectByIdentifier(
-            uploadPanel.getProjectSelectionCB().getValue().toString());
+                uploadPanel.getProjectSelectionCB().getValue().toString());
       } catch (NullPointerException e) {
         Utils.notification("Error", "Dataset could not be found in database", "error");
       }
@@ -245,7 +244,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
             String type = item.getItemProperty("type").toString();
             filename = item.getItemProperty("name").toString();
             if (type.equalsIgnoreCase("Q_WF_NGS_HLATYPING_RESULTS") && (filename.contains(".txt")
-                || filename.contains(".tsv") || filename.contains(".alleles"))) {
+                    || filename.contains(".tsv") || filename.contains(".alleles"))) {
               uploadPanel.getAlleleFileSelectionCB().addItem(item.getItemProperty("name"));
             }
           }
@@ -281,7 +280,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         Item item = alleleFileContainer.getItem(itemId);
         String filename = item.getItemProperty("name").toString();
         if (filename
-            .equalsIgnoreCase(uploadPanel.getAlleleFileSelectionCB().getValue().toString())) {
+                .equalsIgnoreCase(uploadPanel.getAlleleFileSelectionCB().getValue().toString())) {
           alleleFileName = item.getItemProperty("name").toString();
           alleleFileCode = item.getItemProperty("code").toString();
           alleleDssPath = item.getItemProperty("dssPath").toString();
@@ -292,10 +291,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     uploadPanel.getUploadButton().addClickListener((ClickListener) event -> {
       if (uploadPanel.getAlleleFileSelectionCB().isValid() || !uploadPanel.getAlleleFileUpload()) {
         Project project = openbis
-            .getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
+                .getProjectByIdentifier(uploadPanel.getProjectSelectionCB().getValue().toString());
         List<Sample> allSamples =
-            openbis
-                .getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
+                openbis
+                        .getSamplesWithParentsAndChildrenOfProjectBySearchService(project.getIdentifier());
         for (Sample sample : allSamples) {
           if (sample.getSampleTypeCode().equals("Q_NGS_SINGLE_SAMPLE_RUN")) {
             sampleBarcode = sample.getCode();
@@ -306,8 +305,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         path = uploadPanel.getSelected().getBean().getDssPath();
         folder = path.replace("original/", "").replace(filename, "");
         sampleCode = openbis
-            .getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier())
-            .getCode();
+                .getSampleByIdentifier(uploadPanel.getSelected().getBean().getSampleIdentifier())
+                .getCode();
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, folder + filename);
@@ -317,7 +316,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           if (uploadPanel.getAlleleFileUpload()) {
             alleleFileFolder = alleleDssPath.replace("original/", "").replace(alleleFileName, "");
             InputStream inAllele = openbis
-                .getDatasetStream(alleleFileCode, alleleFileFolder + alleleFileName);
+                    .getDatasetStream(alleleFileCode, alleleFileFolder + alleleFileName);
             Files.copy(inAllele, Paths.get(tmpAllelesPath));
             File alleleFile = new File(tmpAllelesPath);
             ParserAlleleFile alleleParser = new ParserAlleleFile();
@@ -328,8 +327,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
           Files.delete(destination);
         } catch (AllelesException e) {
           Utils.notification("Error",
-              "Your alleles did not fit to your epitope prediction file. Please try again.",
-              "error");
+                  "Your alleles did not fit to your epitope prediction file. Please try again.",
+                  "error");
           LOG.error("Alleles do not fit to the epitope prediction file");
 
         } catch (Exception e) {
@@ -428,23 +427,23 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       try {
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
         String resultName =
-            sampleBarcode + "_" + sampleCode + "_" + timeStamp + "_epitopeselection_result"
-                + ".txt";
+                sampleBarcode + "_" + sampleCode + "_" + timeStamp + "_epitopeselection_result"
+                        + ".txt";
         Process copy_result = Runtime.getRuntime().exec(
-            "cp " + tmpResultPath + " " + tmpPath + PortalUtils.getUser().getScreenName() + "/"
-                + resultName);
+                "cp " + tmpResultPath + " " + tmpPath + PortalUtils.getUser().getScreenName() + "/"
+                        + resultName);
         copy_result.waitFor();
         LOG.info("cp " + tmpResultPath + " " + tmpPath + PortalUtils.getUser().getScreenName() + "/"
-            + resultName);
-        scpFile.scpToRemote(homePath,
-            tmpPath + PortalUtils.getUser().getScreenName() + "/" + resultName, registerPath,
-            sshKey);
-        Process markAsFinished = Runtime.getRuntime().exec(
-            "ssh -i " + homePath + ".ssh/" + sshKey + " " + dropbox
-                + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_"
                 + resultName);
+        scpFile.scpToRemote(homePath,
+                tmpPath + PortalUtils.getUser().getScreenName() + "/" + resultName, registerPath,
+                sshKey);
+        Process markAsFinished = Runtime.getRuntime().exec(
+                "ssh -i " + homePath + ".ssh/" + sshKey + " " + dropbox
+                        + " touch /mnt/nfs/qbic/dropboxes/qeana08_qbic/incoming/.MARKER_is_finished_"
+                        + resultName);
         Process remove_result = Runtime.getRuntime()
-            .exec("rm -f " + tmpPath + PortalUtils.getUser().getScreenName() + "/" + resultName);
+                .exec("rm -f " + tmpPath + PortalUtils.getUser().getScreenName() + "/" + resultName);
         System.out.println(remove_result.getInputStream());
         remove_result.waitFor();
         LOG.info("rm -f " + tmpPath + PortalUtils.getUser().getScreenName() + "/" + resultName);
@@ -526,8 +525,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         runButton.setDescription(dh.getRerunButtonDescription());
         try {
           Process mkdir = Runtime.getRuntime().exec(
-              "ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " mkdir "
-                  + tmpPathRemote + random);
+                  "ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " mkdir "
+                          + tmpPathRemote + random);
           mkdir.waitFor();
         } catch (IOException | InterruptedException e) {
           LOG.error("Couldn't create folder on virtual machine.");
@@ -609,13 +608,13 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         // writes alleles.txt, include.txt and exclude.txt
         try {
           inputWriter.writeInputData(epitopeSelectionPanel.getContainer(), uploadPanel.getAlleles(),
-              uploadPanel.getAllele_expressions(), uploadPanel.getTaaColTf().getValue(),
-              uploadPanel.getUncertaintyColTf().getValue(),
-              uploadPanel.getDistanceColTf().getValue(), hasTranscriptExpression, hasType, hasUnc,
-              hasDist);
+                  uploadPanel.getAllele_expressions(), uploadPanel.getTaaColTf().getValue(),
+                  uploadPanel.getUncertaintyColTf().getValue(),
+                  uploadPanel.getDistanceColTf().getValue(), hasTranscriptExpression, hasType, hasUnc,
+                  hasDist);
         } catch (IOException e) {
           Utils.notification("Error!",
-              dh.getWriteInputError(), "error");
+                  dh.getWriteInputError(), "error");
           LOG.error("Error while writing the input data");
           e.printStackTrace();
         }
@@ -695,9 +694,9 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     if (!uploadPanel.getHlaAsColumns()) {
       ParserInputAllelesAsRows parser = new ParserInputAllelesAsRows();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
-          uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(),
-          uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(),
-          uploadPanel.getTranscriptExpressionColTf().getValue(), new ArrayList<>(uploadPanel.getAlleles().values()));
+              uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(),
+              uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(),
+              uploadPanel.getTranscriptExpressionColTf().getValue(), new ArrayList<>(uploadPanel.getAlleles().values()));
 //            if (!parser.checkAlleles(uploadPanel.getAlleles())){
 //                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
 //            }
@@ -706,8 +705,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       hasUnc = parser.getHasUnc();
       hasTranscriptExpression = parser.getHasTranscriptExpression();
       epitopeSelectionPanel
-          .setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(),
-              parser.getAlleles(), hasType, hasTranscriptExpression, hasUnc, hasDist);
+              .setDataGrid(parser.getEpitopes(), uploadPanel.getMethodColTf().getValue().trim(),
+                      parser.getAlleles(), hasType, hasTranscriptExpression, hasUnc, hasDist);
       maxLength = parser.getMaxLength();
       if (uploadPanel.getTaaColTf().getValue().equals("")) {
         epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -717,16 +716,16 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     } else {
       ParserInputAllelesAsColumns parser = new ParserInputAllelesAsColumns();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
-          uploadPanel.getTaaColTf().getValue(),
-          uploadPanel.getTranscriptExpressionColTf().getValue(),
+              uploadPanel.getTaaColTf().getValue(),
+              uploadPanel.getTranscriptExpressionColTf().getValue(),
               new ArrayList<>(uploadPanel.getAlleles().values()));
       hasType = parser.getHasType();
       hasDist = false;
       hasUnc = false;
       hasTranscriptExpression = parser.getHasTranscriptExpression();
       epitopeSelectionPanel.setDataGrid(parser.getEpitopes(),
-          uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasType,
-          hasTranscriptExpression, hasUnc, hasDist);
+              uploadPanel.getMethodColTf().getValue().trim(), parser.getAlleles(), hasType,
+              hasTranscriptExpression, hasUnc, hasDist);
       maxLength = parser.getMaxLength();
       if (uploadPanel.getTaaColTf().getValue().equals("")) {
         epitopeSelectionPanel.getDataGrid().removeColumn("type");
@@ -757,12 +756,12 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       nextButton.setEnabled(true);
     } else {
       epitopeSelectionPanel.getMethodSelect()
-          .addValueChangeListener((ValueChangeListener) event -> {
-            epitopeSelectionPanel.applyMethodFilter();
-            setParameterRange();
-            epitopeSelectionPanel.getDataGrid().setEnabled(true);
-            nextButton.setEnabled(true);
-          });
+              .addValueChangeListener((ValueChangeListener) event -> {
+                epitopeSelectionPanel.applyMethodFilter();
+                setParameterRange();
+                epitopeSelectionPanel.getDataGrid().setEnabled(true);
+                nextButton.setEnabled(true);
+              });
     }
     Utils.notification("Upload completed!", dh.getUploadSuccess(), "success");
     LOG.info("Upload successful");
@@ -784,8 +783,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       try {
         try {
           Process mkdir_random = Runtime.getRuntime().exec(
-              "ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " mkdir "
-                  + tmpPathRemote + random);
+                  "ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " mkdir "
+                          + tmpPathRemote + random);
           mkdir_random.waitFor();
           scpFile.scpToRemote(homePath, inputPath, epitopeSelectorVM + ":" + random, sshKey);
           scpFile.scpToRemote(homePath, allelePath, epitopeSelectorVM + ":" + random, sshKey);
@@ -803,7 +802,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         LOG.info(command);
         proc = pb.start();
         BufferedReader stdError =
-            new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+                new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
         pb.redirectErrorStream();
         InputStream inputStream = proc.getInputStream();
@@ -858,10 +857,10 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     getResults();
     downloadButton.setVisible(true);
     String downloadFilePath = tmpResultPath.replace("tmp_result.txt",
-        FilenameUtils.removeExtension(filename) + "_epitopeSelection_results.tsv");
+            FilenameUtils.removeExtension(filename) + "_epitopeSelection_results.tsv");
     try {
       Process copy_download = Runtime.getRuntime()
-          .exec("cp " + tmpResultPath + " " + downloadFilePath);
+              .exec("cp " + tmpResultPath + " " + downloadFilePath);
       copy_download.waitFor();
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();
@@ -906,8 +905,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     try {
       try {
         Process remove_randomRemote = Runtime.getRuntime().exec(
-            "ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " rm -rf "
-                + tmpPathRemote + random);
+                "ssh -i " + homePath + ".ssh/" + sshKey + " " + epitopeSelectorVM + " rm -rf "
+                        + tmpPathRemote + random);
         remove_randomRemote.waitFor();
         random = generator.generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
       } catch (IOException | InterruptedException e) {
