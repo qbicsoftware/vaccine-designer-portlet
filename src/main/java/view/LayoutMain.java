@@ -310,7 +310,6 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
         Path destination = Paths.get(tmpDownloadPath);
         try {
           InputStream in = openbis.getDatasetStream(code, folder + filename);
-          System.out.println();
           Files.copy(in, destination);
           File file = new File(tmpDownloadPath);
           if (uploadPanel.getAlleleFileUpload()) {

@@ -79,7 +79,6 @@ public class WriterScriptInput {
         String allelesHeadline = "A1\tA2\tB1\tB2\tC1\tC2\tA_expression\tB_expression\tC_expression";
         allelesWriter.write(allelesHeadline);
         allelesWriter.newLine();
-        System.out.println(setAlleleRow(alleles, allele_expressions));
         allelesWriter.write(setAlleleRow(alleles, allele_expressions));
 
         allelesWriter.close();

@@ -203,7 +203,6 @@ public class ParserInputAllelesAsColumns {
    * Sets the bean with its parameters and adds it to a bean item container.
    */
   public void setBean() {
-    System.out.println("SET BEAN");
     for (String peptide : peptides.keySet()) {
       for (String method : peptides.get(peptide).keySet()) {
         for (int i = 0; i < peptides.get(peptide).get(method).get("gene").split(",").length; i++) {

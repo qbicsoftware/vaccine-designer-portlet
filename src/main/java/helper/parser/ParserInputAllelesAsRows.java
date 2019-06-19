@@ -270,10 +270,7 @@ public class ParserInputAllelesAsRows {
                 HashMap<String, String> imm = new HashMap<>();
                 HashMap<String, String> dist = new HashMap<>();
                 HashMap<String, String> unc = new HashMap<>();
-                System.out.println(peptide);
                 if (peptides.get(peptide).get(method).get(hlaA1allele + " Score") != null) {
-                    System.out.println(hlaA1allele);
-                    System.out.println(peptides.get(peptide).get(method).get(hlaA1allele + " Score"));
                     imm.put(hlaA1allele, peptides.get(peptide).get(method).get(hlaA1allele + " Score"));
                     newBean.setHlaA1(
                             Float.parseFloat(peptides.get(peptide).get(method).get(hlaA1allele + " Score")));
@@ -290,8 +287,6 @@ public class ParserInputAllelesAsRows {
 
                 }
                 if (peptides.get(peptide).get(method).get(hlaA2allele + " Score") != null) {
-                    System.out.println(hlaA2allele);
-                    System.out.println(peptides.get(peptide).get(method).get(hlaA2allele + " Score"));
                     imm.put(hlaA2allele, peptides.get(peptide).get(method).get(hlaA2allele + " Score"));
                     newBean.setHlaA2(
                             Float.parseFloat(peptides.get(peptide).get(method).get(hlaA2allele + " Score")));
@@ -308,8 +303,6 @@ public class ParserInputAllelesAsRows {
 
                 }
                 if (peptides.get(peptide).get(method).get(hlaB1allele + " Score") != null) {
-                    System.out.println(hlaB1allele);
-                    System.out.println(peptides.get(peptide).get(method).get(hlaB1allele + " Score"));
                     imm.put(hlaB1allele, peptides.get(peptide).get(method).get(hlaB1allele + " Score"));
                     newBean.setHlaB1(
                             Float.parseFloat(peptides.get(peptide).get(method).get(hlaB1allele + " Score")));
@@ -326,8 +319,6 @@ public class ParserInputAllelesAsRows {
 
                 }
                 if (peptides.get(peptide).get(method).get(hlaB2allele + " Score") != null) {
-                    System.out.println(hlaB2allele);
-                    System.out.println(peptides.get(peptide).get(method).get(hlaB2allele + " Score"));
                     imm.put(hlaB2allele, peptides.get(peptide).get(method).get(hlaB2allele + " Score"));
                     newBean.setHlaB2(
                             Float.parseFloat(peptides.get(peptide).get(method).get(hlaB2allele + " Score")));
@@ -344,8 +335,6 @@ public class ParserInputAllelesAsRows {
 
                 }
                 if (peptides.get(peptide).get(method).get(hlaC1allele + " Score") != null) {
-                    System.out.println(hlaC1allele);
-                    System.out.println(peptides.get(peptide).get(method).get(hlaC1allele + " Score"));
                     imm.put(hlaC1allele, peptides.get(peptide).get(method).get(hlaC1allele + " Score"));
                     newBean.setHlaC1(
                             Float.parseFloat(peptides.get(peptide).get(method).get(hlaC1allele + " Score")));
@@ -362,8 +351,6 @@ public class ParserInputAllelesAsRows {
 
                 }
                 if (peptides.get(peptide).get(method).get(hlaC2allele + " Score") != null) {
-                    System.out.println(hlaC2allele);
-                    System.out.println(peptides.get(peptide).get(method).get(hlaC2allele + " Score"));
                     imm.put(hlaC2allele, peptides.get(peptide).get(method).get(hlaC2allele + " Score"));
                     newBean.setHlaC2(
                             Float.parseFloat(peptides.get(peptide).get(method).get(hlaC2allele + " Score")));
