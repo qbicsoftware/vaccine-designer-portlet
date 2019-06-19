@@ -107,8 +107,8 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
 
   // local
   ///*
-  private String tmpPath = "/home/spaethju/Downloads/qbicdatasets201904030434/";
-  private String homePath = "/home/spaethju/Downloads/qbicdatasets201904030434/";
+  private String tmpPath = "/home/spaethju/Downloads/";
+  private String homePath = "/home/spaethju/Downloads/";
   private String tmpPathRemote = "/home/jspaeth/";
   private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
   private String sshKey = "key_rsa";
@@ -686,7 +686,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
   private void processingData(File file) throws Exception {
 
     try {
-      EpitopePredictionFileHelper.compareFileHeaderWithColumns(file, uploadPanel);
+      EpitopePredictionFileHelper.compareFileHeaderWithColumns(file, uploadPanel, uploadPanel.getHlaAsColumns());
     } catch (Exception e) {
       return;
     }
@@ -697,7 +697,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
           uploadPanel.getImmColTf().getValue(), uploadPanel.getTaaColTf().getValue(),
           uploadPanel.getUncertaintyColTf().getValue(), uploadPanel.getDistanceColTf().getValue(),
-          uploadPanel.getTranscriptExpressionColTf().getValue(), uploadPanel.getAlleles());
+          uploadPanel.getTranscriptExpressionColTf().getValue(), new ArrayList<>(uploadPanel.getAlleles().values()));
 //            if (!parser.checkAlleles(uploadPanel.getAlleles())){
 //                throw new AllelesException("Allele files do not fit to the uploaded epitope prediction file.");
 //            }
@@ -714,7 +714,7 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
       } else {
         epitopeSelectionPanel.addTypeFilter();
       }
-    } else if (uploadPanel.getHlaAsColumns()) {
+    } else {
       ParserInputAllelesAsColumns parser = new ParserInputAllelesAsColumns();
       parser.parse(file, uploadPanel.getMethodColTf().getValue(),
           uploadPanel.getTaaColTf().getValue(),

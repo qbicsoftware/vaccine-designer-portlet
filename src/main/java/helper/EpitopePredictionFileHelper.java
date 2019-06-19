@@ -7,7 +7,6 @@ import view.panel.PanelUpload;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class EpitopePredictionFileHelper {
@@ -46,7 +45,7 @@ public class EpitopePredictionFileHelper {
     }
 
 
-    public static void compareFileHeaderWithColumns(File file, PanelUpload uploadPanel) throws Exception {
+    public static void compareFileHeaderWithColumns(File file, PanelUpload uploadPanel, Boolean isColumn) throws Exception {
 
         String[] header = readHeader(file);
 
@@ -56,12 +55,15 @@ public class EpitopePredictionFileHelper {
         isStringInHeader(header, expressionColumn);
         String taaColumn = uploadPanel.getTaaColTf().getValue();
         isStringInHeader(header, taaColumn);
-        String distanceColumn = uploadPanel.getDistanceColTf().getValue();
-        isStringInHeader(header, distanceColumn);
-        String uncertaintyColumn = uploadPanel.getUncertaintyColTf().getValue();
-        isStringInHeader(header, uncertaintyColumn);
-        String immColumn = uploadPanel.getImmColTf().getValue();
-        isStringInHeader(header, immColumn);
+
+        if (!isColumn) {
+            String distanceColumn = uploadPanel.getDistanceColTf().getValue();
+            isStringInHeader(header, distanceColumn);
+            String uncertaintyColumn = uploadPanel.getUncertaintyColTf().getValue();
+            isStringInHeader(header, uncertaintyColumn);
+            String immColumn = uploadPanel.getImmColTf().getValue();
+            isStringInHeader(header, immColumn);
+        }
 
         if (uploadPanel.getHlaAsColumns()) {
             compareFileHeaderWithAlleles(file, uploadPanel);

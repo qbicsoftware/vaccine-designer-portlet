@@ -111,7 +111,6 @@ public class ParserInputAllelesAsColumns {
 
     // for each tab separated header set the corresponding field to the counters value and set
     // counter + 1
-    System.out.println(alleles.toString());
     for (String h : headers) {
       h.trim();
       h.replace("HLA-", "");

@@ -234,8 +234,6 @@ public class PanelUpload extends CustomComponent {
             alleles.put("B2", hlaB2TF.getValue().replace("HLA-", ""));
             alleles.put("C1", hlaC1TF.getValue().replace("HLA-", ""));
             alleles.put("C2", hlaC2TF.getValue().replace("HLA-", ""));
-          } else {
-            Utils.notification("Error", dh.getUploadData_hlaValidatorDescription(), "error");
           }
           allele_expressions.put("A", hlaAEVTF.getValue());
           allele_expressions.put("B", hlaBEVTF.getValue());
@@ -294,14 +292,14 @@ public class PanelUpload extends CustomComponent {
     transcriptExpressionColTf = new TextField("Transcript Expression Column");
     transcriptExpressionColTf.setStyleName("padded");
     transcriptExpressionColTf.setImmediate(true);
-    transcriptExpressionColTf.setValue("");
+    transcriptExpressionColTf.setValue("transcript_expression");
     transcriptExpressionColTf.setDescription(dh.getUploadData_columnTranscriptExpression());
 
     // immunogenicity column
     immColTf = new TextField("Immunogenicity Column");
     immColTf.setStyleName("padded");
     immColTf.setImmediate(true);
-    immColTf.setValue("");
+    immColTf.setValue("HLA_class1_binding_prediction");
     immColTf.setDescription(dh.getUploadData_columnImm());
     immColTf.addValidator(new StringLengthValidator("Please enter a column name", 1, 100, true));
     immColTf.setRequired(true);
@@ -349,13 +347,12 @@ public class PanelUpload extends CustomComponent {
     hlaA1TF = new TextField();
     hlaA1TF.setStyleName("padded");
     hlaA1TF.setImmediate(true);
-    hlaA1TF.setValue("A*01:01");
+    hlaA1TF.setValue("A*03:01");
     hlaA1TF.setDescription("HLA-A Allele");
-    hlaA1TF.setInvalidAllowed(false);
     hlaA2TF = new TextField();
     hlaA2TF.setStyleName("padded");
     hlaA2TF.setImmediate(true);
-    hlaA2TF.setValue("A*25:01");
+    hlaA2TF.setValue("A*68:02");
     hlaA2TF.setDescription("HLA-A Allele");
     hlaAEVTF = new TextField("HLA-A expression");
     hlaAEVTF.setStyleName("padded");
@@ -382,13 +379,13 @@ public class PanelUpload extends CustomComponent {
     hlaB1TF = new TextField();
     hlaB1TF.setStyleName("padded");
     hlaB1TF.setImmediate(true);
-    hlaB1TF.setValue("B*08:01");
+    hlaB1TF.setValue("B*07:02");
     hlaB1TF.setDescription("HLA-B Allele");
     hlaB1TF.setInvalidAllowed(false);
     hlaB2TF = new TextField();
     hlaB2TF.setStyleName("padded");
     hlaB2TF.setImmediate(true);
-    hlaB2TF.setValue("B*18:01");
+    hlaB2TF.setValue("");
     hlaB2TF.setDescription("HLA-B Allele");
     hlaBEVTF = new TextField("HLA-B expression");
     hlaBEVTF.setStyleName("padded");
@@ -414,13 +411,13 @@ public class PanelUpload extends CustomComponent {
     hlaC1TF = new TextField();
     hlaC1TF.setStyleName("padded");
     hlaC1TF.setImmediate(true);
-    hlaC1TF.setValue("C*07:01");
+    hlaC1TF.setValue("C*68:02");
     hlaC1TF.setDescription("HLA-C Allele");
     hlaC1TF.setInvalidAllowed(false);
     hlaC2TF = new TextField();
     hlaC2TF.setStyleName("padded");
     hlaC2TF.setImmediate(true);
-    hlaC2TF.setValue("C*12:03");
+    hlaC2TF.setValue("");
     hlaC2TF.setDescription("HLA-C Allele");
     hlaCEVTF = new TextField("HLA-C expression");
     hlaCEVTF.setStyleName("padded");
