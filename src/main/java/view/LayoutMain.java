@@ -105,20 +105,16 @@ public class LayoutMain extends VerticalLayout implements SucceededListener {
     private FileDownloader downloader;
 
     // local
-  /*
-  private String tmpPath = "/home/spaethju/Downloads/";
-  private String homePath = "/home/spaethju/Downloads/";
-  private String tmpPathRemote = "/home/jspaeth/";
-  private String epitopeSelectorVM = "jspaeth@qbic-epitopeselector.am10.uni-tuebingen.de";
-  private String sshKey = "key_rsa";
-  private String epitopeSelectorContainer = "epitopeselector.img";
-  private String cbcPath = "/root/COIN/bin/";
-    */
+
+//  private String tmpPath = "/home/spaethju/Downloads/";
+//  private String homePath = "/home/spaethju/Downloads/";
+//  private String tmpPathRemote = "/home/jspaeth/";
+
 
     // testing
-    private String tmpPath = "/tmp/";
-    private String homePath = "/home/luser/";
-    private String tmpPathRemote = "/home/jspaeth/";
+     private String tmpPath = "/tmp/";
+     private String homePath = "/home/luser/";
+     private String tmpPathRemote = "/home/jspaeth/";
 
     // production
     // private String tmpPath = "/tmp/";

@@ -411,7 +411,7 @@ public class PanelUpload extends CustomComponent {
     hlaC1TF = new TextField();
     hlaC1TF.setStyleName("padded");
     hlaC1TF.setImmediate(true);
-    hlaC1TF.setValue("C*67:01");
+    hlaC1TF.setValue("C*07:01");
     hlaC1TF.setDescription("HLA-C Allele");
     hlaC1TF.setInvalidAllowed(false);
     hlaC2TF = new TextField();

@@ -170,6 +170,19 @@ public class WriterScriptInput {
      */
     public String setAlleleRow(HashMap<String, String> alleles,
                                HashMap<String, String> allele_expressions) {
+        if (alleles.get("A1").isEmpty() || alleles.get("A1") == null)
+            alleles.put("A1", alleles.get("A2"));
+        if (alleles.get("A2").isEmpty() || alleles.get("A2") == null)
+            alleles.put("A2", alleles.get("A1"));
+        if (alleles.get("B1").isEmpty() || alleles.get("B1") == null)
+            alleles.put("B1", alleles.get("B2"));
+        if (alleles.get("B2").isEmpty() || alleles.get("B2") == null)
+            alleles.put("B2", alleles.get("B1"));
+        if (alleles.get("C1").isEmpty() || alleles.get("C1") == null)
+            alleles.put("C1", alleles.get("C2"));
+        if (alleles.get("C2").isEmpty() || alleles.get("C2") == null)
+            alleles.put("C2", alleles.get("C1"));
+
         String alleleString = alleles.get("A1") + "\t" +
                 alleles.get("A2") + "\t" +
                 alleles.get("B1") + "\t" +
