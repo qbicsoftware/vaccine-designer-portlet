@@ -278,7 +278,7 @@ public class PanelUpload extends CustomComponent {
     methodColTf = new TextField("Method Column");
     methodColTf.setStyleName("padded");
     methodColTf.setImmediate(true);
-    methodColTf.setValue("");
+    methodColTf.setValue("method");
     methodColTf.setDescription(dh.getUploadData_columnMethod());
 
     // taa column
@@ -292,7 +292,7 @@ public class PanelUpload extends CustomComponent {
     transcriptExpressionColTf = new TextField("Transcript Expression Column");
     transcriptExpressionColTf.setStyleName("padded");
     transcriptExpressionColTf.setImmediate(true);
-    transcriptExpressionColTf.setValue("transcript_expression");
+    transcriptExpressionColTf.setValue("RNA expression (RPKM)");
     transcriptExpressionColTf.setDescription(dh.getUploadData_columnTranscriptExpression());
 
     // immunogenicity column
