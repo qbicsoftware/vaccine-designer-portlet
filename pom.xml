@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>life.qbic</groupId>
     <artifactId>vaccinedesigner</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <name>Vaccine Designer</name>
 
     <properties>
@@ -12,20 +12,16 @@
         <jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <vaadin.version>7.7.8</vaadin.version>
-        <vaadin.plugin.version>7.7.8</vaadin.plugin.version>
+        <vaadin.version>7.7.24</vaadin.version>
+        <vaadin.plugin.version>7.7.24</vaadin.plugin.version>
         <liferay.version>6.2.5</liferay.version>
         <liferay.maven.plugin.version>6.2.5</liferay.maven.plugin.version>
+        <log4j.version>2.15.0</log4j.version>
     </properties>
     <repositories>
         <repository>
             <id>liferay-releases</id>
             <url>https://repository.liferay.com/nexus/content/repositories/liferay-public-releases/com/liferay/portal/</url>
-        </repository>
-        <!-- vaadin repos -->
-        <repository>
-            <id>vaadin-addons</id>
-            <url>http://maven.vaadin.com/vaadin-addons</url>
         </repository>
         <repository>
             <id>nexus-snap</id>
@@ -36,6 +32,15 @@
             <id>nexus-release</id>
             <name>qbic release</name>
             <url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-releases</url>
+        </repository>
+        <!-- vaadin repos -->
+        <repository>
+            <id>vaadin-addons</id>
+            <url>https://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+        <repository>
+            <id>maven-central-plugins</id>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 
@@ -76,18 +81,28 @@
         </dependencies>
     </dependencyManagement>
 
-
-
     <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
 
         <!-- Vaadin dependencies -->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-server</artifactId>
+            <version>${vaadin.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client-compiled</artifactId>
+            <version>${vaadin.version}</version>
         </dependency>
         <!-- Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
             For widgetset compilation, vaadin-client-compiler is automatically added
@@ -98,12 +113,14 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client</artifactId>
+            <version>${vaadin.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-themes</artifactId>
+            <version>${vaadin.version}</version>
         </dependency>
 
         <!-- Liferay dependencies -->
