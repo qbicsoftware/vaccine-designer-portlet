@@ -114,7 +114,7 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client</artifactId>
             <version>${vaadin.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -129,14 +129,14 @@
             <groupId>javax.portlet</groupId>
             <artifactId>portlet-api</artifactId>
             <version>2.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -144,7 +144,7 @@
             <artifactId>portal-service</artifactId>
             <version>${liferay.version}</version>
             <!-- compile for local testing - provided for liferay -->
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -152,7 +152,7 @@
             <artifactId>util-java</artifactId>
             <version>${liferay.version}</version>
             <!-- compile for local testing - provided for liferay -->
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
