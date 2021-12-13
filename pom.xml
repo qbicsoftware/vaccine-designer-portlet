@@ -12,8 +12,8 @@
         <jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <vaadin.version>7.7.24</vaadin.version>
-        <vaadin.plugin.version>7.7.24</vaadin.plugin.version>
+        <vaadin.version>7.7.28</vaadin.version>
+        <vaadin.plugin.version>7.7.28</vaadin.plugin.version>
         <liferay.version>6.2.5</liferay.version>
         <liferay.maven.plugin.version>6.2.5</liferay.maven.plugin.version>
         <log4j.version>2.15.0</log4j.version>
